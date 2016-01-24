@@ -54,6 +54,7 @@ input[type="file"] {
 }
 
 </style>
+<title>無題</title>
 </head>
 <body>
 <nav>
@@ -148,6 +149,7 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 	
 	
 	/* ファイル添付 */
+	// ★複数添付した時にファイル名がおかしい
 	$("#attachButton").on("change", function(e) {
 		var elem = e.target;
 	    var files = elem.files;
@@ -202,7 +204,21 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 	});
 	
 	/* 保存 */
-	$("#saveButton").on("click",function(){
+	$("#saveButton").on("click", save);
+	
+	$(window).keydown(function(event) {	
+		// CTRL+Sで保存する
+		var code = (event.keyCode ? event.keyCode : event.which);
+		if (code != 83 || !event.ctrlKey){
+			return true;
+		}
+		event.preventDefault();
+		save();
+		
+		return false;
+	});
+	
+	function save() {
 		// テキストエリアのvalをhtmlに吐いてやらないと保存されない。
 		$("#editor").html($("#editor").val());
 		
@@ -219,7 +235,7 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 		a.href = blobURL;
 		a.click();
 		saved = true;
-	});
+	}
 	
 	/* 更新時、終了時の警告 */
 	var saved = true;
@@ -228,8 +244,6 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 			return "ドキュメントが保存されていません。"
 		}
 	}
-	
-	// ★保存のショートカットキー
 	
 })(jQuery);
 </script>
