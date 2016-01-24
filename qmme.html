@@ -148,10 +148,31 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 	
 	
 	/* ファイル添付 */
-	$("#attachButton").on("change", attachFile);
-	function attachFile(e){
+	$("#attachButton").on("change", function(e) {
 		var elem = e.target;
 	    var files = elem.files;
+	    attachFiles(files);
+	});
+	
+	$("body").on('dragover', function(e) {
+		e.stopPropagation();
+		e.preventDefault();
+		e.originalEvent.dataTransfer.dropEffect = 'copy';
+		
+		$(this).css("border", "5px dashed #99cde1");
+	});
+	$("body").on('drop', function(e) {
+		e.stopPropagation();
+    	e.preventDefault();
+    	attachFiles(e.originalEvent.dataTransfer.files);
+    	$(this).css("border", "0");
+	});
+	
+	$("body").on("dragleave", function() {
+		$(this).css("border", "0");
+	});
+	
+	function attachFiles(files){
 	    for (var i = 0; i < files.length; i++) {
 		    var fr = new FileReader();
 		    fr.onload = function(e) {
@@ -199,8 +220,6 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 		a.click();
 		saved = true;
 	});
-	
-	// ★ファイルのドラッグアンドドロップ
 	
 	/* 更新時、終了時の警告 */
 	var saved = true;
