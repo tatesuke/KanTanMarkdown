@@ -225,16 +225,21 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 		var html = "<!doctype html>\n<html>\n";
 		html += $("html").html();
 		html += "\n</html>";
-		
-		var blob = new Blob([html]);
-		var url = window.URL || window.webkitURL;
-		var blobURL = url.createObjectURL(blob);
 
-		var a = document.createElement('a');
-		a.download = document.title + ".html";
-		a.href = blobURL;
-		a.click();
-		saved = true;
+		var blob = new Blob([html]);
+		if (window.navigator.msSaveBlob) {
+			/* for IE */
+			window.navigator.msSaveBlob(blob, document.title + ".html");
+		} else {
+			var url = window.URL || window.webkitURL;		
+			var blobURL = url.createObjectURL(blob);
+			var a = document.createElement('a');
+			a.download = document.title + ".html";
+			a.href = blobURL;
+			a.click();
+			saved = true;
+		}
+		
 	}
 	
 	/* 更新時、終了時の警告 */
