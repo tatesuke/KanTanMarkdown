@@ -439,7 +439,9 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 		    	var target = e.target;
 		    	var name = target.fileName;
 		    	var script = '<script type="text/template" id="' + name + '">' + target.result + '<' + '/script>'; 
-				$("#fileList").append('<li>' + script + '<input type="text" class="fileName" value="' + name +'"><button class="detachButton">×</button></li>');
+				$("#fileList").append('<li>' + script + '<input type="text" class="fileName"><button class="detachButton">×</button></li>');
+				// なぜかinputタグのvale属性の変更が保存されないので動的に変更する
+				$("#fileList :last-child input").each(function(){$(this).val(name);});
 				queuePreview();
 			}
 			
@@ -454,12 +456,19 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 	});
 	
 	/* ファイル名変更 */
+	$(".fileName").each(function(){
+		// なぜかvale属性の変更が保存されないので起動時に引っ張ってきてやる
+		var fileName = $(this).prev("script").attr("id");
+		$(this).val(fileName);
+	});
+	
 	$(document).on("change", ".fileName", function(){
 		if ($(this).val().trim() == "") {
 			alert("名前は必ず入力してください");
 			$(this).focus();
 		} else {
 			$(this).prev("script").attr("id", $(this).val());
+			queuePreview();
 		}
 	});
 	
@@ -479,13 +488,13 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 	});
 	
 	function save() {
-				var toggleFlag = $("#editor").is(":visible");
+		// テキストエリアは値を入れなおさないと保存されない。
+		$("#editor").html($("#editor").val());
+	
+		var toggleFlag = $("#editor").is(":visible");
 		if (toggleFlag == true) {
 			toggleMode();
 		}
-		
-		// テキストエリアのvalをhtmlに吐いてやらないと保存されない。
-		$("#editor").html($("#editor").val());
 		
 		var html = "<!doctype html>\n<html>\n";
 		html += $("html").html();
