@@ -1,2 +1,2 @@
-# QMMEditor
-QMMEditor is Quine Mitaina Markdown Editor
+# かんたんMarkdown
+かんたんMarkdownは完全に単一のHTMLファイルで動作するMarkdownエディタ・プレビューアです。
