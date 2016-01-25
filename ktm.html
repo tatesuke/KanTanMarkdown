@@ -479,6 +479,11 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 	});
 	
 	function save() {
+				var toggleFlag = $("#editor").is(":visible");
+		if (toggleFlag == true) {
+			toggleMode();
+		}
+		
 		// テキストエリアのvalをhtmlに吐いてやらないと保存されない。
 		$("#editor").html($("#editor").val());
 		
@@ -486,9 +491,7 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 		html += $("html").html();
 		html += "\n</html>";
 
-		if ($("#editor").is(":visible")) {
-			toggleMode();
-		}
+		
 
 		var blob = new Blob([html]);
 		if (window.navigator.msSaveBlob) {
@@ -502,6 +505,10 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 			a.href = blobURL;
 			a.click();
 			saved = true;
+		}
+		
+		if (toggleFlag == true) {
+			toggleMode();
 		}
 	}
 	
