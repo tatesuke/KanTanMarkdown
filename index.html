@@ -486,8 +486,7 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 		html += $("html").html();
 		html += "\n</html>";
 
-		var toggleFlag = $("#editor").is(":visible");
-		if (toggleFlag == true) {
+		if ($("#editor").is(":visible")) {
 			toggleMode();
 		}
 
@@ -503,10 +502,6 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 			a.href = blobURL;
 			a.click();
 			saved = true;
-		}
-		
-		if (toggleFlag == true) {
-			toggleMode();
 		}
 	}
 	
