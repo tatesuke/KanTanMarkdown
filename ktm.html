@@ -4,11 +4,18 @@
 <meta charset="utf-8">
 <style>
 body {
-	padding:10px;
+	margin: 0;
+	padding: 0;
 }
+nav {
+	margint:0;
+	text-align : right;
+}
+
 #attach {
 	width:100%;
-	border:1px dashed gray;
+	border-top:1px solid gray;
+	border-bottom:1px solid gray;
 }
 #attachForm {
 	box-sizing:border-box;
@@ -33,6 +40,7 @@ input[type="file"] {
 	width:50%;
 	height:100%;
 	float:left;
+	border-top:none;
 }
 
 #previewer {
@@ -41,7 +49,6 @@ input[type="file"] {
 	height:100%;
 	overflow:auto;
 	float:left;
-	border:1px solid red;
 }
 
 #previer:after {
@@ -58,7 +65,7 @@ input[type="file"] {
 </head>
 <body>
 <nav>
-	<button id="toggleButton">編集/閲覧</button><button id="saveButton">save</button>
+	<button id="toggleButton">編集/閲覧</button><button id="saveButton">保存</button>
 </nav>
 <div id="attach">
 	<form id="attachForm"><input type="file" id="attachButton" multiple multiple></form>
@@ -94,7 +101,7 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 	$(window).on("resize", doLayout);
 	$("#filer").on("resize", doLayout);
 	function doLayout() {
-		$("#wrapper").height($(window).height() - $("#wrapper").offset().top - 20);
+		$("#wrapper").height($(window).height() - $("#wrapper").offset().top - 10);
 		
 		if ($("#editor").is(':visible')) {
 			$("#previewer").css("width", "50%");
@@ -149,7 +156,6 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 	
 	
 	/* ファイル添付 */
-	// ★複数添付した時にファイル名がおかしい
 	$("#attachButton").on("change", function(e) {
 		var elem = e.target;
 	    var files = elem.files;
@@ -167,7 +173,7 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 		e.stopPropagation();
     	e.preventDefault();
     	attachFiles(e.originalEvent.dataTransfer.files);
-    	$(this).css("border", "0");
+    	$(this).css("border", "0"); // ★クラスの付け替えにしたほうがいい
 	});
 	
 	$("body").on("dragleave", function() {
@@ -177,9 +183,12 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 	function attachFiles(files){
 	    for (var i = 0; i < files.length; i++) {
 		    var fr = new FileReader();
+		    
 		    fr.onload = function(e) {
-		    	var script = '<script type="text/template" id="' + fr.fileName + '">' + fr.result + '<' + '/script>'; 
-				$("#fileList").append('<li>' + script + '<input type="text" class="fileName" value="' + fr.fileName +'"><button class="detachButton">×</button></li>');
+		    	var target = e.target;
+		    	var name = target.fileName;
+		    	var script = '<script type="text/template" id="' + name + '">' + target.result + '<' + '/script>'; 
+				$("#fileList").append('<li>' + script + '<input type="text" class="fileName" value="' + name +'"><button class="detachButton">×</button></li>');
 				queuePreview();
 			}
 			
