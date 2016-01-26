@@ -48,6 +48,9 @@ input[type="file"] {
 	float:left;
 	border-top:none;
 	display:none;
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
 }
 
 #previewer {
@@ -545,6 +548,20 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 			return "ドキュメントが保存されていません。"
 		}
 	}
+	
+	/* tabキーでtabを入力 */
+	$("#editor").on('keydown', function(e) {
+		// tabキー押下時の対応
+		if (e.which == 9 || e.keyCode == 9) {
+			e.preventDefault();
+			var pos = this.selectionStart;
+			var text = $(this).val();
+			// tabの挿入
+			$(this).val(text.substr(0,pos) + '\t' + text.substr(pos, text.length));
+			// カーソルの場所を移動
+			this.setSelectionRange(pos + 1, pos + 1);
+		}
+	});
 	
 })(jQuery);
 </script>
