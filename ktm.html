@@ -501,9 +501,9 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 		
 		var html = "<!doctype html>\n<html>\n";
 		html += $("html").html();
-		var i = html.lastIndexOf("</body>") - 1; // bug fix #1
-		html = html.substring(0, i);
-		html += "</body>\n</html>";
+		html += "\n</html>";
+
+		
 
 		var blob = new Blob([html]);
 		if (window.navigator.msSaveBlob) {
@@ -516,8 +516,8 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 			a.download = document.title + ".html";
 			a.href = blobURL;
 			a.click();
+			saved = true;
 		}
-		saved = true;
 		
 		if (toggleFlag == true) {
 			toggleMode();
