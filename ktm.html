@@ -12,6 +12,11 @@ body {
 	margin: 0;
 	padding: 0;
 }
+
+.onDragover {
+	border : 5px dashed #99cde1;
+}
+
 nav {
 	margint:0;
 	text-align : right;
@@ -438,17 +443,17 @@ n.cssHooks[b]=Ua(l.pixelPosition,function(a,c){return c?(c=Sa(a,b),Oa.test(c)?n(
 		e.preventDefault();
 		e.originalEvent.dataTransfer.dropEffect = 'copy';
 		
-		$(this).css("border", "5px dashed #99cde1");
+		$(this).addClass("onDragover");
 	});
 	$("body").on('drop', function(e) {
 		e.stopPropagation();
     	e.preventDefault();
     	attachFiles(e.originalEvent.dataTransfer.files);
-    	$(this).css("border", "0"); // ★クラスの付け替えにしたほうがいい
+    	$(this).removeClass("onDragover");
 	});
 	
 	$("body").on("dragleave", function() {
-		$(this).css("border", "0");
+		$(this).removeClass("onDragover");
 	});
 	
 	function attachFiles(files){
