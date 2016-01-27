@@ -538,11 +538,6 @@ k:{keyword:"abort abs absolute acc acce accep accept access accessed accessible 
 		var previewer = document.getElementById("previewer");
 		previewer.innerHTML = marked(editor.value);
 		
-		// スクロールバーが最下部にある場合、更新後も最下部にする。
-		if (isMaxScroll) {
-			$("#previewer")[0].scrollTop = $("#previewer")[0].scrollHeight;
-		}
-		
 		// 画像埋め込み
 		var images = document.getElementsByTagName("img");
 		for (i in images) {
@@ -551,6 +546,11 @@ k:{keyword:"abort abs absolute acc acce accep accept access accessed accessible 
 			if (img != null) {
 				elem.src = img.innerHTML;
 			}
+		}
+		
+		// スクロールバーが最下部にある場合、更新後も最下部にする。
+		if (isMaxScroll) {
+			$("#previewer")[0].scrollTop = $("#previewer")[0].scrollHeight;
 		}
 		
 		saved = false;
