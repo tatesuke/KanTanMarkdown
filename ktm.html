@@ -589,7 +589,9 @@ k:{keyword:"abort abs absolute acc acce accep accept access accessed accessible 
 	
 	/* ファイル削除 */
 	$(document).on("click", ".detachButton", function(){
-		$(this).closest("li").remove();
+		if(window.confirm('削除していいですか?')){
+			$(this).closest("li").remove();
+		}
 	});
 	
 	/* ファイル名変更 */
