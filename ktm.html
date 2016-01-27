@@ -540,7 +540,7 @@ k:{keyword:"abort abs absolute acc acce accep accept access accessed accessible 
 		
 		// スクロールバーが最下部にある場合、更新後も最下部にする。
 		if (isMaxScroll) {
-			$("#previewer")[0].scrollTop = Number.MAX_VALUE;
+			$("#previewer")[0].scrollTop = $("#previewer")[0].scrollHeight;
 		}
 		
 		// 画像埋め込み
