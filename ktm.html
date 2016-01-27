@@ -516,8 +516,8 @@ k:{keyword:"abort abs absolute acc acce accep accept access accessed accessible 
 	}
 	
 	marked.setOptions({
-		highlight: function (code) {
-			return hljs.highlightAuto(code).value;
+		highlight: function (code, lang) {
+			return hljs.highlightAuto(code, [lang]).value;
 		}
 	});
 	
