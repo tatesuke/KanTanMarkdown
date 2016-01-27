@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <!--
- * KanTanMarkdown v1.20160127.02
+ * KanTanMarkdown v1.20160127.03
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
@@ -540,7 +540,7 @@ k:{keyword:"abort abs absolute acc acce accep accept access accessed accessible 
 		
 		// スクロールバーが最下部にある場合、更新後も最下部にする。
 		if (isMaxScroll) {
-			$("#previewer")[0].scrollTop = $("#previewer")[0].scrollHeight - $("#previewer")[0].offsetHeight;
+			$("#previewer")[0].scrollTop = Number.MAX_VALUE;
 		}
 		
 		// 画像埋め込み
