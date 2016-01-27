@@ -604,7 +604,7 @@ k:{keyword:"abort abs absolute acc acce accep accept access accessed accessible 
 			alert("名前は必ず入力してください");
 			$(this).focus();
 		} else {
-			$(this).prev("script").attr("title", $(this).val());
+			$(this).prev("script").attr("id", "attach-" + $(this).val()).attr("title", $(this).val());
 			queuePreview();
 		}
 	});
