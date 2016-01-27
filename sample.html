@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <!--
- * KanTanMarkdown v1.20160127.02
+ * KanTanMarkdown v1.20160127.03
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
@@ -425,7 +425,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 
 <title>Javaによる開発の流れ</title>
 </head>
-<body class="">
+<body>
 <nav>
 	<button id="toggleButton">編集/閲覧</button><button id="saveButton">保存</button>
 </nav>
@@ -437,7 +437,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 </ul>
 	</div>
 </div>
-<div id="wrapper" style="height: 868px;">
+<div id="wrapper" style="height: 920px;">
 	<textarea id="editor" style="display: none;"># Javaによる開発の流れ
 
 ## 開発環境構築
@@ -656,7 +656,7 @@ k:{keyword:"abort abs absolute acc acce accep accept access accessed accessible 
 		
 		// スクロールバーが最下部にある場合、更新後も最下部にする。
 		if (isMaxScroll) {
-			$("#previewer")[0].scrollTop = $("#previewer")[0].scrollHeight - $("#previewer")[0].offsetHeight;
+			$("#previewer")[0].scrollTop = $("#previewer")[0].scrollHeight;
 		}
 		
 		// 画像埋め込み
