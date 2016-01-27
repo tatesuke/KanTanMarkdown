@@ -526,10 +526,24 @@ k:{keyword:"abort abs absolute acc acce accep accept access accessed accessible 
 		if(h1.length != 0) {
 			document.title = h1.text();
 		}
+	
+		var isMaxScroll = false;
+		var scrollHeight = $("#previewer")[0].scrollHeight;
+		var offsetHeight = $("#previewer")[0].offsetHeight;
+		var scrollTop = $("#previewer")[0].scrollTop;
+		if ((scrollTop + offsetHeight) == scrollHeight) {
+			isMaxScroll = true;
+		}
 		
 		var previewer = document.getElementById("previewer");
 		previewer.innerHTML = marked(editor.value);
 		
+		// スクロールバーが最下部にある場合、更新後も最下部にする。
+		if (isMaxScroll) {
+			$("#previewer")[0].scrollTop = $("#previewer")[0].scrollHeight - $("#previewer")[0].offsetHeight;
+		}
+		
+		// 画像埋め込み
 		var images = document.getElementsByTagName("img");
 		for (i in images) {
 			var elem = images[i];
