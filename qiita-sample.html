@@ -726,8 +726,11 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		var isMaxScroll = false;
 		var scrollHeight = $("#previewer")[0].scrollHeight;
 		var offsetHeight = $("#previewer")[0].offsetHeight;
+		var borderTop = Number($("#previewer").css('border-top-width').replace(/px/, ""));
+		var borderBottom = Number($("#previewer").css('border-bottom-width').replace(/px/, ""));
+		var borderHeight = borderTop + borderBottom;
 		var scrollTop = $("#previewer")[0].scrollTop;
-		if ((scrollTop + offsetHeight) == scrollHeight) {
+		if ((scrollTop + offsetHeight - borderHeight) == scrollHeight) {
 			isMaxScroll = true;
 		}
 		
