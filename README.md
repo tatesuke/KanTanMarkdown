@@ -21,6 +21,17 @@
 http://tatesuke.github.io/KanTanMarkdown/
 
 ## リリースノート
+
+### v1.20160128_01
+
+#### 改善
+* h1がなくなった時のタイトルを[無題]にした
+
+#### 機能追加
+* info, warn, alertクラスを使うことで、青、黃色、赤枠を使えるようにした
+* sequenceクラス,flowクラスを使うことでjs-sequence-diagramsとflowchart.jsを利用できるようにした
+
+
 ### v1.20160127_03
 
 #### バグ修正
