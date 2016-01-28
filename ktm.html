@@ -561,6 +561,8 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		var h1 = $("h1:first");
 		if(h1.length != 0) {
 			document.title = h1.text();
+		} else {
+			document.title = "無題";
 		}
 	
 		// スクロールバー位置判定
