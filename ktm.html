@@ -45,6 +45,10 @@ input[type="file"] {
 	overflow: auto;
 }
 
+#wrapper {
+	overflow: auto;
+}
+
 #editor {
 	box-sizing:border-box;
 	resize:none; 
@@ -56,17 +60,22 @@ input[type="file"] {
 	-moz-tab-size: 4;
 	-o-tab-size: 4;
 	tab-size: 4;
+	border:1px solid gray;
 }
 
 #previewer {
 	box-sizing:border-box;
 	width:100%;
-	height:100%;
+	margin: 0 auto;
 	overflow:auto;
-	float:left;
+	border:1px solid gray;
 }
 
-#previer:after {
+#previewer:empty {
+	border: 0;
+}
+
+#previewer:after {
 	content: "."; 
 	display: block; 
 	height: 0; 
@@ -549,8 +558,10 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		
 		if ($("#editor").is(':visible')) {
 			$("#previewer").css("width", "50%");
+			$("#previewer").css("height", "100%");
 		} else {
-			$("#previewer").css("width", "100%");
+			$("#previewer").css("width", "980px");
+			$("#previewer").css("height", "");
 		}
 	}
 	
