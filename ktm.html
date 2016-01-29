@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <!--
- * KanTanMarkdown v1.20160128.03
+ * KanTanMarkdown v1.20160129.01
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
@@ -483,7 +483,8 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 </head>
 <body>
 <nav>
-	<button id="toggleButton">編集/閲覧</button><button id="saveButton">保存</button>
+	<input type="checkbox" id="autoSyncButton" name="autoSyncButton" checked="checked"><label for="autoSyncButton">自動同期</label>
+	<button id="syncButton">同期(F5)</button><button id="toggleButton">編集/閲覧</button><button id="saveButton">保存(Ctrl+S)</button>
 </nav>
 <div id="attach">
 	<form id="attachForm"><input type="file" id="attachButton" multiple multiple></form>
@@ -583,22 +584,56 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	}
 	
 	/* 編集・閲覧切り替え */
+	var editorScrollBarPos = 0;
+	var previewerScrollBarPos = 0;
 	$("#toggleButton").on("click", toggleMode);
 	
 	function toggleMode() {
+		if ($("#editor").is(":visible")) {
+			editorScrollBarPos    = $("#editor")[0].scrollTop;
+			previewerScrollBarPos = $("#previewer")[0].scrollTop;
+		}
+	
 		$("#attach").toggle();
 		$("#editor").toggle();
+		
+		doPreview();
 		doLayout();
+		
+		if ($("#editor").is(":visible")) {
+			$("#editor")[0].scrollTop    = editorScrollBarPos;
+			$("#previewer")[0].scrollTop = previewerScrollBarPos;
+		}
 	}
 	
-	
 	/* エディタとプレビューの同期 */
-	$("#editor").on("change", queuePreview)
-			.on("keyup", queuePreview);
 	
+	// 自動同期チェックボックスをクリックしたらchecked属性を更新する
+	// これを行わないと自動同期チェックボックスの状態が保存されない
+	$("#autoSyncButton").on("change", function(){
+		if ($(this).is(":checked")) {
+			$(this).attr("checked", "checked");
+		} else {
+			$(this).removeAttr("checked");
+		}
+	});
+	
+	//更新ボタンを押したら更新する 
+	$("#syncButton").on("click", doPreview);
+	
+	// エディタに変化があったらプレビュー予約
+	$("#editor").on("change", queuePreview)
+			.on("keyup",  queuePreview);
+	
+	// 自動更新がONならプレビューする
+	// ただし、onkeyupなど呼ばれる頻度が高いので一定時間待って最後の呼び出しのみ実行する
 	var queue = null, // キューをストック 
 	wait = 300; // 0.3秒後に実行の場合 
 	function queuePreview() {
+		if (!$("#autoSyncButton").is(":checked")) {
+			return;
+		}
+	
 		// イベント発生の都度、キューをキャンセル 
 		clearTimeout( queue );
 		 
@@ -608,12 +643,14 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		queue = setTimeout(doPreview, wait);
 	}
 	
+	// コードハイライト
 	marked.setOptions({
 		highlight: function (code, lang) {
 			return hljs.highlightAuto(code, [lang]).value;
 		}
 	});
 	
+	// 同期実行
 	function doPreview() {
 		// タイトル変更
 		var h1 = $("h1:first");
@@ -739,18 +776,6 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	/* 保存 */
 	$("#saveButton").on("click", save);
 	
-	$(window).keydown(function(event) {	
-		// CTRL+Sで保存する
-		var code = (event.keyCode ? event.keyCode : event.which);
-		if (code != 83 || !event.ctrlKey){
-			return true;
-		}
-		event.preventDefault();
-		save();
-		
-		return false;
-	});
-	
 	function save() {
 		// テキストエリアは値を入れなおさないと保存されない。
 		$("#editor").html($("#editor").val());
@@ -762,9 +787,9 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		
 		var html = "<!doctype html>\n<html>\n";
 		html += $("html").html();
-		var i = html.lastIndexOf("</body>") - 1; // bug fix #1
+		var i = html.lastIndexOf("/script>"); // bug fix #1 #39
 		html = html.substring(0, i);
-		html += "</body>\n</html>";
+		html += "/script>\n</body>\n</html>";
 
 		var blob = new Blob([html]);
 		if (window.navigator.msSaveBlob) {
@@ -805,6 +830,29 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			// カーソルの場所を移動
 			this.setSelectionRange(pos + 1, pos + 1);
 		}
+	});
+	
+	/* ショートカットキー */
+	$(window).keydown(function(event) {	
+		var code = (event.keyCode ? event.keyCode : event.which);
+		
+		if (code == 83 && event.ctrlKey){
+			// CTRL+Sで保存する
+			event.preventDefault();
+			doPreview();
+			save();
+			return false;
+		}
+		
+		if (code == 116 ||
+				((code == 82) && event.ctrlKey)){
+			// F5 or Ctrl + Rでエディタとプレビューアを同期
+			event.preventDefault();
+			doPreview();
+			return false;
+		}
+		
+		return true;
 	});
 	
 })(jQuery);

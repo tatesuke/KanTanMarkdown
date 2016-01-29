@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <!--
- * KanTanMarkdown v1.20160128.03
+ * KanTanMarkdown v1.20160129.01
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
@@ -483,7 +483,8 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 </head>
 <body class="">
 <nav>
-	<button id="toggleButton">編集/閲覧</button><button id="saveButton">保存</button>
+	<input type="checkbox" id="autoSyncButton" name="autoSyncButton" checked="checked"><label for="autoSyncButton">自動同期</label>
+	<button id="syncButton">同期(F5)</button><button id="toggleButton">編集/閲覧</button><button id="saveButton">保存(Ctrl+S)</button>
 </nav>
 <div id="attach" style="display: none;">
 	<form id="attachForm"><input type="file" id="attachButton" multiple=""></form>
@@ -495,7 +496,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 </ul>
 	</div>
 </div>
-<div id="wrapper" style="height: 785.636px;">
+<div id="wrapper" style="height: 785px;">
 	<textarea id="editor" style="display: none;"># かんたんMarkdown
 かんたんMarkdownは**完**全に**単**一のHTMLファイルで動作するちょっと変わったMarkdownエディタ、プレビューアです。
 
@@ -689,7 +690,7 @@ http://tatesuke.github.io/KanTanMarkdown/ktm.html
 a-&gt;b:call
 <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
 </code></pre>
-<div class="sequence"><svg height="166.359375" version="1.1" width="119.96875" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="overflow: hidden; position: relative; left: -0.636353px; top: -0.525513px;"><desc style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Created with Raphaël 2.1.2</desc><defs style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><path stroke-linecap="round" d="M5,0 0,2.5 5,5z" id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path><marker id="raphael-marker-endblock55-obj103" markerHeight="5" markerWidth="5" orient="auto" refX="2.5" refY="2.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#raphael-marker-block" transform="rotate(180 2.5 2.5) scale(1,1)" stroke-width="1.0000" fill="#000" stroke="none" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></use></marker></defs><rect x="10" y="20" width="27.984375" height="35.453125" rx="0" ry="0" fill="none" stroke="#000000" stroke-width="2" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></rect><rect x="19.984375" y="30" width="7.984375" height="15.453125" rx="0" ry="0" fill="#ffffff" stroke="none" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></rect><text x="23.9921875" y="37.7265625" text-anchor="middle" font-family="Andale Mono, monospace" font-size="16px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: 'Andale Mono', monospace; font-size: 16px;"><tspan dy="5.90625" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">a</tspan></text><rect x="10" y="110.90625" width="27.984375" height="35.453125" rx="0" ry="0" fill="none" stroke="#000000" stroke-width="2" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></rect><rect x="19.984375" y="120.90625" width="7.984375" height="15.453125" rx="0" ry="0" fill="#ffffff" stroke="none" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></rect><text x="23.9921875" y="128.6328125" text-anchor="middle" font-family="Andale Mono, monospace" font-size="16px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: 'Andale Mono', monospace; font-size: 16px;"><tspan dy="5.90625" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">a</tspan></text><path fill="none" stroke="#000000" d="M23.9921875,55.453125L23.9921875,110.90625" stroke-width="2" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path><rect x="61.984375" y="20" width="27.984375" height="35.453125" rx="0" ry="0" fill="none" stroke="#000000" stroke-width="2" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></rect><rect x="71.96875" y="30" width="7.984375" height="15.453125" rx="0" ry="0" fill="#ffffff" stroke="none" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></rect><text x="75.9765625" y="37.7265625" text-anchor="middle" font-family="Andale Mono, monospace" font-size="16px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: 'Andale Mono', monospace; font-size: 16px;"><tspan dy="5.90625" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">b</tspan></text><rect x="61.984375" y="110.90625" width="27.984375" height="35.453125" rx="0" ry="0" fill="none" stroke="#000000" stroke-width="2" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></rect><rect x="71.96875" y="120.90625" width="7.984375" height="15.453125" rx="0" ry="0" fill="#ffffff" stroke="none" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></rect><text x="75.9765625" y="128.6328125" text-anchor="middle" font-family="Andale Mono, monospace" font-size="16px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: 'Andale Mono', monospace; font-size: 16px;"><tspan dy="5.90625" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">b</tspan></text><path fill="none" stroke="#000000" d="M75.9765625,55.453125L75.9765625,110.90625" stroke-width="2" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path><rect x="33.984375" y="72.71875" width="31.984375" height="15.453125" rx="0" ry="0" fill="#ffffff" stroke="none" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></rect><text x="49.984375" y="80.453125" text-anchor="middle" font-family="Andale Mono, monospace" font-size="16px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: 'Andale Mono', monospace; font-size: 16px;"><tspan dy="5.8984375" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">call</tspan></text><path fill="none" stroke="#000000" d="M23.9921875,90.90625C23.9921875,90.90625,57.93977516517043,90.90625,70.96848800932275,90.90625" stroke-width="2" marker-end="url(#raphael-marker-endblock55-obj103)" stroke-dasharray="0" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path></svg></div>
+<div class="sequence"><svg height="168" version="1.1" width="120" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="overflow: hidden; position: relative; left: -0.75px;"><desc style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Created with Raphaël 2.1.2</desc><defs style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><path stroke-linecap="round" d="M5,0 0,2.5 5,5z" id="raphael-marker-block" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path><marker id="raphael-marker-endblock55-obj523" markerHeight="5" markerWidth="5" orient="auto" refX="2.5" refY="2.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#raphael-marker-block" transform="rotate(180 2.5 2.5) scale(1,1)" stroke-width="1.0000" fill="#000" stroke="none" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></use></marker></defs><rect x="10" y="20" width="28" height="36" rx="0" ry="0" fill="none" stroke="#000000" stroke-width="2" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></rect><rect x="20" y="30" width="8" height="16" rx="0" ry="0" fill="#ffffff" stroke="none" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></rect><text x="24" y="38" text-anchor="middle" font-family="Andale Mono, monospace" font-size="16px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: 'Andale Mono', monospace; font-size: 16px;"><tspan dy="6" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">a</tspan></text><rect x="10" y="112" width="28" height="36" rx="0" ry="0" fill="none" stroke="#000000" stroke-width="2" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></rect><rect x="20" y="122" width="8" height="16" rx="0" ry="0" fill="#ffffff" stroke="none" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></rect><text x="24" y="130" text-anchor="middle" font-family="Andale Mono, monospace" font-size="16px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: 'Andale Mono', monospace; font-size: 16px;"><tspan dy="6" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">a</tspan></text><path fill="none" stroke="#000000" d="M24,56L24,112" stroke-width="2" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path><rect x="62" y="20" width="28" height="36" rx="0" ry="0" fill="none" stroke="#000000" stroke-width="2" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></rect><rect x="72" y="30" width="8" height="16" rx="0" ry="0" fill="#ffffff" stroke="none" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></rect><text x="76" y="38" text-anchor="middle" font-family="Andale Mono, monospace" font-size="16px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: 'Andale Mono', monospace; font-size: 16px;"><tspan dy="6" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">b</tspan></text><rect x="62" y="112" width="28" height="36" rx="0" ry="0" fill="none" stroke="#000000" stroke-width="2" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></rect><rect x="72" y="122" width="8" height="16" rx="0" ry="0" fill="#ffffff" stroke="none" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></rect><text x="76" y="130" text-anchor="middle" font-family="Andale Mono, monospace" font-size="16px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: 'Andale Mono', monospace; font-size: 16px;"><tspan dy="6" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">b</tspan></text><path fill="none" stroke="#000000" d="M76,56L76,112" stroke-width="2" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path><rect x="34" y="73" width="32" height="16" rx="0" ry="0" fill="#ffffff" stroke="none" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></rect><text x="50" y="81" text-anchor="middle" font-family="Andale Mono, monospace" font-size="16px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: 'Andale Mono', monospace; font-size: 16px;"><tspan dy="6" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">call</tspan></text><path fill="none" stroke="#000000" d="M24,92C24,92,57.957791328430176,92,70.99042022693902,92" stroke-width="2" marker-end="url(#raphael-marker-endblock55-obj523)" stroke-dasharray="0" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path></svg></div>
 
 <pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"flow"</span>&gt;</span>
 st=&gt;start
@@ -698,7 +699,7 @@ op1=&gt;operation: execute
 st-&gt;op1-&gt;e
 <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
 </code></pre>
-<div class="flow"><svg height="227.359375" version="1.1" width="79.90625" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="overflow: hidden; position: relative; left: -0.636353px; top: -0.235718px;" viewBox="0 0 79.90625 227.359375" preserveAspectRatio="xMidYMid meet"><desc style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Created with Raphaël 2.1.2</desc><defs style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><marker id="raphael-marker-endblock33-obj110" markerHeight="3" markerWidth="3" orient="auto" refX="1.5" refY="1.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#raphael-marker-block" transform="rotate(180 1.5 1.5) scale(0.6,0.6)" stroke-width="1.6667" fill="black" stroke="none" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></use></marker><marker id="raphael-marker-endblock33-obj111" markerHeight="3" markerWidth="3" orient="auto" refX="1.5" refY="1.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#raphael-marker-block" transform="rotate(180 1.5 1.5) scale(0.6,0.6)" stroke-width="1.6667" fill="black" stroke="none" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></use></marker></defs><rect x="0" y="0" width="49.078125" height="35.453125" rx="20" ry="20" fill="#ffffff" stroke="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-width="3" class="flowchart" id="st" transform="matrix(1,0,0,1,16.9141,6)"></rect><text x="10" y="17.7265625" text-anchor="start" font-family="&quot;Arial&quot;" font-size="14px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: start; font-family: Arial; font-size: 14px;" id="stt" class="flowchartt" transform="matrix(1,0,0,1,16.9141,6)" stroke-width="1"><tspan dy="5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Start</tspan></text><rect x="0" y="0" width="70.90625" height="35.453125" rx="0" ry="0" fill="#ffffff" stroke="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-width="3" class="flowchart" id="op1" transform="matrix(1,0,0,1,6,97.4531)"></rect><text x="10" y="17.7265625" text-anchor="start" font-family="&quot;Arial&quot;" font-size="14px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: start; font-family: Arial; font-size: 14px;" id="op1t" class="flowchartt" transform="matrix(1,0,0,1,6,97.4531)" stroke-width="1"><tspan dy="5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">execute</tspan></text><rect x="0" y="0" width="45.453125" height="35.453125" rx="20" ry="20" fill="#ffffff" stroke="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-width="3" class="flowchart" id="e" transform="matrix(1,0,0,1,18.7266,188.9063)"></rect><text x="10" y="17.7265625" text-anchor="start" font-family="&quot;Arial&quot;" font-size="14px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: start; font-family: Arial; font-size: 14px;" id="et" class="flowchartt" transform="matrix(1,0,0,1,18.7266,188.9063)" stroke-width="1"><tspan dy="5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">End</tspan></text><path fill="none" stroke="#000000" d="M41.453125,41.453125C41.453125,41.453125,41.453125,79.65389585494995,41.453125,92.95328531763516" stroke-width="3" marker-end="url(#raphael-marker-endblock33-obj110)" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path><path fill="none" stroke="#000000" d="M41.453125,132.90625C41.453125,132.90625,41.453125,171.10702085494995,41.453125,184.40641031763516" stroke-width="3" marker-end="url(#raphael-marker-endblock33-obj111)" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path></svg></div>
+<div class="flow"><svg height="229" version="1.1" width="79" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="overflow: hidden; position: relative; left: -0.75px;" viewBox="0 0 79 229" preserveAspectRatio="xMidYMid meet"><desc style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Created with Raphaël 2.1.2</desc><defs style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><marker id="raphael-marker-endblock33-obj530" markerHeight="3" markerWidth="3" orient="auto" refX="1.5" refY="1.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#raphael-marker-block" transform="rotate(180 1.5 1.5) scale(0.6,0.6)" stroke-width="1.6667" fill="black" stroke="none" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></use></marker><marker id="raphael-marker-endblock33-obj531" markerHeight="3" markerWidth="3" orient="auto" refX="1.5" refY="1.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#raphael-marker-block" transform="rotate(180 1.5 1.5) scale(0.6,0.6)" stroke-width="1.6667" fill="black" stroke="none" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></use></marker></defs><rect x="0" y="0" width="50" height="36" rx="20" ry="20" fill="#ffffff" stroke="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-width="3" class="flowchart" id="st" transform="matrix(1,0,0,1,16,6)"></rect><text x="10" y="18" text-anchor="start" font-family="&quot;Arial&quot;" font-size="14px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: start; font-family: Arial; font-size: 14px;" id="stt" class="flowchartt" transform="matrix(1,0,0,1,16,6)" stroke-width="1"><tspan dy="5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Start</tspan></text><rect x="0" y="0" width="70" height="36" rx="0" ry="0" fill="#ffffff" stroke="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-width="3" class="flowchart" id="op1" transform="matrix(1,0,0,1,6,98)"></rect><text x="10" y="18" text-anchor="start" font-family="&quot;Arial&quot;" font-size="14px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: start; font-family: Arial; font-size: 14px;" id="op1t" class="flowchartt" transform="matrix(1,0,0,1,6,98)" stroke-width="1"><tspan dy="5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">execute</tspan></text><rect x="0" y="0" width="45" height="36" rx="20" ry="20" fill="#ffffff" stroke="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);" stroke-width="3" class="flowchart" id="e" transform="matrix(1,0,0,1,18.5,190)"></rect><text x="10" y="18" text-anchor="start" font-family="&quot;Arial&quot;" font-size="14px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: start; font-family: Arial; font-size: 14px;" id="et" class="flowchartt" transform="matrix(1,0,0,1,18.5,190)" stroke-width="1"><tspan dy="5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">End</tspan></text><path fill="none" stroke="#000000" d="M41,42C41,42,41,80.20077085494995,41,93.50016031763516" stroke-width="3" marker-end="url(#raphael-marker-endblock33-obj530)" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path><path fill="none" stroke="#000000" d="M41,134C41,134,41,172.20077085494995,41,185.50016031763516" stroke-width="3" marker-end="url(#raphael-marker-endblock33-obj531)" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path></svg></div>
 
 <p class="info"><strong>ポイント</strong> このシーケンス図とフローチャートは画像ではありません。</p>
 
@@ -850,22 +851,56 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	}
 	
 	/* 編集・閲覧切り替え */
+	var editorScrollBarPos = 0;
+	var previewerScrollBarPos = 0;
 	$("#toggleButton").on("click", toggleMode);
 	
 	function toggleMode() {
+		if ($("#editor").is(":visible")) {
+			editorScrollBarPos    = $("#editor")[0].scrollTop;
+			previewerScrollBarPos = $("#previewer")[0].scrollTop;
+		}
+	
 		$("#attach").toggle();
 		$("#editor").toggle();
+		
+		doPreview();
 		doLayout();
+		
+		if ($("#editor").is(":visible")) {
+			$("#editor")[0].scrollTop    = editorScrollBarPos;
+			$("#previewer")[0].scrollTop = previewerScrollBarPos;
+		}
 	}
 	
-	
 	/* エディタとプレビューの同期 */
-	$("#editor").on("change", queuePreview)
-			.on("keyup", queuePreview);
 	
+	// 自動同期チェックボックスをクリックしたらchecked属性を更新する
+	// これを行わないと自動同期チェックボックスの状態が保存されない
+	$("#autoSyncButton").on("change", function(){
+		if ($(this).is(":checked")) {
+			$(this).attr("checked", "checked");
+		} else {
+			$(this).removeAttr("checked");
+		}
+	});
+	
+	//更新ボタンを押したら更新する 
+	$("#syncButton").on("click", doPreview);
+	
+	// エディタに変化があったらプレビュー予約
+	$("#editor").on("change", queuePreview)
+			.on("keyup",  queuePreview);
+	
+	// 自動更新がONならプレビューする
+	// ただし、onkeyupなど呼ばれる頻度が高いので一定時間待って最後の呼び出しのみ実行する
 	var queue = null, // キューをストック 
 	wait = 300; // 0.3秒後に実行の場合 
 	function queuePreview() {
+		if (!$("#autoSyncButton").is(":checked")) {
+			return;
+		}
+	
 		// イベント発生の都度、キューをキャンセル 
 		clearTimeout( queue );
 		 
@@ -875,12 +910,14 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		queue = setTimeout(doPreview, wait);
 	}
 	
+	// コードハイライト
 	marked.setOptions({
 		highlight: function (code, lang) {
 			return hljs.highlightAuto(code, [lang]).value;
 		}
 	});
 	
+	// 同期実行
 	function doPreview() {
 		// タイトル変更
 		var h1 = $("h1:first");
@@ -1006,18 +1043,6 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	/* 保存 */
 	$("#saveButton").on("click", save);
 	
-	$(window).keydown(function(event) {	
-		// CTRL+Sで保存する
-		var code = (event.keyCode ? event.keyCode : event.which);
-		if (code != 83 || !event.ctrlKey){
-			return true;
-		}
-		event.preventDefault();
-		save();
-		
-		return false;
-	});
-	
 	function save() {
 		// テキストエリアは値を入れなおさないと保存されない。
 		$("#editor").html($("#editor").val());
@@ -1029,9 +1054,9 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		
 		var html = "<!doctype html>\n<html>\n";
 		html += $("html").html();
-		var i = html.lastIndexOf("</body>") - 1; // bug fix #1
+		var i = html.lastIndexOf("/script>"); // bug fix #1 #39
 		html = html.substring(0, i);
-		html += "</body>\n</html>";
+		html += "/script>\n</body>\n</html>";
 
 		var blob = new Blob([html]);
 		if (window.navigator.msSaveBlob) {
@@ -1074,12 +1099,30 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		}
 	});
 	
+	/* ショートカットキー */
+	$(window).keydown(function(event) {	
+		var code = (event.keyCode ? event.keyCode : event.which);
+		
+		if (code == 83 && event.ctrlKey){
+			// CTRL+Sで保存する
+			event.preventDefault();
+			doPreview();
+			save();
+			return false;
+		}
+		
+		if (code == 116 ||
+				((code == 82) && event.ctrlKey)){
+			// F5 or Ctrl + Rでエディタとプレビューアを同期
+			event.preventDefault();
+			doPreview();
+			return false;
+		}
+		
+		return true;
+	});
+	
 })(jQuery);
 </script>
-
-
-<i title="Raphaël Colour Picker" style="display: none; color: white;">
-</i><i title="Raphaël Colour Picker" style="display: none; color: white;">
-</i><i title="Raphaël Colour Picker" style="display: none; color: white;">
-</i><i title="Raphaël Colour Picker" style="display: none; color: white;"></i</body>
+</body>
 </html>
