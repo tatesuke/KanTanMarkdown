@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <!--
- * KanTanMarkdown v1.20160129.01
+ * KanTanMarkdown v1.20160129.02
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
@@ -566,6 +566,8 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 </script>
 <script>
 (function($){
+	/* 起動時にコンテンツ読み込み */
+	doPreview();
 	
 	/* レイアウト調整 */
 	doLayout();
@@ -784,6 +786,9 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		if (toggleFlag == true) {
 			toggleMode();
 		}
+		
+		/* ファイルの肥大化を防ぐため中身を消去 */
+		$("#previewer").html("");
 		
 		var html = "<!doctype html>\n<html>\n";
 		html += $("html").html();
