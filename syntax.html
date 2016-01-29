@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <!--
- * KanTanMarkdown v1.20160129.02
+ * KanTanMarkdown v1.20160130.01
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
@@ -494,7 +494,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 </ul>
 	</div>
 </div>
-<div id="wrapper" style="height: 920px;">
+<div id="wrapper" style="height: 834px;">
 	<textarea id="editor" style="display: none;"># かんたんMarkdownの記法
 
 
@@ -935,6 +935,14 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 </script>
 <script>
 (function($){
+	
+	/* シンタックスハイライト設定 */
+	marked.setOptions({
+		highlight: function (code, lang) {
+			return hljs.highlightAuto(code, [lang]).value;
+		}
+	});
+
 	/* 起動時にコンテンツ読み込み */
 	doPreview();
 	
@@ -1015,12 +1023,6 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		queue = setTimeout(doPreview, wait);
 	}
 	
-	// コードハイライト
-	marked.setOptions({
-		highlight: function (code, lang) {
-			return hljs.highlightAuto(code, [lang]).value;
-		}
-	});
 	
 	// 同期実行
 	function doPreview() {	
