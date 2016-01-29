@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <!--
- * KanTanMarkdown v1.20160129.01
+ * KanTanMarkdown v1.20160129.02
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
@@ -566,6 +566,8 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 </script>
 <script>
 (function($){
+	/* 起動時にコンテンツ読み込み */
+	doPreview();
 	
 	/* レイアウト調整 */
 	doLayout();
@@ -630,6 +632,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	var queue = null, // キューをストック 
 	wait = 300; // 0.3秒後に実行の場合 
 	function queuePreview() {
+		saved = false;
 		if (!$("#autoSyncButton").is(":checked")) {
 			return;
 		}
@@ -651,16 +654,8 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	});
 	
 	// 同期実行
-	function doPreview() {
-		// タイトル変更
-		var h1 = $("h1:first");
-		if(h1.length != 0) {
-			document.title = h1.text();
-		} else {
-			document.title = "無題";
-		}
-	
-		// スクロールバー位置判定
+	function doPreview() {	
+		// スクロールバー固定判定
 		var isMaxScroll = false;
 		var scrollHeight = $("#previewer")[0].scrollHeight;
 		var offsetHeight = $("#previewer")[0].offsetHeight;
@@ -675,6 +670,14 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		// マークダウンレンダリング
 		var previewer = document.getElementById("previewer");
 		previewer.innerHTML = marked(editor.value);
+		
+		// タイトル変更
+		var h1 = $("h1:first");
+		if(h1.length != 0) {
+			document.title = h1.text();
+		} else {
+			document.title = "無題";
+		}
 		
 		// 画像埋め込み
 		var images = document.getElementsByTagName("img");
@@ -700,8 +703,6 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		if (isMaxScroll) {
 			$("#previewer")[0].scrollTop = $("#previewer")[0].scrollHeight;
 		}
-		
-		saved = false;
 	}
 	
 	
@@ -784,6 +785,9 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		if (toggleFlag == true) {
 			toggleMode();
 		}
+		
+		/* ファイルの肥大化を防ぐため中身を消去 */
+		$("#previewer").html("");
 		
 		var html = "<!doctype html>\n<html>\n";
 		html += $("html").html();
