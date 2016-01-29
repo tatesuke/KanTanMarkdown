@@ -494,7 +494,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 </ul>
 	</div>
 </div>
-<div id="wrapper" style="height: 834px;">
+<div id="wrapper" style="height: 920px;">
 	<textarea id="editor" style="display: none;"># かんたんMarkdownの記法
 
 
@@ -602,7 +602,7 @@ print "hoge"
 これは**ボールド**です  
 これは***イタリック＆ボールド***です  
 これは~~打消し線~~です  
-これは&lt;sup&gt;上付き&lt;/sub&gt;です  
+これは&lt;sup&gt;上付き&lt;/sup&gt;です  
 これは&lt;sub&gt;下付き&lt;/sub&gt;です
 ```
 
@@ -610,7 +610,7 @@ print "hoge"
 これは**ボールド**です  
 これは***イタリック＆ボールド***です  
 これは~~打消し線~~です  
-これは&lt;sup&gt;上付き&lt;/sub&gt;です  
+これは&lt;sup&gt;上付き&lt;/sup&gt;です  
 これは&lt;sub&gt;下付き&lt;/sub&gt;です
 
 
@@ -669,7 +669,7 @@ print "hoge"
 
 
 ## 水平線(hr)
-`-`や`^-'を３つ以上並べると水平線に変換されます。
+`-`や`_`を３つ以上並べると水平線に変換されます。
 
 ```
 ---
@@ -691,7 +691,7 @@ piyo
 
 
 ## リンク
-`[リンク文字列](URL)]`でリンクに変換されます。
+`[リンク文字列](URL)`でリンクに変換されます。
 
 ```
 [google](http://www.google.co.jp/)
@@ -701,7 +701,7 @@ piyo
 
 
 ## 外部参照リンク
-以下のように、URLを定義することもできます。URLが長くて読みずらくなる場合に有用です。
+以下のように、URLを外部に定義することもできます。URLが長くて読みづらくなる場合に有用です。
 ```
 [yahoo japan][yahoo]
 [yahoo]: http://www.yahoo.co.jp
@@ -747,9 +747,7 @@ piyo
 シンプルな | テーブルです
 
 
-枠をつけても構いません。どんどん重くなるな
-
-困ったもんだな。どっちが重いのかな？
+枠をつけても構いません。
 
 ```
 |枠を   | つけても |
