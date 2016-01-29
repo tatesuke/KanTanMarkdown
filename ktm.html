@@ -584,13 +584,26 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	}
 	
 	/* 編集・閲覧切り替え */
+	var editorScrollBarPos = 0;
+	var previewerScrollBarPos = 0;
 	$("#toggleButton").on("click", toggleMode);
 	
 	function toggleMode() {
+		if ($("#editor").is(":visible")) {
+			editorScrollBarPos    = $("#editor")[0].scrollTop;
+			previewerScrollBarPos = $("#previewer")[0].scrollTop;
+		}
+	
 		$("#attach").toggle();
 		$("#editor").toggle();
+		
 		doPreview();
 		doLayout();
+		
+		if ($("#editor").is(":visible")) {
+			$("#editor")[0].scrollTop    = editorScrollBarPos;
+			$("#previewer")[0].scrollTop = previewerScrollBarPos;
+		}
 	}
 	
 	/* エディタとプレビューの同期 */
