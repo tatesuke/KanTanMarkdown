@@ -787,9 +787,9 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		
 		var html = "<!doctype html>\n<html>\n";
 		html += $("html").html();
-		var i = html.lastIndexOf("</body>") - 1; // bug fix #1
+		var i = html.lastIndexOf("/script>"); // bug fix #1 #39
 		html = html.substring(0, i);
-		html += "</body>\n</html>";
+		html += "/script>\n</body>\n</html>";
 
 		var blob = new Blob([html]);
 		if (window.navigator.msSaveBlob) {
