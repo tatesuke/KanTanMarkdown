@@ -661,7 +661,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	
 	// 同期実行
 	function doPreview() {	
-		// スクロールバー固定判定
+		// スクロールバー下端判定
 		var isMaxScroll = false;
 		var scrollHeight = $("#previewer")[0].scrollHeight;
 		var offsetHeight = $("#previewer")[0].offsetHeight;
@@ -669,7 +669,9 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		var borderBottom = Number($("#previewer").css('border-bottom-width').replace(/px/, ""));
 		var borderHeight = borderTop + borderBottom;
 		var scrollTop = $("#previewer")[0].scrollTop;
-		if ((scrollTop + offsetHeight - borderHeight) == scrollHeight) {
+		var diff = (scrollTop + offsetHeight - borderHeight) - scrollHeight
+		if ((-1.0 <= diff) && (diff <= 1.0)) {
+			// Firefoxではborder-*-widthで小数点付きの数値が返ることがあるため数ピクセルの誤差を許容する
 			isMaxScroll = true;
 		}
 		
