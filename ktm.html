@@ -844,11 +844,27 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		if (e.which == 9 || e.keyCode == 9) {
 			e.preventDefault();
 			var pos = this.selectionStart;
+			var nextPos = pos;
 			var text = $(this).val();
-			// tabの挿入
-			$(this).val(text.substr(0,pos) + '\t' + text.substr(pos, text.length));
+			var editedText = text;
+			var before = text.substr(0, pos);
+			var after = text.substr(pos, text.length);
+
+			if (e.shiftKey) {
+				if (before.match(/\t$/)) {
+					// 直前のtabを削除
+					editedText = before.slice(0, -1) + after;
+					nextPos--;
+				}
+			} else {
+				// tabの挿入
+				editedText = before + '\t' + after;
+				nextPos++;
+			}
+			
+			$(this).val(editedText);
 			// カーソルの場所を移動
-			this.setSelectionRange(pos + 1, pos + 1);
+			this.setSelectionRange(nextPos, nextPos);
 		}
 	});
 	
