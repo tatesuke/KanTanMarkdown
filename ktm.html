@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <!--
- * KanTanMarkdown v1.20160201.02
+ * KanTanMarkdown v1.20160202.01
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
@@ -498,6 +498,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 	</div>
 </div>
 <div id="wrapper">
+	<noscript>このファイルはJavaScriptを有効にしないと閲覧できません。</noscript>
 	<textarea id="editor"></textarea>
 	<div id="previewer"></div>
 </div>
@@ -661,7 +662,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	
 	// 同期実行
 	function doPreview() {	
-		// スクロールバー固定判定
+		// スクロールバー下端判定
 		var isMaxScroll = false;
 		var scrollHeight = $("#previewer")[0].scrollHeight;
 		var offsetHeight = $("#previewer")[0].offsetHeight;
@@ -669,7 +670,9 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		var borderBottom = Number($("#previewer").css('border-bottom-width').replace(/px/, ""));
 		var borderHeight = borderTop + borderBottom;
 		var scrollTop = $("#previewer")[0].scrollTop;
-		if ((scrollTop + offsetHeight - borderHeight) == scrollHeight) {
+		var diff = (scrollTop + offsetHeight - borderHeight) - scrollHeight
+		if ((-1.0 <= diff) && (diff <= 1.0)) {
+			// Firefoxではborder-*-widthで小数点付きの数値が返ることがあるため数ピクセルの誤差を許容する
 			isMaxScroll = true;
 		}
 		
@@ -760,6 +763,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	$(document).on("click", ".detachButton", function(){
 		if(window.confirm('削除していいですか?')){
 			$(this).closest("li").remove();
+			saved = false;
 		}
 	});
 	
@@ -776,10 +780,11 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			$(this).focus();
 		} else {
 			$(this).prev("script").attr("id", "attach-" + $(this).val()).attr("title", $(this).val());
+			saved = false;
 			queuePreview();
 		}
 	});
-	
+		
 	/* 保存 */
 	$("#saveButton").on("click", save);
 	
