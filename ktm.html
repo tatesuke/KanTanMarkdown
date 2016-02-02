@@ -762,6 +762,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	$(document).on("click", ".detachButton", function(){
 		if(window.confirm('削除していいですか?')){
 			$(this).closest("li").remove();
+			saved = false;
 		}
 	});
 	
@@ -778,6 +779,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			$(this).focus();
 		} else {
 			$(this).prev("script").attr("id", "attach-" + $(this).val()).attr("title", $(this).val());
+			saved = false;
 			queuePreview();
 		}
 	});
