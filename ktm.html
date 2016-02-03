@@ -897,14 +897,13 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			
 			
 			// 行頭か先頭に至るまでさかのぼる
-			var pos = this.selectionStart - 1;
-			var text = $(this).val();
 			var count = 0;
-			while ((0 <= pos) && (text.charAt(pos) != "\n")) {
+			var text = $(this).val();
+			var pos = this.selectionStart;
+			while ((0 < pos) && (text.charAt(pos - 1) != "\n")) {
 				pos--;
 				count++;
 			}
-			pos++;
 			
 			// 先頭の空白文字を記憶
 			var spaces = "";
