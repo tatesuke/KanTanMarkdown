@@ -45,8 +45,9 @@ input[type="file"] {
 	overflow: auto;
 }
 
-#attachToggleButton {
-	width: 100%;
+#attachToggleButton,
+#previewToggleButton{
+	width: 50%;
 }
 
 #wrapper {
@@ -500,7 +501,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 		<ul id="fileList">
 		</ul>
 	</div>
-	<button id="attachToggleButton">添付ファイルを隠す(Ctrl+↑)</button>
+	<button id="attachToggleButton">添付ファイルを隠す(Ctrl+↑)</button><button id="previewToggleButton">プレビューを隠す(Ctrl+→)</button>
 </div>
 <div id="wrapper">
 	<noscript>このファイルはJavaScriptを有効にしないと閲覧できません。</noscript>
@@ -617,7 +618,12 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			caretStartPos = $("#editor")[0].selectionStart;
 			caretEndPos = $("#editor")[0].selectionEnd;
 		}
-	
+
+		//プレビュー領域を必ず表示
+		if ($("#previewer").is(":hidden")) {
+			openPreview();
+		}
+
 		$("#attach").toggle();
 		$("#editor").toggle();
 		
@@ -797,7 +803,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			queuePreview();
 		}
 	});
-	
+
 	/* 添付ファイル領域開け閉め */
 	$("#attachToggleButton").click(function(){
 		if ($("#filer").is(":visible")){
@@ -806,7 +812,16 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			openFiler();
 		}
 	});
-	
+
+	/* プレビュー領域開け閉め */
+	$("#previewToggleButton").click(function(){
+		if ($("#previewer").is(":visible")){
+			closePreview();
+		} else {
+			openPreview();
+		}
+	});
+
 	function openFiler() {
 		$("#attachToggleButton").text("添付ファイルを隠す(Ctrl+↑)");
 		$("#attachForm").show();
@@ -820,8 +835,32 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		$("#filer").hide();
 		doLayout();
 	}
-	
-		
+
+	function openPreview() {
+		// エディタサイズに相対値を利用しているためプレビュー表示されていない場合のみ実行
+		// 閲覧モード時は実行しない
+		if ($("#previewer").is(":hidden")
+			&& $("#editor").is(":visible")) {
+			$("#previewToggleButton").text("プレビューを隠す(Ctrl+→)");
+			$("#editor").outerWidth("50%");
+			$("#previewer").show();
+			doLayout();
+		}
+	}
+
+	function closePreview() {
+		// エディタサイズに相対値を利用しているためプレビュー表示されている場合のみ実行
+		// 閲覧モード時は実行しない
+		if ($("#previewer").is(":visible")
+			&& $("#editor").is(":visible")) {
+			$("#previewToggleButton").text("プレビューを表示(Ctrl+←)");
+			$("#editor").outerWidth("100%");
+			$("#previewer").hide();
+			doLayout();
+		}
+	}
+
+
 	/* 保存 */
 	$("#saveButton").on("click", save);
 	
@@ -916,11 +955,25 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			doPreview();
 			return false;
 		}
-		
+
+		if ((code == 37) && event.ctrlKey) {
+			// Ctrl+←
+			event.preventDefault();
+			openPreview();
+			return false;
+		}
+
 		if ((code == 38) && event.ctrlKey) {
 			// Ctrl+↑
 			event.preventDefault();
 			closeFiler();
+			return false;
+		}
+
+		if ((code == 39) && event.ctrlKey) {
+			// Ctrl+→
+			event.preventDefault();
+			closePreview();
 			return false;
 		}
 		
