@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <!--
- * KanTanMarkdown v1.20160202.01
+ * KanTanMarkdown v1.20160203.01
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
@@ -41,8 +41,12 @@ input[type="file"] {
 #filer{
 	box-sizing:border-box;
 	width:100%;
-	height:100px;
+	height:150px;
 	overflow: auto;
+}
+
+#attachToggleButton {
+	width: 100%;
 }
 
 #wrapper {
@@ -488,7 +492,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <body>
 <nav>
 	<input type="checkbox" id="autoSyncButton" name="autoSyncButton" checked="checked"><label for="autoSyncButton">自動同期</label>
-	<button id="syncButton">同期(F5)</button><button id="toggleButton">編集/閲覧</button><button id="saveButton">保存(Ctrl+S)</button>
+	<button id="syncButton">同期(F5)</button><button id="toggleButton">編集/閲覧(ESC)</button><button id="saveButton">保存(Ctrl+S)</button>
 </nav>
 <div id="attach">
 	<form id="attachForm"><input type="file" id="attachButton" multiple multiple></form>
@@ -496,6 +500,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 		<ul id="fileList">
 		</ul>
 	</div>
+	<button id="attachToggleButton">添付ファイルを隠す(Ctrl+↑)</button>
 </div>
 <div id="wrapper">
 	<noscript>このファイルはJavaScriptを有効にしないと閲覧できません。</noscript>
@@ -601,12 +606,16 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	/* 編集・閲覧切り替え */
 	var editorScrollBarPos = 0;
 	var previewerScrollBarPos = 0;
+	var caretStartPos = 0;
+	var caretEndPos = 0;
 	$("#toggleButton").on("click", toggleMode);
 	
 	function toggleMode() {
 		if ($("#editor").is(":visible")) {
 			editorScrollBarPos    = $("#editor")[0].scrollTop;
 			previewerScrollBarPos = $("#previewer")[0].scrollTop;
+			caretStartPos = $("#editor")[0].selectionStart;
+			caretEndPos = $("#editor")[0].selectionEnd;
 		}
 	
 		$("#attach").toggle();
@@ -618,6 +627,9 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		if ($("#editor").is(":visible")) {
 			$("#editor")[0].scrollTop    = editorScrollBarPos;
 			$("#previewer")[0].scrollTop = previewerScrollBarPos;
+			$("#editor")[0].selectionStart = caretStartPos;
+			$("#editor")[0].selectionEnd = caretEndPos;
+			$("#editor").focus();
 		}
 	}
 	
@@ -663,18 +675,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	// 同期実行
 	function doPreview() {	
 		// スクロールバー下端判定
-		var isMaxScroll = false;
-		var scrollHeight = $("#previewer")[0].scrollHeight;
-		var offsetHeight = $("#previewer")[0].offsetHeight;
-		var borderTop = Number($("#previewer").css('border-top-width').replace(/px/, ""));
-		var borderBottom = Number($("#previewer").css('border-bottom-width').replace(/px/, ""));
-		var borderHeight = borderTop + borderBottom;
-		var scrollTop = $("#previewer")[0].scrollTop;
-		var diff = (scrollTop + offsetHeight - borderHeight) - scrollHeight
-		if ((-1.0 <= diff) && (diff <= 1.0)) {
-			// Firefoxではborder-*-widthで小数点付きの数値が返ることがあるため数ピクセルの誤差を許容する
-			isMaxScroll = true;
-		}
+		var scrollLockFlag = isMaxScroll("previewer");
 		
 		// マークダウンレンダリング
 		var previewer = document.getElementById("previewer");
@@ -709,11 +710,23 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		});
 		
 		// スクロールバーが最下部にある場合、更新後も最下部にする。
-		if (isMaxScroll) {
+		if (scrollLockFlag == true) {
 			$("#previewer")[0].scrollTop = $("#previewer")[0].scrollHeight;
 		}
 	}
 	
+	function isMaxScroll(id) {
+		var isMaxScroll = false;
+		var scrollHeight = $("#" + id)[0].scrollHeight;
+		var offsetHeight = $("#" + id)[0].offsetHeight;
+		var borderTop = Number($("#" + id).css('border-top-width').replace(/px/, ""));
+		var borderBottom = Number($("#" + id).css('border-bottom-width').replace(/px/, ""));
+		var borderHeight = borderTop + borderBottom;
+		var scrollTop = $("#" + id)[0].scrollTop;
+		var diff = (scrollTop + offsetHeight - borderHeight) - scrollHeight
+		// Firefoxではborder-*-widthで小数点付きの数値が返ることがあるため数ピクセルの誤差を許容する
+		return (-1.0 <= diff) && (diff <= 1.0);
+	}
 	
 	/* ファイル添付 */
 	$("#attachButton").on("change", function(e) {
@@ -784,6 +797,30 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			queuePreview();
 		}
 	});
+	
+	/* 添付ファイル領域開け閉め */
+	$("#attachToggleButton").click(function(){
+		if ($("#filer").is(":visible")){
+			closeFiler();
+		} else {
+			openFiler();
+		}
+	});
+	
+	function openFiler() {
+		$("#attachToggleButton").text("添付ファイルを隠す(Ctrl+↑)");
+		$("#attachForm").show();
+		$("#filer").show();
+		doLayout();
+	}
+	
+	function closeFiler() {
+		$("#attachToggleButton").text("添付ファイルを表示(Ctrl+↓)");
+		$("#attachForm").hide();
+		$("#filer").hide();
+		doLayout();
+	}
+	
 		
 	/* 保存 */
 	$("#saveButton").on("click", save);
@@ -856,6 +893,14 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	$(window).keydown(function(event) {	
 		var code = (event.keyCode ? event.keyCode : event.which);
 		
+		if (code == 27) {
+			// ESCキーで閲覧/編集モード切り替え
+			event.preventDefault();
+			toggleMode();
+			return false;
+		}
+		
+		
 		if (code == 83 && event.ctrlKey){
 			// CTRL+Sで保存する
 			event.preventDefault();
@@ -869,6 +914,20 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			// F5 or Ctrl + Rでエディタとプレビューアを同期
 			event.preventDefault();
 			doPreview();
+			return false;
+		}
+		
+		if ((code == 38) && event.ctrlKey) {
+			// Ctrl+↑
+			event.preventDefault();
+			closeFiler();
+			return false;
+		}
+		
+		if ((code == 40) && event.ctrlKey) {
+			// Ctrl+↓
+			event.preventDefault();
+			openFiler();
 			return false;
 		}
 		
