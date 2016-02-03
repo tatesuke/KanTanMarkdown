@@ -500,7 +500,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 		<ul id="fileList">
 		</ul>
 	</div>
-	<button id="attachToggleButton">^(Ctrl+UP)</button>
+	<button id="attachToggleButton">添付ファイルを隠す(Ctrl+↑)</button>
 </div>
 <div id="wrapper">
 	<noscript>このファイルはJavaScriptを有効にしないと閲覧できません。</noscript>
@@ -808,13 +808,15 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	});
 	
 	function openFiler() {
-		$("#attachToggleButton").text("^(Ctrl+UP)");
+		$("#attachToggleButton").text("添付ファイルを隠す(Ctrl+↑)");
+		$("#attachForm").show();
 		$("#filer").show();
 		doLayout();
 	}
 	
 	function closeFiler() {
-		$("#attachToggleButton").text("v(Ctrl+DOWN)");
+		$("#attachToggleButton").text("添付ファイルを表示(Ctrl+↓)");
+		$("#attachForm").hide();
 		$("#filer").hide();
 		doLayout();
 	}
