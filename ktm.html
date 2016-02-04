@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <!--
- * KanTanMarkdown v1.20160204.01
+ * KanTanMarkdown v1.20160204.02
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
@@ -917,54 +917,9 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	
 	/* tabキーでtabを入力 */
 	$("#editor").on('keydown', function(e) {
-		// tabキー押下時の対応
 		if (e.which == 9 || e.keyCode == 9) {
 			e.preventDefault();
-			var pos = this.selectionStart;
-			var text = $(this).val();
-			// tabの挿入
-			$(this).val(text.substr(0,pos) + '\t' + text.substr(pos, text.length));
-			// カーソルの場所を移動
-			this.setSelectionRange(pos + 1, pos + 1);
-		}
-	});
-	
-	/* オートインデント */
-	$("#editor").on('keydown', function(e) {
-		// Enterキー
-		if (e.which == 13 || e.keyCode == 13) {
-			e.preventDefault();
-			
-			
-			// 行頭か先頭に至るまでさかのぼる
-			var count = 0;
-			var text = $(this).val();
-			var pos = this.selectionStart;
-			while ((0 < pos) && (text.charAt(pos - 1) != "\n")) {
-				pos--;
-				count++;
-			}
-			
-			// 先頭の空白文字を記憶
-			var spaces = "";
-			for (var i = 0; i < count; i++) {
-				var c = text.charAt(pos + i);
-				if((c != " ") && (c !=  "　") && (c != "\t")) {
-					break;
-				}
-				spaces += c;
-			}			
-			
-			// 改行の挿入
-			var maxScrollFlag = isMaxScroll("editor");
-			var newPos = this.selectionStart + spaces.length + 1;
-			$(this).val(text.substr(0, this.selectionStart) + '\n' + spaces + text.substr(this.selectionEnd, text.length));
-			// カーソルの場所を移動
-			this.setSelectionRange(newPos, newPos);
-			// スクロール
-			if (maxScrollFlag) {
-				$("#editor")[0].scrollTop = $("#editor")[0].scrollHeight;
-			}
+			document.execCommand('insertText', false, "\t"); 
 		}
 	});
 	
