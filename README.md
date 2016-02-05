@@ -7,6 +7,11 @@ http://tatesuke.github.io/KanTanMarkdown/
 
 ## リリースノート
 
+### v1.20160205.01
+
+#### バグ修正
+* IE, Firefoxにおいてtabキーが効かなくなっていたのを修正
+
 ### v1.20160204.02
 
 #### バグ修正
