@@ -493,6 +493,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 </head>
 <body>
 <nav>
+	<span id="messageArea"></span>
 	<input type="checkbox" id="autoSyncButton" name="autoSyncButton" checked="checked"><label for="autoSyncButton">自動同期</label>
 	<button id="syncButton">同期(F5)</button><button id="toggleButton">編集/閲覧(ESC)</button><button id="saveButton">保存(Ctrl+S)</button>
 </nav>
@@ -578,6 +579,27 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 </script>
 <script>
 (function($){
+	
+	/* 編集不可ブラウザ判定 */
+
+	// Blobが使用できないブラウザは保存不可(IE9等)
+	try {
+		new Blob(["temp"]);
+	} catch(e) {
+		setViewMode(); 
+	}
+
+	// Safariはdownload属性に対応していないので閲覧のみ
+	var ua = window.navigator.userAgent.toLowerCase();
+	if ((ua.indexOf("chrome") == -1) && (ua.indexOf('safari') != -1)) {
+		alert(window.navigator.userAgent.toLowerCase());
+		setViewMode();
+	}
+	
+	function setViewMode() {
+		$("#messageArea").text("このブラウザでは編集できません。");
+		$("nav > *").attr("disabled", "disabled");
+	}
 	
 	/* シンタックスハイライト設定 */
 	marked.setOptions({
@@ -876,6 +898,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		
 		/* ファイルの肥大化を防ぐため中身を消去 */
 		$("#previewer").html("");
+		$("#messageArea").html("");
 		
 		var html = "<!doctype html>\n<html>\n";
 		html += $("html").html();
@@ -940,7 +963,9 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		if (code == 27) {
 			// ESCキーで閲覧/編集モード切り替え
 			event.preventDefault();
-			toggleMode();
+			if ($("#toggleButton").is(":enabled")) {
+				$("#toggleButton").click();
+			}
 			return false;
 		}
 		
@@ -948,8 +973,9 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		if (code == 83 && event.ctrlKey){
 			// CTRL+Sで保存する
 			event.preventDefault();
-			doPreview();
-			save();
+			if ($("#saveButton").is(":enabled")) {
+				$("#saveButton").click();
+			}
 			return false;
 		}
 		
@@ -957,7 +983,9 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 				((code == 82) && event.ctrlKey)){
 			// F5 or Ctrl + Rでエディタとプレビューアを同期
 			event.preventDefault();
-			doPreview();
+			if ($("#syncButton").is(":enabled")) {
+				doPreview();
+			}
 			return false;
 		}
 
