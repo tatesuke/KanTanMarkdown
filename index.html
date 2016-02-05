@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <!--
- * KanTanMarkdown v1.20160204.02
+ * KanTanMarkdown v1.20160205.01
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
@@ -507,7 +507,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 	</div>
 	<button id="attachToggleButton">添付ファイルを隠す(Ctrl+↑)</button><button id="previewToggleButton">プレビューを隠す(Ctrl+→)</button>
 </div>
-<div id="wrapper" style="height: 845px;">
+<div id="wrapper" style="height: 897px;">
 	<noscript>このファイルはJavaScriptを有効にしないと閲覧できません。</noscript>
 	<textarea id="editor" style="display: none;"># かんたんMarkdown
 かんたんMarkdownは**完**全に**単**一のHTMLファイルで動作するちょっと変わったMarkdownエディタ、プレビューアです。クロスプラットフォームで、リアルタイムプレビューにも対応しています。
@@ -1090,7 +1090,17 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	$("#editor").on('keydown', function(e) {
 		if (e.which == 9 || e.keyCode == 9) {
 			e.preventDefault();
-			document.execCommand('insertText', false, "\t"); 
+			
+			// for chrome and opera 
+			var cmdResult = document.execCommand('insertText', false, "\t"); 
+			
+			// for IE, Firefox
+			if (cmdResult == false) {
+				var text = $(this).val();
+				var start = this.selectionStart;
+				$(this).val(text.substr(0, start) + '\t' + text.substr(start, text.length));
+				this.setSelectionRange(start + 1, start + 1);
+			}
 		}
 	});
 	
