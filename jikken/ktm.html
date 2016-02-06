@@ -665,6 +665,9 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						while ((0 < start) && (orgText.charAt(start - 1) != "\n")) {
 							start--;
 						}
+						if (orgText.charAt(end - 1) == "\n") {
+							end -= 1;
+						}
 						while ((end < orgText.length) && (orgText.charAt(end) != "\n")) {
 							end++;
 						}
