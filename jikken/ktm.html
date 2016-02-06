@@ -744,8 +744,8 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 				if ((e.which == 13 || e.keyCode == 13)                          // ENTER
 						|| (e.which == 8 || e.keyCode == 8)                      // BS
 						|| (e.which == 46 || e.keyCode == 46)                    // DELETE
-						|| ((e.which == 86 || e.keyCode == 86) && e.ctrlKey)     // Ctrl+v
-						|| ((e.which == 88 || e.keyCode == 88) && e.ctrlKey)) {  //Ctrl+x
+						|| ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey))     // Ctrl+v
+						|| ((e.which == 88 || e.keyCode == 88) && (e.ctrlKey || e.metaKey))) {  //Ctrl+x
 					
 					saveUndo(e.target);
 				} 
@@ -761,7 +761,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			
 			$(this).on("keydown", function(e) {
 				// Ctrl+Z
-				if (e.keyCode == 90 && e.ctrlKey) {
+				if (e.keyCode == 90 && (e.ctrlKey || e.metaKey)) {
 					e.preventDefault();
 					
 					if (0 < undoStack.length) {
@@ -779,7 +779,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			
 			$(this).on("keydown", function(e) {
 				// Ctrl+Y
-				if (e.keyCode == 89 && e.ctrlKey) {
+				if (e.keyCode == 89 && (e.ctrlKey || e.metaKey)) {
 					e.preventDefault();
 					
 					if (0 < redoStack.length) {
@@ -1187,7 +1187,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		}
 		
 		
-		if (code == 83 && event.ctrlKey){
+		if (code == 83 && (event.ctrlKey || event.metaKey)){
 			// CTRL+Sで保存する
 			event.preventDefault();
 			if ($("#saveButton").is(":enabled")) {
@@ -1197,7 +1197,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		}
 		
 		if (code == 116 ||
-				((code == 82) && event.ctrlKey)){
+				((code == 82) && (event.ctrlKey || event.metaKey))){
 			// F5 or Ctrl + Rでエディタとプレビューアを同期
 			event.preventDefault();
 			if ($("#syncButton").is(":enabled")) {
@@ -1206,28 +1206,28 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			return false;
 		}
 
-		if ((code == 37) && event.ctrlKey) {
+		if ((code == 37) && (event.ctrlKey || event.metaKey)) {
 			// Ctrl+←
 			event.preventDefault();
 			openPreview();
 			return false;
 		}
 
-		if ((code == 38) && event.ctrlKey) {
+		if ((code == 38) && (event.ctrlKey || event.metaKey)) {
 			// Ctrl+↑
 			event.preventDefault();
 			closeFiler();
 			return false;
 		}
 
-		if ((code == 39) && event.ctrlKey) {
+		if ((code == 39) && (event.ctrlKey || event.metaKey)) {
 			// Ctrl+→
 			event.preventDefault();
 			closePreview();
 			return false;
 		}
 		
-		if ((code == 40) && event.ctrlKey) {
+		if ((code == 40) && (event.ctrlKey || event.metaKey)) {
 			// Ctrl+↓
 			event.preventDefault();
 			openFiler();
