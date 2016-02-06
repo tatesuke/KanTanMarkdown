@@ -616,6 +616,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						while ((end < orgText.length) && (orgText.charAt(end) != "\n")) {
 							end++;
 						}
+						end--;
 						
 						var deleteCount = 0;
 						var newText = orgText.substring(0, start);
@@ -651,7 +652,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						$(this).val(newText);
 						
 						this.selectionStart = start;
-						this.selectionEnd   = end - deleteCount;
+						this.selectionEnd   = end - deleteCount + 1;
 						saveUndo(e.target);
 					} else {
 						/* 選択 + Tabで複数行インデント */
