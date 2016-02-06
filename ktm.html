@@ -581,27 +581,106 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 (function( $ ){
 	$.fn.kantanEditor = function( options ) {
 		return this.each(function() {
-			/* tabキーでtabを入力 */
 			$(this).on('keydown', function(e) {
-				if (e.which == 9 || e.keyCode == 9) {
-					e.preventDefault();
-					
-					// for chrome and opera 
-					var cmdResult = document.execCommand('insertText', false, "\t"); 
-					
-					// for IE, Firefox
-					if (cmdResult == false) {
-						var text = $(this).val();
-						var start = this.selectionStart;
-						$(this).val(text.substr(0, start) + '\t' + text.substr(start, text.length));
-						this.setSelectionRange(start + 1, start + 1);
-					}
-					saveUndo(e.target);
+				/* tabキーでtabを入力 */
+				
+				if ((e.which != 9) && (e.keyCode != 9)) {
+					return true;
 				}
-			});
-			
-			// オートインデント
-			$("#editor").on('keydown', function(e) {
+				e.preventDefault();
+				
+				var start = this.selectionStart;
+				var end   = this.selectionEnd;
+				if (start == end) {
+					/* いわゆる普通のtab */
+					
+					var text = $(this).val();
+					$(this).val(text.substr(0, start) + '\t' + text.substr(start, text.length));
+					this.setSelectionRange(start + 1, start + 1);
+					saveUndo(e.target);
+				} else {
+					if (e.shiftKey) {
+						/* 選択 + Shift + Tabで複数行アウトデント */
+						
+						var tabSize = $(this).css("tab-size")
+									|| $(this).css("-moz-tab-size")
+									|| $(this).css("-o-tab-size")
+									|| 8;
+						tabSize = Number(tabSize);
+						
+						// スタート位置特定
+						var orgText = $(this).val();
+						while ((0 < start) && (orgText.charAt(start - 1) != "\n")) {
+							start--;
+						}
+						
+						var newText = orgText.substring(0, start);
+						var i = start;
+						while (i < end) {
+							var c = orgText.charAt(i);
+							var spaceCount = 0;
+							while (spaceCount < tabSize) {
+								if (c == " ") {
+									spaceCount += 1;
+								} else if (c == " ") {
+									spaceCount += 2;
+								} else if (c == "\t") {
+									spaceCount += tabSize;
+								} else {
+									newText += c;
+									i++;
+									break;
+								}
+								c = orgText.charAt(++i);
+							}
+							while ((c != "\n") && (i < end)) {
+								newText += c;
+								i++;
+								c = orgText.charAt(i);
+							} 
+						}
+						newText += orgText.substr(end)
+						
+						$(this).val(newText);
+						
+						this.selectionStart = start;
+						saveUndo(e.target);
+					} else {
+						/* 選択 + Tabで複数行インデント */
+						
+						// スタート位置特定
+						var orgText = $(this).val();
+						while ((0 < start) && (orgText.charAt(start - 1) != "\n")) {
+							start--;
+						}
+						
+						// タブ挿入
+						var count = 1;
+						var newText = orgText.substring(0, start) + "\t";
+						for (var i = start; i < end; i++) {
+							var c = orgText.charAt(i);
+							newText += c;
+							if (c == "\n") {
+								newText += "\t";
+								count++;
+							}
+						}
+						newText += orgText.substr(end);
+						
+						// テキスト入れ替え
+						$(this).val(newText);
+						
+						// 選択位置修正
+						this.selectionStart = start;
+						this.selectionEnd   = end + count;
+						saveUndo(e.target);
+					}
+				}
+				
+				return false;
+			}).on('keydown', function(e) {
+				/* オートインデント */
+				
 				// Enterキー
 				if (e.which == 13 || e.keyCode == 13) {
 					e.preventDefault();
