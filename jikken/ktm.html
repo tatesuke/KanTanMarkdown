@@ -750,7 +750,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 				return (-1.0 <= diff) && (diff <= 1.0);
 			}
 
-			/* UNDO, REDO */
+			/* Undo, Redo */
 			var keyCache = [];
 			var undoStack = [];
 			var redoStack = [];
@@ -822,9 +822,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 				}
 			}
     	});
-	
 	};
-	
 })( jQuery );
 </script>
 <script>
@@ -1135,13 +1133,12 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		}
 	}
 
-
 	/* 保存 */
 	$("#saveButton").on("click", save);
 	
 	function save() {
 		// テキストエリアは値を入れなおさないと保存されない。
-		$("#editor").html($("#editor").val());
+		$("#editor").html($("#editor").val().replace(/</g, "&lt;"));
 	
 		var toggleFlag = $("#editor").is(":visible");
 		if (toggleFlag == true) {
