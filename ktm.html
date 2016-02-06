@@ -608,12 +608,20 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 									|| 8;
 						tabSize = Number(tabSize);
 						
-						// スタート位置特定
+						// スタート・エンド位置特定
 						var orgText = $(this).val();
 						while ((0 < start) && (orgText.charAt(start - 1) != "\n")) {
 							start--;
 						}
+						if (orgText.charAt(end - 1) == "\n") {
+							end -= 1;
+						}
+						while ((end < orgText.length) && (orgText.charAt(end) != "\n")) {
+							end++;
+						}
+						end--;
 						
+						var deleteCount = 0;
 						var newText = orgText.substring(0, start);
 						var i = start;
 						while (i < end) {
@@ -622,10 +630,13 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 							while (spaceCount < tabSize) {
 								if (c == " ") {
 									spaceCount += 1;
+									deleteCount++;
 								} else if (c == " ") {
 									spaceCount += 2;
+									deleteCount++;
 								} else if (c == "\t") {
 									spaceCount += tabSize;
+									deleteCount++;
 								} else {
 									newText += c;
 									i++;
@@ -634,9 +645,8 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 								c = orgText.charAt(++i);
 							}
 							while ((c != "\n") && (i < end)) {
+								c = orgText.charAt(i++);
 								newText += c;
-								i++;
-								c = orgText.charAt(i);
 							} 
 						}
 						newText += orgText.substr(end)
@@ -644,14 +654,21 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						$(this).val(newText);
 						
 						this.selectionStart = start;
+						this.selectionEnd   = end - deleteCount + 1;
 						saveUndo(e.target);
 					} else {
 						/* 選択 + Tabで複数行インデント */
 						
-						// スタート位置特定
+						// スタート・エンド位置特定
 						var orgText = $(this).val();
 						while ((0 < start) && (orgText.charAt(start - 1) != "\n")) {
 							start--;
+						}
+						if (orgText.charAt(end - 1) == "\n") {
+							end -= 1;
+						}
+						while ((end < orgText.length) && (orgText.charAt(end) != "\n")) {
+							end++;
 						}
 						
 						// タブ挿入
@@ -733,7 +750,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 				return (-1.0 <= diff) && (diff <= 1.0);
 			}
 
-			/* UNDO, REDO */
+			/* Undo, Redo */
 			var keyCache = [];
 			var undoStack = [];
 			var redoStack = [];
@@ -744,8 +761,8 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 				if ((e.which == 13 || e.keyCode == 13)                          // ENTER
 						|| (e.which == 8 || e.keyCode == 8)                      // BS
 						|| (e.which == 46 || e.keyCode == 46)                    // DELETE
-						|| ((e.which == 86 || e.keyCode == 86) && e.ctrlKey)     // Ctrl+v
-						|| ((e.which == 88 || e.keyCode == 88) && e.ctrlKey)) {  //Ctrl+x
+						|| ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey))     // Ctrl+v
+						|| ((e.which == 88 || e.keyCode == 88) && (e.ctrlKey || e.metaKey))) {  //Ctrl+x
 					
 					saveUndo(e.target);
 				} 
@@ -754,14 +771,14 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 					saveUndo(e.target);
 				}
 			}).on("keydown", function(e){
-				if (e.originalEvent.code == "Enter") {  // ENTER // for chrome opera ie
+				if (e.originalEvent.code == "Enter") {
 					saveUndo(e.target);
 				} 
 			});
 			
 			$(this).on("keydown", function(e) {
 				// Ctrl+Z
-				if (e.keyCode == 90 && e.ctrlKey) {
+				if (e.keyCode == 90 && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
 					e.preventDefault();
 					
 					if (0 < undoStack.length) {
@@ -772,14 +789,15 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						this.selectionStart = undo.selectionStart;
 						this.selectionEnd   = undo.selectionEnd;
 						previousVal = undo;
-						console.log("undo");
 					}
 				}
 			});
 			
 			$(this).on("keydown", function(e) {
-				// Ctrl+Y
-				if (e.keyCode == 89 && e.ctrlKey) {
+				// Ctrl+Y or Ctrl + Shift + Z or Cmd + Shift + Z
+				if ((e.keyCode == 89 && (e.ctrlKey || e.metaKey))
+						|| (e.keyCode == 90 && e.ctrlKey && e.shiftKey)
+						|| (e.keyCode == 90 && e.metaKey && e.shiftKey)) {
 					e.preventDefault();
 					
 					if (0 < redoStack.length) {
@@ -788,7 +806,6 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						$(this).val(previousVal.val);
 						this.selectionStart = previousVal.selectionStart;
 						this.selectionEnd   = previousVal.selectionEnd;
-						console.log("redo");
 					}
 				}
 			});
@@ -805,9 +822,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 				}
 			}
     	});
-	
 	};
-	
 })( jQuery );
 </script>
 <script>
@@ -825,7 +840,6 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	// Safariはdownload属性に対応していないので閲覧のみ
 	var ua = window.navigator.userAgent.toLowerCase();
 	if ((ua.indexOf("chrome") == -1) && (ua.indexOf('safari') != -1)) {
-		alert(window.navigator.userAgent.toLowerCase());
 		setViewMode();
 	}
 	
@@ -1119,13 +1133,12 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		}
 	}
 
-
 	/* 保存 */
 	$("#saveButton").on("click", save);
 	
 	function save() {
 		// テキストエリアは値を入れなおさないと保存されない。
-		$("#editor").html($("#editor").val());
+		$("#editor").html($("#editor").val().replace(/</g, "&lt;"));
 	
 		var toggleFlag = $("#editor").is(":visible");
 		if (toggleFlag == true) {
@@ -1188,7 +1201,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		}
 		
 		
-		if (code == 83 && event.ctrlKey){
+		if (code == 83 && (event.ctrlKey || event.metaKey)){
 			// CTRL+Sで保存する
 			event.preventDefault();
 			if ($("#saveButton").is(":enabled")) {
@@ -1198,7 +1211,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		}
 		
 		if (code == 116 ||
-				((code == 82) && event.ctrlKey)){
+				((code == 82) && (event.ctrlKey || event.metaKey))){
 			// F5 or Ctrl + Rでエディタとプレビューアを同期
 			event.preventDefault();
 			if ($("#syncButton").is(":enabled")) {
@@ -1207,28 +1220,28 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			return false;
 		}
 
-		if ((code == 37) && event.ctrlKey) {
+		if ((code == 37) && (event.ctrlKey || event.metaKey)) {
 			// Ctrl+←
 			event.preventDefault();
 			openPreview();
 			return false;
 		}
 
-		if ((code == 38) && event.ctrlKey) {
+		if ((code == 38) && (event.ctrlKey || event.metaKey)) {
 			// Ctrl+↑
 			event.preventDefault();
 			closeFiler();
 			return false;
 		}
 
-		if ((code == 39) && event.ctrlKey) {
+		if ((code == 39) && (event.ctrlKey || event.metaKey)) {
 			// Ctrl+→
 			event.preventDefault();
 			closePreview();
 			return false;
 		}
 		
-		if ((code == 40) && event.ctrlKey) {
+		if ((code == 40) && (event.ctrlKey || event.metaKey)) {
 			// Ctrl+↓
 			event.preventDefault();
 			openFiler();
