@@ -774,6 +774,9 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 				if (e.originalEvent.code == "Enter") {
 					saveUndo(e.target);
 				} 
+				if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey)) {
+					saveUndoAfterPaste(e.target);
+				}
 			});
 			
 			$(this).on("keydown", function(e) {
@@ -819,6 +822,15 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						selectionStart: editor.selectionStart,
 						selectionEnd  : editor.selectionEnd
 					}
+				}
+			}
+			
+			var saveUndoAfterPaste = function(editor) {
+				redoStack = [];
+				previousVal = {
+					val: $(editor).val(),
+					selectionStart: editor.selectionStart,
+					selectionEnd  : editor.selectionEnd
 				}
 			}
     	});
