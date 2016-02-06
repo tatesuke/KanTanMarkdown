@@ -778,8 +778,9 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			});
 			
 			$(this).on("keydown", function(e) {
-				// Ctrl+Y
-				if (e.keyCode == 89 && (e.ctrlKey || e.metaKey)) {
+				// Ctrl+Y or Cmd + Shift + Z
+				if ((e.keyCode == 89 && (e.ctrlKey || e.metaKey))
+						|| (e.keyCode == 89 && e.metaKey && e.shiftKey)) {
 					e.preventDefault();
 					
 					if (0 < redoStack.length) {
