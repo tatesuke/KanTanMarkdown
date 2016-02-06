@@ -645,9 +645,8 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 								c = orgText.charAt(++i);
 							}
 							while ((c != "\n") && (i < end)) {
+								c = orgText.charAt(i++);
 								newText += c;
-								i++;
-								c = orgText.charAt(i);
 							} 
 						}
 						newText += orgText.substr(end)
