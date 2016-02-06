@@ -582,7 +582,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	$.fn.kantanEditor = function( options ) {
 		return this.each(function() {
 			/* tabキーでtabを入力 */
-			$("#editor").on('keydown', function(e) {
+			$(this).on('keydown', function(e) {
 				if (e.which == 9 || e.keyCode == 9) {
 					e.preventDefault();
 					
@@ -596,6 +596,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						$(this).val(text.substr(0, start) + '\t' + text.substr(start, text.length));
 						this.setSelectionRange(start + 1, start + 1);
 					}
+					saveUndo(e.target);
 				}
 			});
 			
@@ -603,8 +604,8 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			var keyCache = [];
 			var undoStack = [];
 			var redoStack = [];
-			var previousVal = {val:$("#editor").val(), selectionStart:0, selectionEnd:0};
-			$("#editor").on("keypress", function(e){
+			var previousVal = {val:$(this).val(), selectionStart:0, selectionEnd:0};
+			$(this).on("keypress", function(e){
 				keyCache[e.originalEvent.code] = true;
 			}).on("keyup", function(e){
 				if ((e.which == 13 || e.keyCode == 13)                          // ENTER
@@ -613,19 +614,19 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						|| ((e.which == 86 || e.keyCode == 86) && e.ctrlKey)     // Ctrl+v
 						|| ((e.which == 88 || e.keyCode == 88) && e.ctrlKey)) {  //Ctrl+x
 					
-					saveUndo();
+					saveUndo(e.target);
 				} 
 				if (keyCache[e.originalEvent.code] == true) {
 					keyCache[e.originalEvent.code] = false;
-					saveUndo();
+					saveUndo(e.target);
 				}
 			}).on("keydown", function(e){
 				if (e.originalEvent.code == "Enter") {  // ENTER // for chrome opera ie
-					saveUndo();
+					saveUndo(e.target);
 				} 
 			});
 			
-			$("#editor").on("keydown", function(e) {
+			$(this).on("keydown", function(e) {
 				// Ctrl+Z
 				if (e.keyCode == 90 && e.ctrlKey) {
 					e.preventDefault();
@@ -639,12 +640,11 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						this.selectionEnd   = undo.selectionEnd;
 						previousVal = undo;
 						console.log("undo");
-						
 					}
 				}
 			});
 			
-			$("#editor").on("keydown", function(e) {
+			$(this).on("keydown", function(e) {
 				// Ctrl+Y
 				if (e.keyCode == 89 && e.ctrlKey) {
 					e.preventDefault();
@@ -655,21 +655,19 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						$(this).val(previousVal.val);
 						this.selectionStart = previousVal.selectionStart;
 						this.selectionEnd   = previousVal.selectionEnd;
-						
 						console.log("redo");
 					}
 				}
 			});
 			
-			function saveUndo() {
-				var editor= $("#editor");
-				if (previousVal.val != editor.val()) {
+			var saveUndo = function(editor) {
+				if (previousVal.val != $(editor).val()) {
 					undoStack.push(previousVal);
 					redoStack = [];
 					previousVal = {
-						val: editor.val(),
-						selectionStart: editor[0].selectionStart,
-						selectionEnd  : editor[0].selectionEnd
+						val: $(editor).val(),
+						selectionStart: editor.selectionStart,
+						selectionEnd  : editor.selectionEnd
 					}
 				}
 			}
