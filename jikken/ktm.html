@@ -608,12 +608,16 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 									|| 8;
 						tabSize = Number(tabSize);
 						
-						// スタート位置特定
+						// スタート・エンド位置特定
 						var orgText = $(this).val();
 						while ((0 < start) && (orgText.charAt(start - 1) != "\n")) {
 							start--;
 						}
+						while ((end < orgText.length) && (orgText.charAt(end) != "\n")) {
+							end++;
+						}
 						
+						var deleteCount = 0;
 						var newText = orgText.substring(0, start);
 						var i = start;
 						while (i < end) {
@@ -622,10 +626,13 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 							while (spaceCount < tabSize) {
 								if (c == " ") {
 									spaceCount += 1;
+									deleteCount++;
 								} else if (c == " ") {
 									spaceCount += 2;
+									deleteCount++;
 								} else if (c == "\t") {
 									spaceCount += tabSize;
+									deleteCount++;
 								} else {
 									newText += c;
 									i++;
@@ -644,14 +651,18 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						$(this).val(newText);
 						
 						this.selectionStart = start;
+						this.selectionEnd   = end - deleteCount;
 						saveUndo(e.target);
 					} else {
 						/* 選択 + Tabで複数行インデント */
 						
-						// スタート位置特定
+						// スタート・エンド位置特定
 						var orgText = $(this).val();
 						while ((0 < start) && (orgText.charAt(start - 1) != "\n")) {
 							start--;
+						}
+						while ((end < orgText.length) && (orgText.charAt(end) != "\n")) {
+							end++;
 						}
 						
 						// タブ挿入
@@ -754,7 +765,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 					saveUndo(e.target);
 				}
 			}).on("keydown", function(e){
-				if (e.originalEvent.code == "Enter") {  // ENTER // for chrome opera ie
+				if (e.originalEvent.code == "Enter") {
 					saveUndo(e.target);
 				} 
 			});
@@ -772,14 +783,14 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						this.selectionStart = undo.selectionStart;
 						this.selectionEnd   = undo.selectionEnd;
 						previousVal = undo;
-						console.log("undo");
 					}
 				}
 			});
 			
 			$(this).on("keydown", function(e) {
-				// Ctrl+Y or Cmd + Shift + Z
+				// Ctrl+Y or Ctrl + Shift + Z or Cmd + Shift + Z
 				if ((e.keyCode == 89 && (e.ctrlKey || e.metaKey))
+						|| (e.keyCode == 90 && e.ctrlKey && e.shiftKey)
 						|| (e.keyCode == 90 && e.metaKey && e.shiftKey)) {
 					e.preventDefault();
 					
@@ -789,7 +800,6 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						$(this).val(previousVal.val);
 						this.selectionStart = previousVal.selectionStart;
 						this.selectionEnd   = previousVal.selectionEnd;
-						console.log("redo");
 					}
 				}
 			});
