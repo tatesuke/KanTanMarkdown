@@ -600,6 +600,60 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 				}
 			});
 			
+			// オートインデント
+			$("#editor").on('keydown', function(e) {
+				// Enterキー
+				if (e.which == 13 || e.keyCode == 13) {
+					e.preventDefault();
+					
+					
+					// 行頭か先頭に至るまでさかのぼる
+					var count = 0;
+					var text = $(this).val();
+					var pos = this.selectionStart;
+					while ((0 < pos) && (text.charAt(pos - 1) != "\n")) {
+						pos--;
+						count++;
+					}
+					
+					// 先頭の空白文字を記憶
+					var spaces = "";
+					for (var i = 0; i < count; i++) {
+						var c = text.charAt(pos + i);
+						if((c != " ") && (c !=  "　") && (c != "\t")) {
+							break;
+						}
+						spaces += c;
+					}			
+					
+					// 改行の挿入
+					var maxScrollFlag = isMaxScroll(this);
+					var newPos = this.selectionStart + spaces.length + 1;
+					$(this).val(text.substr(0, this.selectionStart) + '\n' + spaces + text.substr(this.selectionEnd, text.length));
+					// カーソルの場所を移動
+					this.setSelectionRange(newPos, newPos);
+					// スクロール
+					if (maxScrollFlag) {
+						$("#editor")[0].scrollTop = $("#editor")[0].scrollHeight;
+					}
+					
+					saveUndo(e.target);
+				}
+			});
+
+			var isMaxScroll = function(elem) {
+				var isMaxScroll = false;
+				var scrollHeight = $(elem)[0].scrollHeight;
+				var offsetHeight = $(elem)[0].offsetHeight;
+				var borderTop = Number($(elem).css('border-top-width').replace(/px/, ""));
+				var borderBottom = Number($(elem).css('border-bottom-width').replace(/px/, ""));
+				var borderHeight = borderTop + borderBottom;
+				var scrollTop = $(elem)[0].scrollTop;
+				var diff = (scrollTop + offsetHeight - borderHeight) - scrollHeight
+				// Firefoxではborder-*-widthで小数点付きの数値が返ることがあるため数ピクセルの誤差を許容する
+				return (-1.0 <= diff) && (diff <= 1.0);
+			}
+
 			/* UNDO, REDO */
 			var keyCache = [];
 			var undoStack = [];
