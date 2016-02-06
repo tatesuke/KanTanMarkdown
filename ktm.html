@@ -578,6 +578,108 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 //# sourceMappingURL=flowchart.min.js.map
 </script>
 <script>
+(function( $ ){
+	$.fn.kantanEditor = function( options ) {
+		return this.each(function() {
+			/* tabキーでtabを入力 */
+			$("#editor").on('keydown', function(e) {
+				if (e.which == 9 || e.keyCode == 9) {
+					e.preventDefault();
+					
+					// for chrome and opera 
+					var cmdResult = document.execCommand('insertText', false, "\t"); 
+					
+					// for IE, Firefox
+					if (cmdResult == false) {
+						var text = $(this).val();
+						var start = this.selectionStart;
+						$(this).val(text.substr(0, start) + '\t' + text.substr(start, text.length));
+						this.setSelectionRange(start + 1, start + 1);
+					}
+				}
+			});
+			
+			/* UNDO, REDO */
+			var keyCache = [];
+			var undoStack = [];
+			var redoStack = [];
+			var previousVal = {val:$("#editor").val(), selectionStart:0, selectionEnd:0};
+			$("#editor").on("keypress", function(e){
+				keyCache[e.originalEvent.code] = true;
+			}).on("keyup", function(e){
+				if ((e.which == 13 || e.keyCode == 13)                          // ENTER
+						|| (e.which == 8 || e.keyCode == 8)                      // BS
+						|| (e.which == 46 || e.keyCode == 46)                    // DELETE
+						|| ((e.which == 86 || e.keyCode == 86) && e.ctrlKey)     // Ctrl+v
+						|| ((e.which == 88 || e.keyCode == 88) && e.ctrlKey)) {  //Ctrl+x
+					
+					saveUndo();
+				} 
+				if (keyCache[e.originalEvent.code] == true) {
+					keyCache[e.originalEvent.code] = false;
+					saveUndo();
+				}
+			}).on("keydown", function(e){
+				if (e.originalEvent.code == "Enter") {  // ENTER // for chrome opera ie
+					saveUndo();
+				} 
+			});
+			
+			$("#editor").on("keydown", function(e) {
+				// Ctrl+Z
+				if (e.keyCode == 90 && e.ctrlKey) {
+					e.preventDefault();
+					
+					if (0 < undoStack.length) {
+						redoStack.push(previousVal);
+						
+						var undo = undoStack.pop();
+						$(this).val(undo.val);
+						this.selectionStart = undo.selectionStart;
+						this.selectionEnd   = undo.selectionEnd;
+						previousVal = undo;
+						console.log("undo");
+						
+					}
+				}
+			});
+			
+			$("#editor").on("keydown", function(e) {
+				// Ctrl+Y
+				if (e.keyCode == 89 && e.ctrlKey) {
+					e.preventDefault();
+					
+					if (0 < redoStack.length) {
+						undoStack.push(previousVal);
+						previousVal = redoStack.pop();
+						$(this).val(previousVal.val);
+						this.selectionStart = previousVal.selectionStart;
+						this.selectionEnd   = previousVal.selectionEnd;
+						
+						console.log("redo");
+					}
+				}
+			});
+			
+			function saveUndo() {
+				var editor= $("#editor");
+				if (previousVal.val != editor.val()) {
+					undoStack.push(previousVal);
+					redoStack = [];
+					previousVal = {
+						val: editor.val(),
+						selectionStart: editor[0].selectionStart,
+						selectionEnd  : editor[0].selectionEnd
+					}
+				}
+			}
+    	});
+	
+	};
+	
+})( jQuery );
+</script>
+<script>
 (function($){
 	
 	/* 編集不可ブラウザ判定 */
@@ -600,6 +702,9 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		$("#messageArea").text("このブラウザでは編集できません。");
 		$("nav > *").attr("disabled", "disabled");
 	}
+	
+	/* エディタに機能追加 */
+	$("#editor").kantanEditor();
 	
 	/* シンタックスハイライト設定 */
 	marked.setOptions({
@@ -935,100 +1040,6 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	window.onbeforeunload = function() {
 		if (!saved) {
 			return "ドキュメントが保存されていません。"
-		}
-	}
-	
-	/* tabキーでtabを入力 */
-	$("#editor").on('keydown', function(e) {
-		if (e.which == 9 || e.keyCode == 9) {
-			e.preventDefault();
-			
-			// for chrome and opera 
-			var cmdResult = document.execCommand('insertText', false, "\t"); 
-			
-			// for IE, Firefox
-			if (cmdResult == false) {
-				var text = $(this).val();
-				var start = this.selectionStart;
-				$(this).val(text.substr(0, start) + '\t' + text.substr(start, text.length));
-				this.setSelectionRange(start + 1, start + 1);
-			}
-		}
-	});
-
-	/* UNDO, REDO */
-	var keyCache = [];
-	var undoStack = [];
-	var redoStack = [];
-	var previousVal = {val:$("#editor").val(), selectionStart:0, selectionEnd:0};
-	$("#editor").on("keypress", function(e){
-		keyCache[e.originalEvent.code] = true;
-	}).on("keyup", function(e){
-		if ((e.which == 13 || e.keyCode == 13)                          // ENTER
-				|| (e.which == 8 || e.keyCode == 8)                      // BS
-				|| (e.which == 46 || e.keyCode == 46)                    // DELETE
-				|| ((e.which == 86 || e.keyCode == 86) && e.ctrlKey)     // Ctrl+v
-				|| ((e.which == 88 || e.keyCode == 88) && e.ctrlKey)) {  //Ctrl+x
-			
-			saveUndo();
-		} 
-		if (keyCache[e.originalEvent.code] == true) {
-			keyCache[e.originalEvent.code] = false;
-			saveUndo();
-		}
-	}).on("keydown", function(e){
-		if (e.originalEvent.code == "Enter") {  // ENTER // for chrome opera ie
-			saveUndo();
-		} 
-	});
-	
-
-	$("#editor").on("keydown", function(e) {
-		// Ctrl+Z
-		if (e.keyCode == 90 && e.ctrlKey) {
-			e.preventDefault();
-			
-			if (0 < undoStack.length) {
-				redoStack.push(previousVal);
-				
-				var undo = undoStack.pop();
-				$(this).val(undo.val);
-				this.selectionStart = undo.selectionStart;
-				this.selectionEnd   = undo.selectionEnd;
-				previousVal = undo;
-				console.log("undo");
-				
-			}
-		}
-	});
-	
-	$("#editor").on("keydown", function(e) {
-		// Ctrl+Y
-		if (e.keyCode == 89 && e.ctrlKey) {
-			e.preventDefault();
-			
-			if (0 < redoStack.length) {
-				undoStack.push(previousVal);
-				previousVal = redoStack.pop();
-				$(this).val(previousVal.val);
-				this.selectionStart = previousVal.selectionStart;
-				this.selectionEnd   = previousVal.selectionEnd;
-				
-				console.log("redo");
-			}
-		}
-	});
-	
-	function saveUndo() {
-		var editor= $("#editor");
-		if (previousVal.val != editor.val()) {
-			undoStack.push(previousVal);
-			redoStack = [];
-			previousVal = {
-				val: editor.val(),
-				selectionStart: editor[0].selectionStart,
-				selectionEnd  : editor[0].selectionEnd
-			}
 		}
 	}
 	
