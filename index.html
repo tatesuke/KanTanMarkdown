@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <!--
- * KanTanMarkdown v1.20160205.01
+ * KanTanMarkdown v1.20160206.01
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
@@ -493,6 +493,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 </head>
 <body class="">
 <nav>
+	<span id="messageArea"></span>
 	<input type="checkbox" id="autoSyncButton" name="autoSyncButton" checked="checked"><label for="autoSyncButton">自動同期</label>
 	<button id="syncButton">同期(F5)</button><button id="toggleButton">編集/閲覧(ESC)</button><button id="saveButton">保存(Ctrl+S)</button>
 </nav>
@@ -507,10 +508,10 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 	</div>
 	<button id="attachToggleButton">添付ファイルを隠す(Ctrl+↑)</button><button id="previewToggleButton">プレビューを隠す(Ctrl+→)</button>
 </div>
-<div id="wrapper" style="height: 897px;">
+<div id="wrapper" style="height: 638px;">
 	<noscript>このファイルはJavaScriptを有効にしないと閲覧できません。</noscript>
 	<textarea id="editor" style="display: none;"># かんたんMarkdown
-かんたんMarkdownは**完**全に**単**一のHTMLファイルで動作するちょっと変わったMarkdownエディタ、プレビューアです。クロスプラットフォームで、リアルタイムプレビューにも対応しています。
+かんたんMarkdownはメモ帳感覚で使えるちょっと変わったMarkdownエディタ、プレビューアです。クロスプラットフォームで、リアルタイムプレビューにも対応しています。
 
 * ちょっとメモしたいけどMarkdownの環境がない
 * 人に渡す簡単な資料をMarkdownで作りたい
@@ -526,7 +527,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 ## 特徴
 
 ### 完全に単一のファイルで動く
-かんたんMarkdownは完全に単一のHTMLファイルで動作します。したがって、JavaScriptが動作するブラウザさえあればどこでもMarkdownを利用することができます。面倒な環境構築は不要です。Windows, Mac OS, LinuxなどOSを意識する必要もありません。
+かんたんMarkdownは**完**全に**単**一のHTMLファイルで動作します。したがって、JavaScriptが動作するブラウザさえあればどこでもMarkdownを利用することができます。面倒な環境構築は不要です。Windows, Mac OSなどOSを意識する必要もほとんどありません。
 
 ### 非クラウドアプリ
 ウェブブラウザ上で動作しますがクラウドアプリではありません。また、編集内容を外部に送信する機能は一切備わっていません。セキュリティ上クラウドアプリを利用できない環境でも利用することができます。
@@ -748,7 +749,290 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 //# sourceMappingURL=flowchart.min.js.map
 </script>
 <script>
+(function( $ ){
+	$.fn.kantanEditor = function( options ) {
+		return this.each(function() {
+			$(this).on('keydown', function(e) {
+				/* tabキーでtabを入力 */
+				
+				if ((e.which != 9) && (e.keyCode != 9)) {
+					return true;
+				}
+				e.preventDefault();
+				
+				var start = this.selectionStart;
+				var end   = this.selectionEnd;
+				if (start == end) {
+					/* いわゆる普通のtab */
+					
+					var text = $(this).val();
+					$(this).val(text.substr(0, start) + '\t' + text.substr(start, text.length));
+					this.setSelectionRange(start + 1, start + 1);
+					saveUndo(e.target);
+				} else {
+					if (e.shiftKey) {
+						/* 選択 + Shift + Tabで複数行アウトデント */
+						
+						var tabSize = $(this).css("tab-size")
+									|| $(this).css("-moz-tab-size")
+									|| $(this).css("-o-tab-size")
+									|| 8;
+						tabSize = Number(tabSize);
+						
+						// スタート・エンド位置特定
+						var orgText = $(this).val();
+						while ((0 < start) && (orgText.charAt(start - 1) != "\n")) {
+							start--;
+						}
+						if (orgText.charAt(end - 1) == "\n") {
+							end -= 1;
+						}
+						while ((end < orgText.length) && (orgText.charAt(end) != "\n")) {
+							end++;
+						}
+						end--;
+						
+						var deleteCount = 0;
+						var newText = orgText.substring(0, start);
+						var i = start;
+						while (i < end) {
+							var c = orgText.charAt(i);
+							var spaceCount = 0;
+							while (spaceCount < tabSize) {
+								if (c == " ") {
+									spaceCount += 1;
+									deleteCount++;
+								} else if (c == " ") {
+									spaceCount += 2;
+									deleteCount++;
+								} else if (c == "\t") {
+									spaceCount += tabSize;
+									deleteCount++;
+								} else {
+									newText += c;
+									i++;
+									break;
+								}
+								c = orgText.charAt(++i);
+							}
+							while ((c != "\n") && (i < end)) {
+								c = orgText.charAt(i++);
+								newText += c;
+							} 
+						}
+						newText += orgText.substr(end)
+						
+						$(this).val(newText);
+						
+						this.selectionStart = start;
+						this.selectionEnd   = end - deleteCount + 1;
+						saveUndo(e.target);
+					} else {
+						/* 選択 + Tabで複数行インデント */
+						
+						// スタート・エンド位置特定
+						var orgText = $(this).val();
+						while ((0 < start) && (orgText.charAt(start - 1) != "\n")) {
+							start--;
+						}
+						if (orgText.charAt(end - 1) == "\n") {
+							end -= 1;
+						}
+						while ((end < orgText.length) && (orgText.charAt(end) != "\n")) {
+							end++;
+						}
+						
+						// タブ挿入
+						var count = 1;
+						var newText = orgText.substring(0, start) + "\t";
+						for (var i = start; i < end; i++) {
+							var c = orgText.charAt(i);
+							newText += c;
+							if (c == "\n") {
+								newText += "\t";
+								count++;
+							}
+						}
+						newText += orgText.substr(end);
+						
+						// テキスト入れ替え
+						$(this).val(newText);
+						
+						// 選択位置修正
+						this.selectionStart = start;
+						this.selectionEnd   = end + count;
+						saveUndo(e.target);
+					}
+				}
+				
+				return false;
+			}).on('keydown', function(e) {
+				/* オートインデント */
+				
+				// Enterキー
+				if (e.which == 13 || e.keyCode == 13) {
+					e.preventDefault();
+					
+					
+					// 行頭か先頭に至るまでさかのぼる
+					var count = 0;
+					var text = $(this).val();
+					var pos = this.selectionStart;
+					while ((0 < pos) && (text.charAt(pos - 1) != "\n")) {
+						pos--;
+						count++;
+					}
+					
+					// 先頭の空白文字を記憶
+					var spaces = "";
+					for (var i = 0; i < count; i++) {
+						var c = text.charAt(pos + i);
+						if((c != " ") && (c !=  "　") && (c != "\t")) {
+							break;
+						}
+						spaces += c;
+					}			
+					
+					// 改行の挿入
+					var maxScrollFlag = isMaxScroll(this);
+					var newPos = this.selectionStart + spaces.length + 1;
+					$(this).val(text.substr(0, this.selectionStart) + '\n' + spaces + text.substr(this.selectionEnd, text.length));
+					// カーソルの場所を移動
+					this.setSelectionRange(newPos, newPos);
+					// スクロール
+					if (maxScrollFlag) {
+						$("#editor")[0].scrollTop = $("#editor")[0].scrollHeight;
+					}
+					
+					saveUndo(e.target);
+				}
+			});
+
+			var isMaxScroll = function(elem) {
+				var isMaxScroll = false;
+				var scrollHeight = $(elem)[0].scrollHeight;
+				var offsetHeight = $(elem)[0].offsetHeight;
+				var borderTop = Number($(elem).css('border-top-width').replace(/px/, ""));
+				var borderBottom = Number($(elem).css('border-bottom-width').replace(/px/, ""));
+				var borderHeight = borderTop + borderBottom;
+				var scrollTop = $(elem)[0].scrollTop;
+				var diff = (scrollTop + offsetHeight - borderHeight) - scrollHeight
+				// Firefoxではborder-*-widthで小数点付きの数値が返ることがあるため数ピクセルの誤差を許容する
+				return (-1.0 <= diff) && (diff <= 1.0);
+			}
+
+			/* Undo, Redo */
+			var keyCache = [];
+			var undoStack = [];
+			var redoStack = [];
+			var previousVal = {val:$(this).val(), selectionStart:0, selectionEnd:0};
+			$(this).on("keypress", function(e){
+				keyCache[e.originalEvent.code] = true;
+			}).on("keyup", function(e){
+				if ((e.which == 13 || e.keyCode == 13)                          // ENTER
+						|| (e.which == 8 || e.keyCode == 8)                      // BS
+						|| (e.which == 46 || e.keyCode == 46)                    // DELETE
+						|| ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey))     // Ctrl+v
+						|| ((e.which == 88 || e.keyCode == 88) && (e.ctrlKey || e.metaKey))) {  //Ctrl+x
+					
+					saveUndo(e.target);
+				} 
+				if (keyCache[e.originalEvent.code] == true) {
+					keyCache[e.originalEvent.code] = false;
+					saveUndo(e.target);
+				}
+			}).on("keydown", function(e){
+				if (e.originalEvent.code == "Enter") {
+					saveUndo(e.target);
+				} 
+				if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey)) {
+					saveUndoAfterPaste(e.target);
+				}
+			});
+			
+			$(this).on("keydown", function(e) {
+				// Ctrl+Z
+				if (e.keyCode == 90 && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
+					e.preventDefault();
+					
+					if (0 < undoStack.length) {
+						redoStack.push(previousVal);
+						
+						var undo = undoStack.pop();
+						$(this).val(undo.val);
+						this.selectionStart = undo.selectionStart;
+						this.selectionEnd   = undo.selectionEnd;
+						previousVal = undo;
+					}
+				}
+			});
+			
+			$(this).on("keydown", function(e) {
+				// Ctrl+Y or Ctrl + Shift + Z or Cmd + Shift + Z
+				if ((e.keyCode == 89 && (e.ctrlKey || e.metaKey))
+						|| (e.keyCode == 90 && e.ctrlKey && e.shiftKey)
+						|| (e.keyCode == 90 && e.metaKey && e.shiftKey)) {
+					e.preventDefault();
+					
+					if (0 < redoStack.length) {
+						undoStack.push(previousVal);
+						previousVal = redoStack.pop();
+						$(this).val(previousVal.val);
+						this.selectionStart = previousVal.selectionStart;
+						this.selectionEnd   = previousVal.selectionEnd;
+					}
+				}
+			});
+			
+			var saveUndo = function(editor) {
+				if (previousVal.val != $(editor).val()) {
+					undoStack.push(previousVal);
+					redoStack = [];
+					previousVal = {
+						val: $(editor).val(),
+						selectionStart: editor.selectionStart,
+						selectionEnd  : editor.selectionEnd
+					}
+				}
+			}
+			
+			var saveUndoAfterPaste = function(editor) {
+				redoStack = [];
+				previousVal = {
+					val: $(editor).val(),
+					selectionStart: editor.selectionStart,
+					selectionEnd  : editor.selectionEnd
+				}
+			}
+    	});
+	};
+})( jQuery );
+</script>
+<script>
 (function($){
+	
+	/* 編集不可ブラウザ判定 */
+
+	// Blobが使用できないブラウザは保存不可(IE9等)
+	try {
+		new Blob(["temp"]);
+	} catch(e) {
+		setViewMode(); 
+	}
+
+	// Safariはdownload属性に対応していないので閲覧のみ
+	var ua = window.navigator.userAgent.toLowerCase();
+	if ((ua.indexOf("chrome") == -1) && (ua.indexOf('safari') != -1)) {
+		setViewMode();
+	}
+	
+	function setViewMode() {
+		$("#messageArea").text("このブラウザでは編集できません。");
+		$("nav > *").attr("disabled", "disabled");
+	}
+	
+	/* エディタに機能追加 */
+	$("#editor").kantanEditor();
 	
 	/* シンタックスハイライト設定 */
 	marked.setOptions({
@@ -1032,13 +1316,12 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		}
 	}
 
-
 	/* 保存 */
 	$("#saveButton").on("click", save);
 	
 	function save() {
 		// テキストエリアは値を入れなおさないと保存されない。
-		$("#editor").html($("#editor").val());
+		$("#editor").html($("#editor").val().replace(/</g, "&lt;"));
 	
 		var toggleFlag = $("#editor").is(":visible");
 		if (toggleFlag == true) {
@@ -1047,6 +1330,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		
 		/* ファイルの肥大化を防ぐため中身を消去 */
 		$("#previewer").html("");
+		$("#messageArea").html("");
 		
 		var html = "<!doctype html>\n<html>\n";
 		html += $("html").html();
@@ -1086,24 +1370,6 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		}
 	}
 	
-	/* tabキーでtabを入力 */
-	$("#editor").on('keydown', function(e) {
-		if (e.which == 9 || e.keyCode == 9) {
-			e.preventDefault();
-			
-			// for chrome and opera 
-			var cmdResult = document.execCommand('insertText', false, "\t"); 
-			
-			// for IE, Firefox
-			if (cmdResult == false) {
-				var text = $(this).val();
-				var start = this.selectionStart;
-				$(this).val(text.substr(0, start) + '\t' + text.substr(start, text.length));
-				this.setSelectionRange(start + 1, start + 1);
-			}
-		}
-	});
-	
 	/* ショートカットキー */
 	$(window).keydown(function(event) {	
 		var code = (event.keyCode ? event.keyCode : event.which);
@@ -1111,49 +1377,54 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		if (code == 27) {
 			// ESCキーで閲覧/編集モード切り替え
 			event.preventDefault();
-			toggleMode();
+			if ($("#toggleButton").is(":enabled")) {
+				$("#toggleButton").click();
+			}
 			return false;
 		}
 		
 		
-		if (code == 83 && event.ctrlKey){
+		if (code == 83 && (event.ctrlKey || event.metaKey)){
 			// CTRL+Sで保存する
 			event.preventDefault();
-			doPreview();
-			save();
+			if ($("#saveButton").is(":enabled")) {
+				$("#saveButton").click();
+			}
 			return false;
 		}
 		
 		if (code == 116 ||
-				((code == 82) && event.ctrlKey)){
+				((code == 82) && (event.ctrlKey || event.metaKey))){
 			// F5 or Ctrl + Rでエディタとプレビューアを同期
 			event.preventDefault();
-			doPreview();
+			if ($("#syncButton").is(":enabled")) {
+				doPreview();
+			}
 			return false;
 		}
 
-		if ((code == 37) && event.ctrlKey) {
+		if ((code == 37) && (event.ctrlKey || event.metaKey)) {
 			// Ctrl+←
 			event.preventDefault();
 			openPreview();
 			return false;
 		}
 
-		if ((code == 38) && event.ctrlKey) {
+		if ((code == 38) && (event.ctrlKey || event.metaKey)) {
 			// Ctrl+↑
 			event.preventDefault();
 			closeFiler();
 			return false;
 		}
 
-		if ((code == 39) && event.ctrlKey) {
+		if ((code == 39) && (event.ctrlKey || event.metaKey)) {
 			// Ctrl+→
 			event.preventDefault();
 			closePreview();
 			return false;
 		}
 		
-		if ((code == 40) && event.ctrlKey) {
+		if ((code == 40) && (event.ctrlKey || event.metaKey)) {
 			// Ctrl+↓
 			event.preventDefault();
 			openFiler();
