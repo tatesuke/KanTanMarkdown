@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <!--
- * KanTanMarkdown v1.20160206.01
+ * KanTanMarkdown v1.20160207.01
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
@@ -754,7 +754,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			var keyCache = [];
 			var undoStack = [];
 			var redoStack = [];
-			var previousVal = {val:$(this).val(), selectionStart:0, selectionEnd:0};
+			var previousVal = {val:$(this).val(), selectionStart:undefined, selectionEnd:undefined};
 			$(this).on("keypress", function(e){
 				keyCache[e.originalEvent.code] = true;
 			}).on("keyup", function(e){
@@ -765,17 +765,21 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						|| ((e.which == 88 || e.keyCode == 88) && (e.ctrlKey || e.metaKey))) {  //Ctrl+x
 					
 					saveUndo(e.target);
-				} 
-				if (keyCache[e.originalEvent.code] == true) {
+				} else if (keyCache[e.originalEvent.code] == true) {
+					// keypressが発生していた(IME OFF)なら、Undo可能にする
 					keyCache[e.originalEvent.code] = false;
 					saveUndo(e.target);
 				}
 			}).on("keydown", function(e){
 				if (e.originalEvent.code == "Enter") {
 					saveUndo(e.target);
-				} 
-				if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey)) {
+				} else if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey)) {
+					// Ctrl + vの前にundoできるようにする
 					saveUndoAfterPaste(e.target);
+				} else if (!previousVal.selectionStart) {
+					// 編集開始1文字目入力前にカーソル位置を記憶する(#66fix)
+					previousVal.selectionStart = this.selectionStart;
+					previousVal.selectionEnd = this.selectionEnd;
 				}
 			});
 			
