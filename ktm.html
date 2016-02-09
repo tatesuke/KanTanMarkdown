@@ -753,6 +753,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			}
 
 			/* Undo, Redo */
+			var isCtrlVDowning = false;
 			var keyCache = [];
 			var undoStack = [];
 			var redoStack = [];
@@ -772,12 +773,20 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 					keyCache[e.originalEvent.code] = false;
 					saveUndo(e.target);
 				}
+				// Ctrl+Vを離したらフラグを下げる
+				if (!e.ctrlKey && !e.metaKey && isCtrlVDowning) {
+					isCtrlVDowning = false;
+				}
 			}).on("keydown", function(e){
 				if (e.originalEvent.code == "Enter") {
 					saveUndo(e.target);
-				} else if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey)) {
+				} else if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey) && !isCtrlVDowning) {
 					// Ctrl + vの前にundoできるようにする
 					saveUndoAfterPaste(e.target);
+					isCtrlVDowning = true;
+				} else if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey) && isCtrlVDowning) {
+					// Ctrl + vを押しっぱなしの時は普通のundo(#73 fix)
+					saveUndo(e.target);
 				} else if (!previousVal.selectionStart) {
 					// 編集開始1文字目入力前にカーソル位置を記憶する(#66fix)
 					previousVal.selectionStart = this.selectionStart;
