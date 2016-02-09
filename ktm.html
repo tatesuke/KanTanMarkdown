@@ -1054,11 +1054,13 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		attachFiles(e.originalEvent.dataTransfer.files);
 		$(this).removeClass("onDragover");
 		
-		if (!$("#editor").is(":visible")) {
-			$("#toggleButton").click();
-		}
-		if (!$("#filer").is(":visible")) {
-			openFiler();
+		if (0 < e.originalEvent.dataTransfer.files.length) {
+			if (!$("#editor").is(":visible")) {
+				$("#toggleButton").click();
+			}
+			if (!$("#filer").is(":visible")) {
+				openFiler();
+			}
 		}
 	});
 	
