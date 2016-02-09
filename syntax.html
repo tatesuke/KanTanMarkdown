@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <!--
- * KanTanMarkdown v1.20160208.01
+ * KanTanMarkdown v1.20160209.01
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
@@ -32,6 +32,7 @@ nav {
 	box-sizing:border-box;
 	width:100%;
 	height:100%;
+	display:none;
 }
 
 input[type="file"] {
@@ -43,6 +44,7 @@ input[type="file"] {
 	width:100%;
 	height:150px;
 	overflow: auto;
+	display:none;
 }
 
 #attachToggleButton,
@@ -506,7 +508,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 	</div>
 	<button id="attachToggleButton">添付ファイルを表示(Alt+↓)</button><button id="previewToggleButton">プレビューを隠す(Alt+→)</button>
 </div>
-<div id="wrapper" style="height: 897px;">
+<div id="wrapper" style="height: 852px;">
 	<noscript>このファイルはJavaScriptを有効にしないと閲覧できません。</noscript>
 	<textarea id="editor" style="display: none;"># かんたんMarkdownの記法
 
@@ -1120,6 +1122,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			}
 
 			/* Undo, Redo */
+			var isCtrlVDowning = false;
 			var keyCache = [];
 			var undoStack = [];
 			var redoStack = [];
@@ -1139,12 +1142,20 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 					keyCache[e.originalEvent.code] = false;
 					saveUndo(e.target);
 				}
+				// Ctrl+Vを離したらフラグを下げる
+				if (!e.ctrlKey && !e.metaKey && isCtrlVDowning) {
+					isCtrlVDowning = false;
+				}
 			}).on("keydown", function(e){
 				if (e.originalEvent.code == "Enter") {
 					saveUndo(e.target);
-				} else if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey)) {
+				} else if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey) && !isCtrlVDowning) {
 					// Ctrl + vの前にundoできるようにする
 					saveUndoAfterPaste(e.target);
+					isCtrlVDowning = true;
+				} else if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey) && isCtrlVDowning) {
+					// Ctrl + vを押しっぱなしの時は普通のundo(#73 fix)
+					saveUndo(e.target);
 				} else if (!previousVal.selectionStart) {
 					// 編集開始1文字目入力前にカーソル位置を記憶する(#66fix)
 					previousVal.selectionStart = this.selectionStart;
@@ -1408,9 +1419,18 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	});
 	$("body").on('drop', function(e) {
 		e.stopPropagation();
-    	e.preventDefault();
-    	attachFiles(e.originalEvent.dataTransfer.files);
-    	$(this).removeClass("onDragover");
+		e.preventDefault();
+		attachFiles(e.originalEvent.dataTransfer.files);
+		$(this).removeClass("onDragover");
+		
+		if (0 < e.originalEvent.dataTransfer.files.length) {
+			if (!$("#editor").is(":visible")) {
+				$("#toggleButton").click();
+			}
+			if (!$("#filer").is(":visible")) {
+				openFiler();
+			}
+		}
 	});
 	
 	$("body").on("dragleave", function() {
