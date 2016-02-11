@@ -582,7 +582,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 <script>
 (function( $ ){
 	$.fn.kantanEditor = function( options ) {
-		return this.each(function() {
+		return this.each(function() {			
 			$(this).on('keydown', function(e) {
 				/* tabキーでtabを入力 */
 				
@@ -724,33 +724,53 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						spaces += c;
 					}			
 					
-					// 改行の挿入
-					var maxScrollFlag = isMaxScroll(this);
-					var newPos = this.selectionStart + spaces.length + 1;
-					$(this).val(text.substr(0, this.selectionStart) + '\n' + spaces + text.substr(this.selectionEnd, text.length));
-					// カーソルの場所を移動
-					this.setSelectionRange(newPos, newPos);
-					// スクロール
-					if (maxScrollFlag) {
-						$("#editor")[0].scrollTop = $("#editor")[0].scrollHeight;
+					// 改行＋スペース（タブ）の挿入
+					var isInsertEnabled;
+					try {
+						isInsertEnabled = document.execCommand("insertText", false, "\n" + spaces);
+					} catch(e) {
+						// IE10では何故かfalseを返さずに例外が発生するのでcatchで対応する
+						isInsertEnabled = false;
+					}
+					
+					if (isInsertEnabled) {
+						// ChromeはinsertTextに成功する。
+						// しかし、カーソルが画面外に出た時にそのままではスクロールバーが追従してくれないので
+						// 苦肉の策として一旦フォーカスを外してすぐに戻す。そうするとスクロールバーが追従する
+						// これにより、kantanEditorはblurやfocusイベントはまともに使えなくなる黒魔術
+						$(this).trigger("blur", ["kantanEditorDummy"]);
+						$(this).trigger("focus", ["kantanEditorDummy"]);
+					} else {
+						// IE,FirefoxはinsertTextに失敗するのでvalで書き換える。
+						// しかし、IEはカーソルが画面外に出た時にそのままではスクロールバーが追従してくれないので
+						// 敢えて余計な文字列(dummy)を挿入して、その後にdeleteコマンドで削除する
+						// deleteコマンドを実行することでスクロールバーが追従する
+						var selectionStart = this.selectionStart;
+						var selectionEnd   = this.selectionEnd;
+						var newPos = selectionStart + spaces.length + 1;
+						$(this).val(text.substr(0, selectionStart)
+								+ '\n' + spaces + "dummy"
+								+ text.substr(selectionEnd, text.length));
+						
+						// IEでは何故か範囲選択後のdeleteでselectionStartの位置がおかしくなってしまう
+						// その後、範囲選択無しのdeleteを実行すると正しくなるのでそのような実装にする
+						// 多分IEのバグ
+						this.setSelectionRange(newPos, newPos + "dummy".length - 1);
+						var isDeleteEnabled = document.execCommand("delete", false, null);
+						document.execCommand("delete", false, null); 
+						
+						if (!isDeleteEnabled) {
+							// Firefoxはdeleteに失敗するので再度dummy無しで挿入し直す
+							// 無駄な処理が多いが実用上問題なさそう
+							$(this).val(text.substr(0, selectionStart) + '\n' + spaces + text.substr(selectionEnd, text.length));
+							this.selectionStart = newPos;
+							this.selectionEnd   = newPos;
+						} 
 					}
 					
 					saveUndo(e.target);
 				}
 			});
-
-			var isMaxScroll = function(elem) {
-				var isMaxScroll = false;
-				var scrollHeight = $(elem)[0].scrollHeight;
-				var offsetHeight = $(elem)[0].offsetHeight;
-				var borderTop = Number($(elem).css('border-top-width').replace(/px/, ""));
-				var borderBottom = Number($(elem).css('border-bottom-width').replace(/px/, ""));
-				var borderHeight = borderTop + borderBottom;
-				var scrollTop = $(elem)[0].scrollTop;
-				var diff = (scrollTop + offsetHeight - borderHeight) - scrollHeight
-				// Firefoxではborder-*-widthで小数点付きの数値が返ることがあるため数ピクセルの誤差を許容する
-				return (-1.0 <= diff) && (diff <= 1.0);
-			}
 
 			/* Undo, Redo */
 			var isCtrlVDowning = false;
@@ -848,7 +868,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 					selectionEnd  : editor.selectionEnd
 				}
 			}
-    	});
+		});
 	};
 })( jQuery );
 </script>
