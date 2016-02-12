@@ -774,10 +774,11 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 
 			/* Undo, Redo */
 			var isCtrlVDowning = false;
-			var keyCache = [];
+			var keyCache = {};
 			var undoStack = [];
 			var redoStack = [];
 			var previousVal = {val:$(this).val(), selectionStart:undefined, selectionEnd:undefined};
+			var valueAtArrowOrClick = undefined;
 			$(this).on("keypress", function(e){
 				keyCache[e.originalEvent.code] = true;
 			}).on("keyup", function(e){
@@ -789,9 +790,19 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 					
 					saveUndo(e.target);
 				} else if (keyCache[e.originalEvent.code] == true) {
-					// keypressが発生していた(IME OFF)なら、Undo可能にする
-					keyCache[e.originalEvent.code] = false;
-					saveUndo(e.target);
+					var code = (e.keyCode ? e.keyCode : e.which);
+					if ((37 <= code) && (code <= 40)) {
+						valueAtArrowOrClick = {
+							val: $(this).val(),
+							selectionStart: this.selectionStart,
+							selectionEnd: this.selectionEnd
+						};
+						keyCache[e.originalEvent.code] = false;
+					} else {
+						// keypressが発生していた(IME OFF)なら、Undo可能にする
+						keyCache[e.originalEvent.code] = false;
+						saveUndo(e.target);
+					}
 				}
 				// Ctrl+Vを離したらフラグを下げる
 				if (!e.ctrlKey && !e.metaKey && isCtrlVDowning) {
@@ -807,11 +818,17 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 				} else if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey) && isCtrlVDowning) {
 					// Ctrl + vを押しっぱなしの時は普通のundo(#73 fix)
 					saveUndo(e.target);
-				} else if (!previousVal.selectionStart) {
-					// 編集開始1文字目入力前にカーソル位置を記憶する(#66fix)
-					previousVal.selectionStart = this.selectionStart;
-					previousVal.selectionEnd = this.selectionEnd;
+				} 
+				var code = (e.keyCode ? e.keyCode : e.which);
+				if ((37 <= code) && (code <= 40)) {
+					keyCache[e.originalEvent.code] = true;
 				}
+			}).on("mouseup", function(e) {
+				valueAtArrowOrClick = {
+					val: $(this).val(),
+					selectionStart: this.selectionStart,
+					selectionEnd: this.selectionEnd
+				};
 			});
 			
 			$(this).on("keydown", function(e) {
@@ -850,7 +867,13 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			
 			var saveUndo = function(editor) {
 				if (previousVal.val != $(editor).val()) {
-					undoStack.push(previousVal);
+					if(valueAtArrowOrClick) {
+						undoStack.push(valueAtArrowOrClick);
+						valueAtArrowOrClick = undefined;
+					} else {
+						undoStack.push(previousVal);
+					}
+					
 					redoStack = [];
 					previousVal = {
 						val: $(editor).val(),
