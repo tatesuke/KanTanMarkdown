@@ -583,9 +583,9 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 (function( $ ){
 	$.fn.kantanEditor = function( options ) {
 		return this.each(function() {
+		
+			/* tabキーでtabを入力 */
 			$(this).on('keydown', function(e) {
-				/* tabキーでtabを入力 */
-				
 				if ((e.which != 9) && (e.keyCode != 9)) {
 					return true;
 				}
@@ -697,8 +697,10 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 				}
 				
 				return false;
-			}).on('keydown', function(e) {
-				/* オートインデント */
+			});
+			
+			/* オートインデント */
+			$(this).on('keydown', function(e) {
 				
 				// Enterキー
 				if (e.which == 13 || e.keyCode == 13) {
@@ -779,7 +781,22 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			var redoStack = [];
 			var previousVal = {val:$(this).val(), selectionStart:undefined, selectionEnd:undefined};
 			var valueAtArrowOrClick = undefined;
-			$(this).on("keypress", function(e){
+			$(this).on("keydown", function(e){
+				if (e.originalEvent.code == "Enter") {
+					saveUndo(e.target);
+				} else if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey) && !isCtrlVDowning) {
+					// Ctrl + vの前にundoできるようにする
+					saveUndoAfterPaste(e.target);
+					isCtrlVDowning = true;
+				} else if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey) && isCtrlVDowning) {
+					// Ctrl + vを押しっぱなしの時は普通のundo(#73 fix)
+					saveUndo(e.target);
+				} 
+				var code = (e.keyCode ? e.keyCode : e.which);
+				if ((37 <= code) && (code <= 40)) {
+					keyCache[e.originalEvent.code] = true;
+				}
+			}).on("keypress", function(e){
 				keyCache[e.originalEvent.code] = true;
 			}).on("keyup", function(e){
 				if ((e.which == 13 || e.keyCode == 13)                          // ENTER
@@ -807,21 +824,6 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 				// Ctrl+Vを離したらフラグを下げる
 				if (!e.ctrlKey && !e.metaKey && isCtrlVDowning) {
 					isCtrlVDowning = false;
-				}
-			}).on("keydown", function(e){
-				if (e.originalEvent.code == "Enter") {
-					saveUndo(e.target);
-				} else if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey) && !isCtrlVDowning) {
-					// Ctrl + vの前にundoできるようにする
-					saveUndoAfterPaste(e.target);
-					isCtrlVDowning = true;
-				} else if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey) && isCtrlVDowning) {
-					// Ctrl + vを押しっぱなしの時は普通のundo(#73 fix)
-					saveUndo(e.target);
-				} 
-				var code = (e.keyCode ? e.keyCode : e.which);
-				if ((37 <= code) && (code <= 40)) {
-					keyCache[e.originalEvent.code] = true;
 				}
 			}).on("mouseup", function(e) {
 				valueAtArrowOrClick = {
