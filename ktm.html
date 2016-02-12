@@ -599,6 +599,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 					var text = $(this).val();
 					$(this).val(text.substr(0, start) + '\t' + text.substr(start, text.length));
 					this.setSelectionRange(start + 1, start + 1);
+					updateScrollPos(e.target);
 					saveUndo(e.target);
 				} else {
 					if (e.shiftKey) {
@@ -657,6 +658,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						
 						this.selectionStart = start;
 						this.selectionEnd   = end - deleteCount + 1;
+						updateScrollPos(e.target);
 						saveUndo(e.target);
 					} else {
 						/* 選択 + Tabで複数行インデント */
@@ -692,6 +694,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						// 選択位置修正
 						this.selectionStart = start;
 						this.selectionEnd   = end + count;
+						updateScrollPos(e.target);
 						saveUndo(e.target);
 					}
 				}
@@ -705,7 +708,6 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 				// Enterキー
 				if (e.which == 13 || e.keyCode == 13) {
 					e.preventDefault();
-					
 					
 					// 行頭か先頭に至るまでさかのぼる
 					var count = 0;
@@ -727,48 +729,14 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 					}			
 					
 					// 改行＋スペース（タブ）の挿入
-					var isInsertEnabled;
-					try {
-						isInsertEnabled = document.execCommand("insertText", false, "\n" + spaces);
-					} catch(e) {
-						// IE10では何故かfalseを返さずに例外が発生するのでcatchで対応する
-						isInsertEnabled = false;
-					}
+					var newPos = this.selectionStart + spaces.length + 1;
+					var part1 = text.substring(0, this.selectionStart);
+					var part2 = text.substr(this.selectionEnd);
+					$(this).val(part1 + "\n" + spaces + part2);
 					
-					if (isInsertEnabled) {
-						// ChromeはinsertTextに成功する。
-						// しかし、カーソルが画面外に出た時にそのままではスクロールバーが追従してくれないので
-						// 苦肉の策として一旦フォーカスを外してすぐに戻す。そうするとスクロールバーが追従する
-						// これにより、kantanEditorはblurやfocusイベントはまともに使えなくなる黒魔術
-						$(this).trigger("blur", ["kantanEditorDummy"]);
-						$(this).trigger("focus", ["kantanEditorDummy"]);
-					} else {
-						// IE,FirefoxはinsertTextに失敗するのでvalで書き換える。
-						// しかし、IEはカーソルが画面外に出た時にそのままではスクロールバーが追従してくれないので
-						// 敢えて余計な文字列(dummy)を挿入して、その後にdeleteコマンドで削除する
-						// deleteコマンドを実行することでスクロールバーが追従する
-						var selectionStart = this.selectionStart;
-						var selectionEnd   = this.selectionEnd;
-						var newPos = selectionStart + spaces.length + 1;
-						$(this).val(text.substr(0, selectionStart)
-								+ '\n' + spaces + "dummy"
-								+ text.substr(selectionEnd, text.length));
-						
-						// IEでは何故か範囲選択後のdeleteでselectionStartの位置がおかしくなってしまう
-						// その後、範囲選択無しのdeleteを実行すると正しくなるのでそのような実装にする
-						// 多分IEのバグ
-						this.setSelectionRange(newPos, newPos + "dummy".length - 1);
-						var isDeleteEnabled = document.execCommand("delete", false, null);
-						document.execCommand("delete", false, null); 
-						
-						if (!isDeleteEnabled) {
-							// Firefoxはdeleteに失敗するので再度dummy無しで挿入し直す
-							// 無駄な処理が多いが実用上問題なさそう
-							$(this).val(text.substr(0, selectionStart) + '\n' + spaces + text.substr(selectionEnd, text.length));
-							this.selectionStart = newPos;
-							this.selectionEnd   = newPos;
-						} 
-					}
+					this.selectionStart = newPos;
+					this.selectionEnd = newPos;
+					updateScrollPos(e.target);
 					
 					saveUndo(e.target);
 				}
@@ -845,6 +813,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						$(this).val(undo.val);
 						this.selectionStart = undo.selectionStart;
 						this.selectionEnd   = undo.selectionEnd;
+						updateScrollPos(e.target);
 						previousVal = undo;
 					}
 				}
@@ -863,6 +832,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						$(this).val(previousVal.val);
 						this.selectionStart = previousVal.selectionStart;
 						this.selectionEnd   = previousVal.selectionEnd;
+						updateScrollPos(e.target);
 					}
 				}
 			});
@@ -891,6 +861,57 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 					val: $(editor).val(),
 					selectionStart: editor.selectionStart,
 					selectionEnd  : editor.selectionEnd
+				}
+			}
+			/* 共通関数 */
+			
+			// スクロールバー位置更新
+			// chromeやIEではjsで値を変更してキャレットが画面の外に出ても
+			// スクロールバーが追従しないのを何とかする関数
+			var updateScrollPos = function(editor) {
+				// 初期状態を保存
+				var text = $(editor).val();
+				var selectionStart = editor.selectionStart;
+				var selectionEnd   = editor.selectionEnd;
+			
+				// insertTextコマンドで適当な文字(X)の追加を試みる
+				var isInsertEnabled;
+				try {
+					isInsertEnabled = document.execCommand("insertText", false, "X");
+				} catch(e) {
+					// IE10では何故かfalseを返さずに例外が発生するのでcatchで対応する
+					isInsertEnabled = false;
+				}
+				
+				if (isInsertEnabled) {
+					// insertTextに成功したらChrome
+					// chromeはどう頑張ってもまっとうな手段が通用しない。
+					// 苦肉の策としてselectionStart,endを揃えてから
+					// 一旦フォーカスを外してすぐに戻す。そうするとスクロールバーが追従する
+					// これにより、chromeではblurやfocusイベントはまともに使えなくなる黒魔術
+					$(editor).val(text);
+					editor.selectionStart = selectionStart;
+					editor.selectionEnd = selectionStart;
+					$(editor).trigger("blur", ["kantanEditorDummy"]);
+					$(editor).trigger("focus", ["kantanEditorDummy"]);
+					
+					// valは戻してあるのでキャレット位置のみ元に戻す
+					editor.selectionStart = selectionStart;
+					editor.selectionEnd = selectionEnd;
+				} else {
+					// IE,FirefoxはinsertTextに失敗するのでval関数で適当な文字(X)を挿入する。
+					// IEではその後にその文字を選択してdeleteコマンドで削除するとスクロールバーが追従する
+					var part1 = text.substring(0, selectionStart);
+					var part2 = text.substr(selectionEnd);
+					$(editor).val(part1 + "X" + part2);
+					editor.selectionStart = part1.length;
+					editor.selectionEnd = part1.length + 1;
+					var isDeleteEnabled = document.execCommand("delete", false, null);
+					
+					// 追従した後はvalとキャレットを元に戻す
+					$(editor).val(text);
+					editor.selectionStart = selectionStart;
+					editor.selectionEnd = selectionEnd;
 				}
 			}
 		});
