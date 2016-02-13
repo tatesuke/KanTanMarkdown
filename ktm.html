@@ -1240,19 +1240,20 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	
 	function save() {
 		// テキストエリアは値を入れなおさないと保存されない。
-		$("#editor").html($("#editor").val().replace(/</g, "&lt;"));
-	
-		var toggleFlag = $("#editor").is(":visible");
+		var editor = document.getElementById("editor");
+		editor.innerHTML = editor.value.replace(/</g, "&lt;");
+		
+		var toggleFlag = (editor.disabled == false);
 		if (toggleFlag == true) {
 			toggleMode();
 		}
 		
 		/* ファイルの肥大化を防ぐため中身を消去 */
-		$("#previewer").html("");
-		$("#messageArea").html("");
+		document.getElementById("previewer").innerHTML = "";
+		document.getElementById("messageArea").innerHTML = "";
 		
 		var html = "<!doctype html>\n<html>\n";
-		html += $("html").html();
+		html += document.getElementsByTagName("html")[0].innerHTML;
 		var i = html.lastIndexOf("/script>"); // bug fix #1 #39
 		html = html.substring(0, i);
 		html += "/script>\n</body>\n</html>";
