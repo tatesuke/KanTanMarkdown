@@ -956,7 +956,12 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	});
 
 	/* 起動時にコンテンツ読み込み */
-	doPreview();
+	if ($("#editor").val() == "") {
+		// 内容が空であれば初期状態を編集モードにする
+		toggleMode();
+	} else {
+		doPreview();
+	}
 	
 	/* レイアウト調整 */
 	doLayout();
