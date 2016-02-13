@@ -1214,11 +1214,13 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	function openPreview() {
 		// エディタサイズに相対値を利用しているためプレビュー表示されていない場合のみ実行
 		// 閲覧モード時は実行しない
-		if ($("#previewer").is(":hidden")
-			&& $("#editor").is(":visible")) {
-			$("#previewToggleButton").text("プレビューを隠す(Alt+→)");
-			$("#editor").outerWidth("50%");
-			$("#previewer").show();
+		var previewer = document.getElementById("previewer");
+		var editor = document.getElementById("editor");
+		if (!isVisible(previewer)
+				&& isVisible(editor)) {
+			document.getElementById("previewToggleButton").innerText = "プレビューを隠す(Alt+→)";
+			editor.style.width = "50%";
+			show(previewer);
 			doLayout();
 		}
 	}
@@ -1226,11 +1228,13 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	function closePreview() {
 		// エディタサイズに相対値を利用しているためプレビュー表示されている場合のみ実行
 		// 閲覧モード時は実行しない
-		if ($("#previewer").is(":visible")
-			&& $("#editor").is(":visible")) {
-			$("#previewToggleButton").text("プレビューを表示(Alt+←)");
-			$("#editor").outerWidth("100%");
-			$("#previewer").hide();
+		var previewer = document.getElementById("previewer");
+		var editor = document.getElementById("editor");
+		if (isVisible(previewer)
+				&& isVisible(editor)) {
+			document.getElementById("previewToggleButton").innerText = "プレビューを表示(Alt+←)";
+			editor.style.width = "100%";
+			hide(previewer);
 			doLayout();
 		}
 	}
@@ -1243,7 +1247,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		var editor = document.getElementById("editor");
 		editor.innerHTML = editor.value.replace(/</g, "&lt;");
 		
-		var toggleFlag = (editor.disabled == false);
+		var toggleFlag = isEnable(editor);
 		if (toggleFlag == true) {
 			toggleMode();
 		}
@@ -1299,7 +1303,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			event.preventDefault();
 			
 			var toggleButton = document.getElementById("toggleButton");
-			if (toggleButton.disabled == false) {
+			if (isEnable(toggleButton)) {
 				toggleButton.click();
 			}
 			return false;
@@ -1311,7 +1315,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			event.preventDefault();
 			
 			var saveButton = document.getElementById("saveButton");
-			if (saveButton.disabled == false) {
+			if (isEnable(saveButton)) {
 				saveButton.click();
 			}
 			return false;
@@ -1323,7 +1327,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			event.preventDefault();
 			
 			var syncButton = document.getElementById("syncButton");
-			if (syncButton.disabled == false) {
+			if (isEnable(syncButton)) {
 				doPreview();
 			}
 			return false;
@@ -1359,6 +1363,32 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		
 		return true;
 	});
+	
+	var isEnable = function(elem) {
+		return elem &&
+				((typeof elem.disabled === "undefined")
+				|| (elem.disabled == false));
+	}
+	
+	var isVisible = function(elem) {
+		return elem && (elem.style.display != "none");
+	}
+	
+	var show = function(elem) {
+		var previousDisplay = elem.getAttribute("previousDisplay");
+		if (!previousDisplay) {
+			previousDisplay = ""
+		}
+		elem.style.display = previousDisplay;
+	}
+	
+	var hide = function(elem) {
+		var previousDisplay = elem.style.display;
+		if (previousDisplay != "none") {
+			elem.setAttribute("previousDisplay", previousDisplay);
+		}
+		elem.style.display = "none";
+	}
 	
 })(jQuery);
 </script>
