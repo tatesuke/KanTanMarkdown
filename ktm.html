@@ -1290,14 +1290,16 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	}
 	
 	/* ショートカットキー */
-	$(window).keydown(function(event) {	
+	window.addEventListener("keydown", function(event) {
 		var code = (event.keyCode ? event.keyCode : event.which);
 		
 		if (code == 27) {
 			// ESCキーで閲覧/編集モード切り替え
 			event.preventDefault();
-			if ($("#toggleButton").is(":enabled")) {
-				$("#toggleButton").click();
+			
+			var toggleButton = document.getElementById("toggleButton");
+			if (toggleButton.disabled == false) {
+				toggleButton.click();
 			}
 			return false;
 		}
@@ -1306,8 +1308,10 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		if (code == 83 && (event.ctrlKey || event.metaKey)){
 			// CTRL+Sで保存する
 			event.preventDefault();
-			if ($("#saveButton").is(":enabled")) {
-				$("#saveButton").click();
+			
+			var saveButton = document.getElementById("saveButton");
+			if (saveButton.disabled == false) {
+				saveButton.click();
 			}
 			return false;
 		}
@@ -1316,35 +1320,37 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 				((code == 82) && (event.ctrlKey || event.metaKey))){
 			// F5 or Ctrl + Rでエディタとプレビューアを同期
 			event.preventDefault();
-			if ($("#syncButton").is(":enabled")) {
+			
+			var syncButton = document.getElementById("syncButton");
+			if (syncButton.disabled == false) {
 				doPreview();
 			}
 			return false;
 		}
 
 		if ((code == 37) && event.altKey) {
-			// Ctrl+←
+			// Alt+←
 			event.preventDefault();
 			openPreview();
 			return false;
 		}
 
 		if ((code == 38) && event.altKey) {
-			// Ctrl+↑
+			// Alt+↑
 			event.preventDefault();
 			closeFiler();
 			return false;
 		}
 
 		if ((code == 39) && event.altKey) {
-			// Ctrl+→
+			// Alt+→
 			event.preventDefault();
 			closePreview();
 			return false;
 		}
 		
 		if ((code == 40) && event.altKey) {
-			// Ctrl+↓
+			// Alt+↓
 			event.preventDefault();
 			openFiler();
 			return false;
