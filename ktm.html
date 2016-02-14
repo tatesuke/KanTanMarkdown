@@ -970,17 +970,21 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	
 	/* レイアウト調整 */
 	doLayout();
-	$(window).on("resize", doLayout);
-	$("#filer").on("resize", doLayout);
+	window.addEventListener("resize", doLayout);
 	function doLayout() {
-		$("#wrapper").height($(window).height() - $("#wrapper").offset().top - 10);
+		var editor = document.getElementById("editor");
+		var previewer = document.getElementById("previewer");
+		var wrapper = document.getElementById("wrapper");
 		
-		if ($("#editor").is(':visible')) {
-			$("#previewer").css("width", "50%");
-			$("#previewer").css("height", "100%");
+		var height = window.innerHeight - wrapper.offsetTop - 10;
+		wrapper.style.height = height + "px";
+		
+		if (isVisible(editor)) {
+			previewer.style.width = "50%";
+			previewer.style.height = "100%";
 		} else {
-			$("#previewer").css("width", "980px");
-			$("#previewer").css("height", "");
+			previewer.style.width = "980px";
+			previewer.style.height = "";
 		}
 	}
 	
@@ -1433,7 +1437,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 				|| (elem.disabled == false));
 	}
 	
-	var isVisible = function(elem) {
+	function isVisible(elem) {
 		if (elem.style.display == "none") {
 			return false;
 		}
