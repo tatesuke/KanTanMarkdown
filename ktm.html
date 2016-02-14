@@ -933,8 +933,9 @@ marked.setOptions({
 });
 
 /* 起動時にコンテンツ読み込み */
-if (document.getElementById("editor").innerHTML == "") {
-	// 内容が空であれば初期状態を編集モードにする
+if (isEnable(document.getElementById("toggleButton")) 
+		&& (document.getElementById("editor").innerHTML == "")) {
+	// 編集モードでなく、内容が空であれば初期状態を編集モードにする
 	toggleMode();
 } else {
 	doPreview();
