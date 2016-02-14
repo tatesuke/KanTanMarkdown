@@ -1085,22 +1085,30 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		}
 		
 		// シーケンス図
-		$(".sequence").sequenceDiagram({theme: 'simple'});
+		var sequences = document.getElementsByClassName("sequence");
+		for (var i = 0; i < sequences.length; i++) {
+			var sequence = sequences[i];
+			var diagram = Diagram.parse(sequence.textContent);
+			sequence.innerHTML = "";
+			diagram.drawSVG(sequence, {theme: 'simple'});
+		}
 		
 		// フローチャート
-		$(".flow").each(function() {
-			var diagram = flowchart.parse($(this).text());
-			$(this).empty();
-			diagram.drawSVG($(this).get(0));
-		});
+		var flows = document.getElementsByClassName("flow");
+		for (var i = 0; i < flows.length; i++) {
+			var flow = flows[i];
+			var diagram = flowchart.parse(flow.textContent);
+			flow.innerHTML = "";
+			diagram.drawSVG(flow);
+		}
 		
 		// スクロールバーが最下部にある場合、更新後も最下部にする。
 		if (scrollLockFlag == true) {
-			$("#previewer")[0].scrollTop = $("#previewer")[0].scrollHeight;
+			previewer.scrollTop = previewer.scrollHeight;
 		}
 	}
 	
-	function isMaxScroll(id) {
+	function isMaxScroll (id) {
 		var elem = document.getElementById(id);
 		
 		var scrollHeight = elem.scrollHeight;
