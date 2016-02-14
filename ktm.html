@@ -993,33 +993,41 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	var previewerScrollBarPos = 0;
 	var caretStartPos = 0;
 	var caretEndPos = 0;
-	$("#toggleButton").on("click", toggleMode);
+	document.getElementById("toggleButton").addEventListener("click", toggleMode);
 	
 	function toggleMode() {
-		if ($("#editor").is(":visible")) {
-			editorScrollBarPos    = $("#editor")[0].scrollTop;
-			previewerScrollBarPos = $("#previewer")[0].scrollTop;
-			caretStartPos = $("#editor")[0].selectionStart;
-			caretEndPos = $("#editor")[0].selectionEnd;
+		var attach = document.getElementById("attach");
+		var editor = document.getElementById("editor");
+		var previewer = document.getElementById("previewer");
+		if (isVisible(editor)) {
+			editorScrollBarPos    = editor.scrollTop;
+			previewerScrollBarPos = previewer.scrollTop;
+			caretStartPos = editor.selectionStart;
+			caretEndPos = editor.selectionEnd;
 		}
 
 		//プレビュー領域を必ず表示
-		if ($("#previewer").is(":hidden")) {
+		if (!isVisible(previewer)) {
 			openPreview();
 		}
-
-		$("#attach").toggle();
-		$("#editor").toggle();
+		
+		if (isVisible(editor)) {
+			hide(attach);
+			hide(editor);
+		} else {
+			showBlock(attach);
+			showBlock(editor);
+		}
 		
 		doPreview();
 		doLayout();
 		
-		if ($("#editor").is(":visible")) {
-			$("#editor")[0].scrollTop    = editorScrollBarPos;
-			$("#previewer")[0].scrollTop = previewerScrollBarPos;
-			$("#editor")[0].selectionStart = caretStartPos;
-			$("#editor")[0].selectionEnd = caretEndPos;
-			$("#editor").focus();
+		if (isVisible(editor)) {
+			editor.scrollTop    = editorScrollBarPos;
+			previewer.scrollTop = previewerScrollBarPos;
+			editor.selectionStart = caretStartPos;
+			editor.selectionEnd = caretEndPos;
+			editor.focus();
 		}
 	}
 	
@@ -1431,14 +1439,15 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		return true;
 	});
 	
-	var isEnable = function(elem) {
+	function isEnable(elem) {
 		return elem &&
 				((typeof elem.disabled === "undefined")
 				|| (elem.disabled == false));
 	}
 	
 	function isVisible(elem) {
-		if (elem.style.display == "none") {
+		var style = elem.currentStyle || document.defaultView.getComputedStyle(elem, '');
+		if (style.display == "none") {
 			return false;
 		}
 		var parent = (elem.tagName.toLowerCase() == "body") ? null : elem.parentNode;
@@ -1449,11 +1458,11 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		}
 	}
 	
-	var showBlock = function(elem) {
+	function showBlock(elem) {
 		elem.style.display = "block";
 	}
 	
-	var hide = function(elem) {
+	function hide(elem) {
 		elem.style.display = "none";
 	}
 	
