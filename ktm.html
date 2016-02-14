@@ -1175,11 +1175,13 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	});
 	
 	/* ファイル名変更 */
-	$(".fileName").each(function(){
+	var fileNameElems = document.getElementsByClassName("fileName");
+	for (var i = 0; i < fileNameElems.length; i++) {
 		// なぜかvale属性の変更が保存されないので起動時に引っ張ってきてやる
-		var fileName = $(this).prev("script").attr("title");
-		$(this).val(fileName);
-	});
+		var fileNameElem = fileNameElems[i];
+		var fileName = fileNameElem.previousElementSibling.getAttribute("title");
+		fileNameElem.value = fileName;
+	}
 	
 	$(document).on("change", ".fileName", function(){
 		if ($(this).val().trim() == "") {
