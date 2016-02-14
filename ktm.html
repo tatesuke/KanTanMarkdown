@@ -817,7 +817,8 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						previousVal = undo;
 						
 						if (undoStack.length == 0) {
-							$(this).trigger("undoStackEmpty");
+							var event = new CustomEvent("undoStackEmpty");
+							this.dispatchEvent(event);
 						}
 					}
 				}
@@ -1306,11 +1307,12 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		}
 	}
 	
-	$("#editor").on("input", function(e) {
+	document.getElementById("editor").addEventListener("input", function(e) {
 		if (saved == true) {
 			saved = false;
 		}
-	}).on("undoStackEmpty", function(e){
+	});
+	document.getElementById("editor").addEventListener("undoStackEmpty", function(e){
 		saved = true;
 	});
 	
