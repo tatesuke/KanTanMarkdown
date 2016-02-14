@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <!--
- * KanTanMarkdown v1.20160213.01
+ * KanTanMarkdown v1.20160214.01
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
@@ -815,6 +815,10 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 						this.selectionEnd   = undo.selectionEnd;
 						updateScrollPos(e.target);
 						previousVal = undo;
+						
+						if (undoStack.length == 0) {
+							$(this).trigger("undoStackEmpty");
+						}
 					}
 				}
 			});
@@ -952,7 +956,12 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	});
 
 	/* 起動時にコンテンツ読み込み */
-	doPreview();
+	if ($("#editor").val() == "") {
+		// 内容が空であれば初期状態を編集モードにする
+		toggleMode();
+	} else {
+		doPreview();
+	}
 	
 	/* レイアウト調整 */
 	doLayout();
@@ -1029,7 +1038,6 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	var queue = null, // キューをストック 
 	wait = 300; // 0.3秒後に実行の場合 
 	function queuePreview() {
-		saved = false;
 		if (!$("#autoSyncButton").is(":checked")) {
 			return;
 		}
@@ -1060,6 +1068,10 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		} else {
 			document.title = "無題";
 		}
+		if (saved == false) {
+			document.title = "* " + document.title;
+		}
+		
 		
 		// 画像埋め込み
 		var images = document.getElementsByTagName("img");
@@ -1270,7 +1282,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			var url = window.URL || window.webkitURL;		
 			var blobURL = url.createObjectURL(blob);
 			var a = document.createElement('a');
-			a.download = document.title + ".html";
+			a.download = document.title.replace(/^\* /, "") + ".html";
 			a.href = blobURL;
 			
 			// firefoxでa.click()が効かないため無理やりclickイベントをディスパッチする
@@ -1293,6 +1305,14 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			return "ドキュメントが保存されていません。"
 		}
 	}
+	
+	$("#editor").on("input", function(e) {
+		if (saved == true) {
+			saved = false;
+		}
+	}).on("undoStackEmpty", function(e){
+		saved = true;
+	});
 	
 	/* ショートカットキー */
 	window.addEventListener("keydown", function(event) {
