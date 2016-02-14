@@ -580,348 +580,343 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 //# sourceMappingURL=flowchart.min.js.map
 </script>
 <script>
-(function( $ ){
-	$.fn.kantanEditor = function( options ) {
-		return this.each(function() {
+function toKantanEditor(editor) {
+	/* tabキーでtabを入力 */
+	$(editor).on('keydown', function(e) {
+		if ((e.which != 9) && (e.keyCode != 9)) {
+			return true;
+		}
+		e.preventDefault();
 		
-			/* tabキーでtabを入力 */
-			$(this).on('keydown', function(e) {
-				if ((e.which != 9) && (e.keyCode != 9)) {
-					return true;
-				}
-				e.preventDefault();
-				
-				var start = this.selectionStart;
-				var end   = this.selectionEnd;
-				if (start == end) {
-					/* いわゆる普通のtab */
-					
-					var text = $(this).val();
-					$(this).val(text.substr(0, start) + '\t' + text.substr(start, text.length));
-					this.setSelectionRange(start + 1, start + 1);
-					updateScrollPos(e.target);
-					saveUndo(e.target);
-				} else {
-					if (e.shiftKey) {
-						/* 選択 + Shift + Tabで複数行アウトデント */
-						
-						var tabSize = $(this).css("tab-size")
-									|| $(this).css("-moz-tab-size")
-									|| $(this).css("-o-tab-size")
-									|| 8;
-						tabSize = Number(tabSize);
-						
-						// スタート・エンド位置特定
-						var orgText = $(this).val();
-						while ((0 < start) && (orgText.charAt(start - 1) != "\n")) {
-							start--;
-						}
-						if (orgText.charAt(end - 1) == "\n") {
-							end -= 1;
-						}
-						while ((end < orgText.length) && (orgText.charAt(end) != "\n")) {
-							end++;
-						}
-						end--;
-						
-						var deleteCount = 0;
-						var newText = orgText.substring(0, start);
-						var i = start;
-						while (i < end) {
-							var c = orgText.charAt(i);
-							var spaceCount = 0;
-							while (spaceCount < tabSize) {
-								if (c == " ") {
-									spaceCount += 1;
-									deleteCount++;
-								} else if (c == " ") {
-									spaceCount += 2;
-									deleteCount++;
-								} else if (c == "\t") {
-									spaceCount += tabSize;
-									deleteCount++;
-								} else {
-									newText += c;
-									i++;
-									break;
-								}
-								c = orgText.charAt(++i);
-							}
-							while ((c != "\n") && (i < end)) {
-								c = orgText.charAt(i++);
-								newText += c;
-							} 
-						}
-						newText += orgText.substr(end)
-						
-						$(this).val(newText);
-						
-						this.selectionStart = start;
-						this.selectionEnd   = end - deleteCount + 1;
-						updateScrollPos(e.target);
-						saveUndo(e.target);
-					} else {
-						/* 選択 + Tabで複数行インデント */
-						
-						// スタート・エンド位置特定
-						var orgText = $(this).val();
-						while ((0 < start) && (orgText.charAt(start - 1) != "\n")) {
-							start--;
-						}
-						if (orgText.charAt(end - 1) == "\n") {
-							end -= 1;
-						}
-						while ((end < orgText.length) && (orgText.charAt(end) != "\n")) {
-							end++;
-						}
-						
-						// タブ挿入
-						var count = 1;
-						var newText = orgText.substring(0, start) + "\t";
-						for (var i = start; i < end; i++) {
-							var c = orgText.charAt(i);
-							newText += c;
-							if (c == "\n") {
-								newText += "\t";
-								count++;
-							}
-						}
-						newText += orgText.substr(end);
-						
-						// テキスト入れ替え
-						$(this).val(newText);
-						
-						// 選択位置修正
-						this.selectionStart = start;
-						this.selectionEnd   = end + count;
-						updateScrollPos(e.target);
-						saveUndo(e.target);
-					}
-				}
-				
-				return false;
-			});
+		var start = editor.selectionStart;
+		var end   = editor.selectionEnd;
+		if (start == end) {
+			/* いわゆる普通のtab */
 			
-			/* オートインデント */
-			$(this).on('keydown', function(e) {
+			var text = $(editor).val();
+			$(editor).val(text.substr(0, start) + '\t' + text.substr(start, text.length));
+			editor.setSelectionRange(start + 1, start + 1);
+			updateScrollPos(e.target);
+			saveUndo(e.target);
+		} else {
+			if (e.shiftKey) {
+				/* 選択 + Shift + Tabで複数行アウトデント */
 				
-				// Enterキー
-				if (e.which == 13 || e.keyCode == 13) {
-					e.preventDefault();
-					
-					// 行頭か先頭に至るまでさかのぼる
-					var count = 0;
-					var text = $(this).val();
-					var pos = this.selectionStart;
-					while ((0 < pos) && (text.charAt(pos - 1) != "\n")) {
-						pos--;
-						count++;
-					}
-					
-					// 先頭の空白文字を記憶
-					var spaces = "";
-					for (var i = 0; i < count; i++) {
-						var c = text.charAt(pos + i);
-						if((c != " ") && (c !=  "　") && (c != "\t")) {
+				var tabSize = $(editor).css("tab-size")
+							|| $(editor).css("-moz-tab-size")
+							|| $(editor).css("-o-tab-size")
+							|| 8;
+				tabSize = Number(tabSize);
+				
+				// スタート・エンド位置特定
+				var orgText = $(editor).val();
+				while ((0 < start) && (orgText.charAt(start - 1) != "\n")) {
+					start--;
+				}
+				if (orgText.charAt(end - 1) == "\n") {
+					end -= 1;
+				}
+				while ((end < orgText.length) && (orgText.charAt(end) != "\n")) {
+					end++;
+				}
+				end--;
+				
+				var deleteCount = 0;
+				var newText = orgText.substring(0, start);
+				var i = start;
+				while (i < end) {
+					var c = orgText.charAt(i);
+					var spaceCount = 0;
+					while (spaceCount < tabSize) {
+						if (c == " ") {
+							spaceCount += 1;
+							deleteCount++;
+						} else if (c == " ") {
+							spaceCount += 2;
+							deleteCount++;
+						} else if (c == "\t") {
+							spaceCount += tabSize;
+							deleteCount++;
+						} else {
+							newText += c;
+							i++;
 							break;
 						}
-						spaces += c;
-					}			
-					
-					// 改行＋スペース（タブ）の挿入
-					var newPos = this.selectionStart + spaces.length + 1;
-					var part1 = text.substring(0, this.selectionStart);
-					var part2 = text.substr(this.selectionEnd);
-					$(this).val(part1 + "\n" + spaces + part2);
-					
-					this.selectionStart = newPos;
-					this.selectionEnd = newPos;
-					updateScrollPos(e.target);
-					
-					saveUndo(e.target);
-				}
-			});
-
-			/* Undo, Redo */
-			var isCtrlVDowning = false;
-			var keyCache = {};
-			var undoStack = [];
-			var redoStack = [];
-			var previousVal = {val:$(this).val(), selectionStart:undefined, selectionEnd:undefined};
-			var valueAtArrowOrClick = undefined;
-			$(this).on("keydown", function(e){
-				if (e.originalEvent.code == "Enter") {
-					saveUndo(e.target);
-				} else if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey) && !isCtrlVDowning) {
-					// Ctrl + vの前にundoできるようにする
-					saveUndoAfterPaste(e.target);
-					isCtrlVDowning = true;
-				} else if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey) && isCtrlVDowning) {
-					// Ctrl + vを押しっぱなしの時は普通のundo(#73 fix)
-					saveUndo(e.target);
-				} 
-				var code = (e.keyCode ? e.keyCode : e.which);
-				if ((37 <= code) && (code <= 40)) {
-					keyCache[e.originalEvent.code] = true;
-				}
-			}).on("keypress", function(e){
-				keyCache[e.originalEvent.code] = true;
-			}).on("keyup", function(e){
-				if ((e.which == 13 || e.keyCode == 13)                          // ENTER
-						|| (e.which == 8 || e.keyCode == 8)                      // BS
-						|| (e.which == 46 || e.keyCode == 46)                    // DELETE
-						|| ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey))     // Ctrl+v
-						|| ((e.which == 88 || e.keyCode == 88) && (e.ctrlKey || e.metaKey))) {  //Ctrl+x
-					
-					saveUndo(e.target);
-				} else if (keyCache[e.originalEvent.code] == true) {
-					var code = (e.keyCode ? e.keyCode : e.which);
-					if ((37 <= code) && (code <= 40)) {
-						valueAtArrowOrClick = {
-							val: $(this).val(),
-							selectionStart: this.selectionStart,
-							selectionEnd: this.selectionEnd
-						};
-						keyCache[e.originalEvent.code] = false;
-					} else {
-						// keypressが発生していた(IME OFF)なら、Undo可能にする
-						keyCache[e.originalEvent.code] = false;
-						saveUndo(e.target);
+						c = orgText.charAt(++i);
 					}
+					while ((c != "\n") && (i < end)) {
+						c = orgText.charAt(i++);
+						newText += c;
+					} 
 				}
-				// Ctrl+Vを離したらフラグを下げる
-				if (!e.ctrlKey && !e.metaKey && isCtrlVDowning) {
-					isCtrlVDowning = false;
+				newText += orgText.substr(end)
+				
+				$(editor).val(newText);
+				
+				editor.selectionStart = start;
+				editor.selectionEnd   = end - deleteCount + 1;
+				updateScrollPos(e.target);
+				saveUndo(e.target);
+			} else {
+				/* 選択 + Tabで複数行インデント */
+				
+				// スタート・エンド位置特定
+				var orgText = $(editor).val();
+				while ((0 < start) && (orgText.charAt(start - 1) != "\n")) {
+					start--;
 				}
-			}).on("mouseup", function(e) {
-				valueAtArrowOrClick = {
-					val: $(this).val(),
-					selectionStart: this.selectionStart,
-					selectionEnd: this.selectionEnd
-				};
-			});
-			
-			$(this).on("keydown", function(e) {
-				// Ctrl+Z
-				if (e.keyCode == 90 && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
-					e.preventDefault();
-					
-					if (0 < undoStack.length) {
-						redoStack.push(previousVal);
-						
-						var undo = undoStack.pop();
-						$(this).val(undo.val);
-						this.selectionStart = undo.selectionStart;
-						this.selectionEnd   = undo.selectionEnd;
-						updateScrollPos(e.target);
-						previousVal = undo;
-						
-						if (undoStack.length == 0) {
-							var event = new CustomEvent("undoStackEmpty");
-							this.dispatchEvent(event);
-						}
-					}
+				if (orgText.charAt(end - 1) == "\n") {
+					end -= 1;
 				}
-			});
-			
-			$(this).on("keydown", function(e) {
-				// Ctrl+Y or Ctrl + Shift + Z or Cmd + Shift + Z
-				if ((e.keyCode == 89 && (e.ctrlKey || e.metaKey))
-						|| (e.keyCode == 90 && e.ctrlKey && e.shiftKey)
-						|| (e.keyCode == 90 && e.metaKey && e.shiftKey)) {
-					e.preventDefault();
-					
-					if (0 < redoStack.length) {
-						undoStack.push(previousVal);
-						previousVal = redoStack.pop();
-						$(this).val(previousVal.val);
-						this.selectionStart = previousVal.selectionStart;
-						this.selectionEnd   = previousVal.selectionEnd;
-						updateScrollPos(e.target);
-					}
-				}
-			});
-			
-			var saveUndo = function(editor) {
-				if (previousVal.val != $(editor).val()) {
-					if(valueAtArrowOrClick) {
-						undoStack.push(valueAtArrowOrClick);
-						valueAtArrowOrClick = undefined;
-					} else {
-						undoStack.push(previousVal);
-					}
-					
-					redoStack = [];
-					previousVal = {
-						val: $(editor).val(),
-						selectionStart: editor.selectionStart,
-						selectionEnd  : editor.selectionEnd
-					}
-				}
-			}
-			
-			var saveUndoAfterPaste = function(editor) {
-				redoStack = [];
-				previousVal = {
-					val: $(editor).val(),
-					selectionStart: editor.selectionStart,
-					selectionEnd  : editor.selectionEnd
-				}
-			}
-			/* 共通関数 */
-			
-			// スクロールバー位置更新
-			// chromeやIEではjsで値を変更してキャレットが画面の外に出ても
-			// スクロールバーが追従しないのを何とかする関数
-			var updateScrollPos = function(editor) {
-				// 初期状態を保存
-				var text = $(editor).val();
-				var selectionStart = editor.selectionStart;
-				var selectionEnd   = editor.selectionEnd;
-			
-				// insertTextコマンドで適当な文字(X)の追加を試みる
-				var isInsertEnabled;
-				try {
-					isInsertEnabled = document.execCommand("insertText", false, "X");
-				} catch(e) {
-					// IE10では何故かfalseを返さずに例外が発生するのでcatchで対応する
-					isInsertEnabled = false;
+				while ((end < orgText.length) && (orgText.charAt(end) != "\n")) {
+					end++;
 				}
 				
-				if (isInsertEnabled) {
-					// insertTextに成功したらChrome
-					// chromeはどう頑張ってもまっとうな手段が通用しない。
-					// 苦肉の策としてselectionStart,endを揃えてから
-					// 一旦フォーカスを外してすぐに戻す。そうするとスクロールバーが追従する
-					// これにより、chromeではblurやfocusイベントはまともに使えなくなる黒魔術
-					$(editor).val(text);
-					editor.selectionStart = selectionStart;
-					editor.selectionEnd = selectionStart;
-					$(editor).trigger("blur", ["kantanEditorDummy"]);
-					$(editor).trigger("focus", ["kantanEditorDummy"]);
-					
-					// valは戻してあるのでキャレット位置のみ元に戻す
-					editor.selectionStart = selectionStart;
-					editor.selectionEnd = selectionEnd;
-				} else {
-					// IE,FirefoxはinsertTextに失敗するのでval関数で適当な文字(X)を挿入する。
-					// IEではその後にその文字を選択してdeleteコマンドで削除するとスクロールバーが追従する
-					var part1 = text.substring(0, selectionStart);
-					var part2 = text.substr(selectionEnd);
-					$(editor).val(part1 + "X" + part2);
-					editor.selectionStart = part1.length;
-					editor.selectionEnd = part1.length + 1;
-					var isDeleteEnabled = document.execCommand("delete", false, null);
-					
-					// 追従した後はvalとキャレットを元に戻す
-					$(editor).val(text);
-					editor.selectionStart = selectionStart;
-					editor.selectionEnd = selectionEnd;
+				// タブ挿入
+				var count = 1;
+				var newText = orgText.substring(0, start) + "\t";
+				for (var i = start; i < end; i++) {
+					var c = orgText.charAt(i);
+					newText += c;
+					if (c == "\n") {
+						newText += "\t";
+						count++;
+					}
+				}
+				newText += orgText.substr(end);
+				
+				// テキスト入れ替え
+				$(editor).val(newText);
+				
+				// 選択位置修正
+				editor.selectionStart = start;
+				editor.selectionEnd   = end + count;
+				updateScrollPos(e.target);
+				saveUndo(e.target);
+			}
+		}
+		
+		return false;
+	});
+	
+	/* オートインデント */
+	$(editor).on('keydown', function(e) {
+		
+		// Enterキー
+		if (e.which == 13 || e.keyCode == 13) {
+			e.preventDefault();
+			
+			// 行頭か先頭に至るまでさかのぼる
+			var count = 0;
+			var text = $(editor).val();
+			var pos = editor.selectionStart;
+			while ((0 < pos) && (text.charAt(pos - 1) != "\n")) {
+				pos--;
+				count++;
+			}
+			
+			// 先頭の空白文字を記憶
+			var spaces = "";
+			for (var i = 0; i < count; i++) {
+				var c = text.charAt(pos + i);
+				if((c != " ") && (c !=  "　") && (c != "\t")) {
+					break;
+				}
+				spaces += c;
+			}			
+			
+			// 改行＋スペース（タブ）の挿入
+			var newPos = editor.selectionStart + spaces.length + 1;
+			var part1 = text.substring(0, editor.selectionStart);
+			var part2 = text.substr(editor.selectionEnd);
+			$(editor).val(part1 + "\n" + spaces + part2);
+			
+			editor.selectionStart = newPos;
+			editor.selectionEnd = newPos;
+			updateScrollPos(e.target);
+			
+			saveUndo(e.target);
+		}
+	});
+
+	/* Undo, Redo */
+	var isCtrlVDowning = false;
+	var keyCache = {};
+	var undoStack = [];
+	var redoStack = [];
+	var previousVal = {val:$(editor).val(), selectionStart:undefined, selectionEnd:undefined};
+	var valueAtArrowOrClick = undefined;
+	$(editor).on("keydown", function(e){
+		if (e.originalEvent.code == "Enter") {
+			saveUndo(e.target);
+		} else if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey) && !isCtrlVDowning) {
+			// Ctrl + vの前にundoできるようにする
+			saveUndoAfterPaste(e.target);
+			isCtrlVDowning = true;
+		} else if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey) && isCtrlVDowning) {
+			// Ctrl + vを押しっぱなしの時は普通のundo(#73 fix)
+			saveUndo(e.target);
+		} 
+		var code = (e.keyCode ? e.keyCode : e.which);
+		if ((37 <= code) && (code <= 40)) {
+			keyCache[e.originalEvent.code] = true;
+		}
+	}).on("keypress", function(e){
+		keyCache[e.originalEvent.code] = true;
+	}).on("keyup", function(e){
+		if ((e.which == 13 || e.keyCode == 13)                          // ENTER
+				|| (e.which == 8 || e.keyCode == 8)                      // BS
+				|| (e.which == 46 || e.keyCode == 46)                    // DELETE
+				|| ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey))     // Ctrl+v
+				|| ((e.which == 88 || e.keyCode == 88) && (e.ctrlKey || e.metaKey))) {  //Ctrl+x
+			
+			saveUndo(e.target);
+		} else if (keyCache[e.originalEvent.code] == true) {
+			var code = (e.keyCode ? e.keyCode : e.which);
+			if ((37 <= code) && (code <= 40)) {
+				valueAtArrowOrClick = {
+					val: $(editor).val(),
+					selectionStart: editor.selectionStart,
+					selectionEnd: editor.selectionEnd
+				};
+				keyCache[e.originalEvent.code] = false;
+			} else {
+				// keypressが発生していた(IME OFF)なら、Undo可能にする
+				keyCache[e.originalEvent.code] = false;
+				saveUndo(e.target);
+			}
+		}
+		// Ctrl+Vを離したらフラグを下げる
+		if (!e.ctrlKey && !e.metaKey && isCtrlVDowning) {
+			isCtrlVDowning = false;
+		}
+	}).on("mouseup", function(e) {
+		valueAtArrowOrClick = {
+			val: $(editor).val(),
+			selectionStart: editor.selectionStart,
+			selectionEnd: editor.selectionEnd
+		};
+	});
+	
+	$(editor).on("keydown", function(e) {
+		// Ctrl+Z
+		if (e.keyCode == 90 && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
+			e.preventDefault();
+			
+			if (0 < undoStack.length) {
+				redoStack.push(previousVal);
+				
+				var undo = undoStack.pop();
+				$(editor).val(undo.val);
+				editor.selectionStart = undo.selectionStart;
+				editor.selectionEnd   = undo.selectionEnd;
+				updateScrollPos(e.target);
+				previousVal = undo;
+				
+				if (undoStack.length == 0) {
+					var event = new CustomEvent("undoStackEmpty");
+					editor.dispatchEvent(event);
 				}
 			}
-		});
-	};
-})( jQuery );
+		}
+	});
+	
+	$(editor).on("keydown", function(e) {
+		// Ctrl+Y or Ctrl + Shift + Z or Cmd + Shift + Z
+		if ((e.keyCode == 89 && (e.ctrlKey || e.metaKey))
+				|| (e.keyCode == 90 && e.ctrlKey && e.shiftKey)
+				|| (e.keyCode == 90 && e.metaKey && e.shiftKey)) {
+			e.preventDefault();
+			
+			if (0 < redoStack.length) {
+				undoStack.push(previousVal);
+				previousVal = redoStack.pop();
+				$(editor).val(previousVal.val);
+				editor.selectionStart = previousVal.selectionStart;
+				editor.selectionEnd   = previousVal.selectionEnd;
+				updateScrollPos(e.target);
+			}
+		}
+	});
+	
+	var saveUndo = function(editor) {
+		if (previousVal.val != $(editor).val()) {
+			if(valueAtArrowOrClick) {
+				undoStack.push(valueAtArrowOrClick);
+				valueAtArrowOrClick = undefined;
+			} else {
+				undoStack.push(previousVal);
+			}
+			
+			redoStack = [];
+			previousVal = {
+				val: $(editor).val(),
+				selectionStart: editor.selectionStart,
+				selectionEnd  : editor.selectionEnd
+			}
+		}
+	}
+	
+	var saveUndoAfterPaste = function(editor) {
+		redoStack = [];
+		previousVal = {
+			val: $(editor).val(),
+			selectionStart: editor.selectionStart,
+			selectionEnd  : editor.selectionEnd
+		}
+	}
+	/* 共通関数 */
+	
+	// スクロールバー位置更新
+	// chromeやIEではjsで値を変更してキャレットが画面の外に出ても
+	// スクロールバーが追従しないのを何とかする関数
+	var updateScrollPos = function(editor) {
+		// 初期状態を保存
+		var text = $(editor).val();
+		var selectionStart = editor.selectionStart;
+		var selectionEnd   = editor.selectionEnd;
+	
+		// insertTextコマンドで適当な文字(X)の追加を試みる
+		var isInsertEnabled;
+		try {
+			isInsertEnabled = document.execCommand("insertText", false, "X");
+		} catch(e) {
+			// IE10では何故かfalseを返さずに例外が発生するのでcatchで対応する
+			isInsertEnabled = false;
+		}
+		
+		if (isInsertEnabled) {
+			// insertTextに成功したらChrome
+			// chromeはどう頑張ってもまっとうな手段が通用しない。
+			// 苦肉の策としてselectionStart,endを揃えてから
+			// 一旦フォーカスを外してすぐに戻す。そうするとスクロールバーが追従する
+			// これにより、chromeではblurやfocusイベントはまともに使えなくなる黒魔術
+			$(editor).val(text);
+			editor.selectionStart = selectionStart;
+			editor.selectionEnd = selectionStart;
+			$(editor).trigger("blur", ["kantanEditorDummy"]);
+			$(editor).trigger("focus", ["kantanEditorDummy"]);
+			
+			// valは戻してあるのでキャレット位置のみ元に戻す
+			editor.selectionStart = selectionStart;
+			editor.selectionEnd = selectionEnd;
+		} else {
+			// IE,FirefoxはinsertTextに失敗するのでval関数で適当な文字(X)を挿入する。
+			// IEではその後にその文字を選択してdeleteコマンドで削除するとスクロールバーが追従する
+			var part1 = text.substring(0, selectionStart);
+			var part2 = text.substr(selectionEnd);
+			$(editor).val(part1 + "X" + part2);
+			editor.selectionStart = part1.length;
+			editor.selectionEnd = part1.length + 1;
+			var isDeleteEnabled = document.execCommand("delete", false, null);
+			
+			// 追従した後はvalとキャレットを元に戻す
+			$(editor).val(text);
+			editor.selectionStart = selectionStart;
+			editor.selectionEnd = selectionEnd;
+		}
+	}
+}
 </script>
 <script>
 (function($){
@@ -951,7 +946,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	}
 	
 	/* エディタに機能追加 */
-	$("#editor").kantanEditor();
+	toKantanEditor(document.getElementById("editor"));
 	
 	/* シンタックスハイライト設定 */
 	marked.setOptions({
