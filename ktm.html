@@ -1019,11 +1019,11 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	
 	// 自動同期チェックボックスをクリックしたらchecked属性を更新する
 	// これを行わないと自動同期チェックボックスの状態が保存されない
-	$("#autoSyncButton").on("change", function(){
-		if ($(this).is(":checked")) {
-			$(this).attr("checked", "checked");
+	document.getElementById("autoSyncButton").addEventListener("change", function() {
+		if (this.checked == true) {
+			this.setAttribute("checked", "checked");
 		} else {
-			$(this).removeAttr("checked");
+			this.removeAttribute("checked");
 		}
 	});
 	
