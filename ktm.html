@@ -582,7 +582,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 <script>
 function toKantanEditor(editor) {
 	/* tabキーでtabを入力 */
-	$(editor).on('keydown', function(e) {
+	editor.addEventListener('keydown', function(e) {
 		if ((e.which != 9) && (e.keyCode != 9)) {
 			return true;
 		}
@@ -593,23 +593,23 @@ function toKantanEditor(editor) {
 		if (start == end) {
 			/* いわゆる普通のtab */
 			
-			var text = $(editor).val();
-			$(editor).val(text.substr(0, start) + '\t' + text.substr(start, text.length));
+			var text = editor.value;
+			editor.value = text.substr(0, start) + '\t' + text.substr(start, text.length);
 			editor.setSelectionRange(start + 1, start + 1);
 			updateScrollPos(e.target);
 			saveUndo(e.target);
 		} else {
 			if (e.shiftKey) {
 				/* 選択 + Shift + Tabで複数行アウトデント */
-				
-				var tabSize = $(editor).css("tab-size")
-							|| $(editor).css("-moz-tab-size")
-							|| $(editor).css("-o-tab-size")
+				var style = editor.currentStyle 
+						|| document.defaultView.getComputedStyle(editor, '');
+				var tabSize = style.tabSize
+							|| style.MozTabSize
 							|| 8;
 				tabSize = Number(tabSize);
 				
 				// スタート・エンド位置特定
-				var orgText = $(editor).val();
+				var orgText = editor.value;
 				while ((0 < start) && (orgText.charAt(start - 1) != "\n")) {
 					start--;
 				}
@@ -651,7 +651,7 @@ function toKantanEditor(editor) {
 				}
 				newText += orgText.substr(end)
 				
-				$(editor).val(newText);
+				editor.value = newText;
 				
 				editor.selectionStart = start;
 				editor.selectionEnd   = end - deleteCount + 1;
@@ -661,7 +661,7 @@ function toKantanEditor(editor) {
 				/* 選択 + Tabで複数行インデント */
 				
 				// スタート・エンド位置特定
-				var orgText = $(editor).val();
+				var orgText = editor.value;
 				while ((0 < start) && (orgText.charAt(start - 1) != "\n")) {
 					start--;
 				}
@@ -686,7 +686,7 @@ function toKantanEditor(editor) {
 				newText += orgText.substr(end);
 				
 				// テキスト入れ替え
-				$(editor).val(newText);
+				editor.value = newText;
 				
 				// 選択位置修正
 				editor.selectionStart = start;
@@ -700,7 +700,7 @@ function toKantanEditor(editor) {
 	});
 	
 	/* オートインデント */
-	$(editor).on('keydown', function(e) {
+	editor.addEventListener('keydown', function(e) {
 		
 		// Enterキー
 		if (e.which == 13 || e.keyCode == 13) {
@@ -746,8 +746,8 @@ function toKantanEditor(editor) {
 	var redoStack = [];
 	var previousVal = {val:$(editor).val(), selectionStart:undefined, selectionEnd:undefined};
 	var valueAtArrowOrClick = undefined;
-	$(editor).on("keydown", function(e){
-		if (e.originalEvent.code == "Enter") {
+	editor.addEventListener("keydown", function(e){
+		if (e.code == "Enter") {
 			saveUndo(e.target);
 		} else if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey) && !isCtrlVDowning) {
 			// Ctrl + vの前にundoできるようにする
@@ -759,11 +759,13 @@ function toKantanEditor(editor) {
 		} 
 		var code = (e.keyCode ? e.keyCode : e.which);
 		if ((37 <= code) && (code <= 40)) {
-			keyCache[e.originalEvent.code] = true;
+			keyCache[e.code] = true;
 		}
-	}).on("keypress", function(e){
-		keyCache[e.originalEvent.code] = true;
-	}).on("keyup", function(e){
+	});
+	editor.addEventListener("keypress", function(e){
+		keyCache[e.code] = true;
+	});
+	editor.addEventListener("keyup", function(e){
 		if ((e.which == 13 || e.keyCode == 13)                          // ENTER
 				|| (e.which == 8 || e.keyCode == 8)                      // BS
 				|| (e.which == 46 || e.keyCode == 46)                    // DELETE
@@ -771,7 +773,7 @@ function toKantanEditor(editor) {
 				|| ((e.which == 88 || e.keyCode == 88) && (e.ctrlKey || e.metaKey))) {  //Ctrl+x
 			
 			saveUndo(e.target);
-		} else if (keyCache[e.originalEvent.code] == true) {
+		} else if (keyCache[e.code] == true) {
 			var code = (e.keyCode ? e.keyCode : e.which);
 			if ((37 <= code) && (code <= 40)) {
 				valueAtArrowOrClick = {
@@ -779,10 +781,10 @@ function toKantanEditor(editor) {
 					selectionStart: editor.selectionStart,
 					selectionEnd: editor.selectionEnd
 				};
-				keyCache[e.originalEvent.code] = false;
+				keyCache[e.code] = false;
 			} else {
 				// keypressが発生していた(IME OFF)なら、Undo可能にする
-				keyCache[e.originalEvent.code] = false;
+				keyCache[e.code] = false;
 				saveUndo(e.target);
 			}
 		}
@@ -790,7 +792,8 @@ function toKantanEditor(editor) {
 		if (!e.ctrlKey && !e.metaKey && isCtrlVDowning) {
 			isCtrlVDowning = false;
 		}
-	}).on("mouseup", function(e) {
+	});
+	editor.addEventListener("mouseup", function(e) {
 		valueAtArrowOrClick = {
 			val: $(editor).val(),
 			selectionStart: editor.selectionStart,
@@ -798,7 +801,7 @@ function toKantanEditor(editor) {
 		};
 	});
 	
-	$(editor).on("keydown", function(e) {
+	editor.addEventListener("keydown", function(e) {
 		// Ctrl+Z
 		if (e.keyCode == 90 && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
 			e.preventDefault();
@@ -821,7 +824,7 @@ function toKantanEditor(editor) {
 		}
 	});
 	
-	$(editor).on("keydown", function(e) {
+	editor.addEventListener("keydown", function(e) {
 		// Ctrl+Y or Ctrl + Shift + Z or Cmd + Shift + Z
 		if ((e.keyCode == 89 && (e.ctrlKey || e.metaKey))
 				|| (e.keyCode == 90 && e.ctrlKey && e.shiftKey)
