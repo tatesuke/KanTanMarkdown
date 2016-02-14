@@ -708,7 +708,7 @@ function toKantanEditor(editor) {
 			
 			// 行頭か先頭に至るまでさかのぼる
 			var count = 0;
-			var text = $(editor).val();
+			var text = editor.value;
 			var pos = editor.selectionStart;
 			while ((0 < pos) && (text.charAt(pos - 1) != "\n")) {
 				pos--;
@@ -729,7 +729,7 @@ function toKantanEditor(editor) {
 			var newPos = editor.selectionStart + spaces.length + 1;
 			var part1 = text.substring(0, editor.selectionStart);
 			var part2 = text.substr(editor.selectionEnd);
-			$(editor).val(part1 + "\n" + spaces + part2);
+			editor.value = part1 + "\n" + spaces + part2;
 			
 			editor.selectionStart = newPos;
 			editor.selectionEnd = newPos;
@@ -744,7 +744,7 @@ function toKantanEditor(editor) {
 	var keyCache = {};
 	var undoStack = [];
 	var redoStack = [];
-	var previousVal = {val:$(editor).val(), selectionStart:undefined, selectionEnd:undefined};
+	var previousVal = {val:editor.value, selectionStart:undefined, selectionEnd:undefined};
 	var valueAtArrowOrClick = undefined;
 	editor.addEventListener("keydown", function(e){
 		if (e.code == "Enter") {
@@ -777,7 +777,7 @@ function toKantanEditor(editor) {
 			var code = (e.keyCode ? e.keyCode : e.which);
 			if ((37 <= code) && (code <= 40)) {
 				valueAtArrowOrClick = {
-					val: $(editor).val(),
+					val: editor.value,
 					selectionStart: editor.selectionStart,
 					selectionEnd: editor.selectionEnd
 				};
@@ -795,7 +795,7 @@ function toKantanEditor(editor) {
 	});
 	editor.addEventListener("mouseup", function(e) {
 		valueAtArrowOrClick = {
-			val: $(editor).val(),
+			val: editor.value,
 			selectionStart: editor.selectionStart,
 			selectionEnd: editor.selectionEnd
 		};
@@ -810,7 +810,7 @@ function toKantanEditor(editor) {
 				redoStack.push(previousVal);
 				
 				var undo = undoStack.pop();
-				$(editor).val(undo.val);
+				editor.value = undo.val;
 				editor.selectionStart = undo.selectionStart;
 				editor.selectionEnd   = undo.selectionEnd;
 				updateScrollPos(e.target);
@@ -834,7 +834,7 @@ function toKantanEditor(editor) {
 			if (0 < redoStack.length) {
 				undoStack.push(previousVal);
 				previousVal = redoStack.pop();
-				$(editor).val(previousVal.val);
+				editor.value = previousVal.val;
 				editor.selectionStart = previousVal.selectionStart;
 				editor.selectionEnd   = previousVal.selectionEnd;
 				updateScrollPos(e.target);
@@ -843,7 +843,7 @@ function toKantanEditor(editor) {
 	});
 	
 	var saveUndo = function(editor) {
-		if (previousVal.val != $(editor).val()) {
+		if (previousVal.val != editor.value) {
 			if(valueAtArrowOrClick) {
 				undoStack.push(valueAtArrowOrClick);
 				valueAtArrowOrClick = undefined;
@@ -853,7 +853,7 @@ function toKantanEditor(editor) {
 			
 			redoStack = [];
 			previousVal = {
-				val: $(editor).val(),
+				val: editor.value,
 				selectionStart: editor.selectionStart,
 				selectionEnd  : editor.selectionEnd
 			}
@@ -863,7 +863,7 @@ function toKantanEditor(editor) {
 	var saveUndoAfterPaste = function(editor) {
 		redoStack = [];
 		previousVal = {
-			val: $(editor).val(),
+			val: editor.value,
 			selectionStart: editor.selectionStart,
 			selectionEnd  : editor.selectionEnd
 		}
@@ -875,7 +875,7 @@ function toKantanEditor(editor) {
 	// スクロールバーが追従しないのを何とかする関数
 	var updateScrollPos = function(editor) {
 		// 初期状態を保存
-		var text = $(editor).val();
+		var text = editor.value;
 		var selectionStart = editor.selectionStart;
 		var selectionEnd   = editor.selectionEnd;
 	
@@ -894,7 +894,7 @@ function toKantanEditor(editor) {
 			// 苦肉の策としてselectionStart,endを揃えてから
 			// 一旦フォーカスを外してすぐに戻す。そうするとスクロールバーが追従する
 			// これにより、chromeではblurやfocusイベントはまともに使えなくなる黒魔術
-			$(editor).val(text);
+			editor.value = text;
 			editor.selectionStart = selectionStart;
 			editor.selectionEnd = selectionStart;
 			$(editor).trigger("blur", ["kantanEditorDummy"]);
@@ -908,13 +908,13 @@ function toKantanEditor(editor) {
 			// IEではその後にその文字を選択してdeleteコマンドで削除するとスクロールバーが追従する
 			var part1 = text.substring(0, selectionStart);
 			var part2 = text.substr(selectionEnd);
-			$(editor).val(part1 + "X" + part2);
+			editor.value = part1 + "X" + part2;
 			editor.selectionStart = part1.length;
 			editor.selectionEnd = part1.length + 1;
 			var isDeleteEnabled = document.execCommand("delete", false, null);
 			
 			// 追従した後はvalとキャレットを元に戻す
-			$(editor).val(text);
+			editor.value = text;
 			editor.selectionStart = selectionStart;
 			editor.selectionEnd = selectionEnd;
 		}
@@ -922,7 +922,7 @@ function toKantanEditor(editor) {
 }
 </script>
 <script>
-(function($){
+(function(){
 	
 	/* 編集不可ブラウザ判定 */
 
