@@ -1277,7 +1277,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 			var url = window.URL || window.webkitURL;		
 			var blobURL = url.createObjectURL(blob);
 			var a = document.createElement('a');
-			a.download = document.title + ".html";
+			a.download = document.title.replace(/^\* /, "") + ".html";
 			a.href = blobURL;
 			
 			// firefoxでa.click()が効かないため無理やりclickイベントをディスパッチする
