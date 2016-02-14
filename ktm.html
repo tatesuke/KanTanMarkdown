@@ -796,11 +796,6 @@ function toKantanEditor(editor) {
 				editor.selectionEnd   = undo.selectionEnd;
 				updateScrollPos(e.target);
 				previousVal = undo;
-				
-				if (undoStack.length == 0) {
-					var event = new CustomEvent("undoStackEmpty");
-					editor.dispatchEvent(event);
-				}
 			}
 		}
 	});
@@ -1059,14 +1054,13 @@ function doPreview() {
 	// タイトル変更
 	var h1 = document.querySelector("h1");
 	if(h1) {
-		document.title = h1.innerText;
+		document.title = h1.textContent;
 	} else {
 		document.title = "無題";
 	}
 	if (saved == false) {
 		document.title = "* " + document.title;
 	}
-	
 	
 	// 画像埋め込み
 	var images = document.getElementsByTagName("img");
@@ -1290,7 +1284,7 @@ function save() {
 	var editor = document.getElementById("editor");
 	editor.innerHTML = editor.value.replace(/</g, "&lt;");
 	
-	var toggleFlag = isEnable(editor);
+	var toggleFlag = isVisible(editor);
 	if (toggleFlag == true) {
 		toggleMode();
 	}
@@ -1341,9 +1335,6 @@ document.getElementById("editor").addEventListener("input", function(e) {
 	if (saved == true) {
 		saved = false;
 	}
-});
-document.getElementById("editor").addEventListener("undoStackEmpty", function(e){
-	saved = true;
 });
 
 /* ショートカットキー */
