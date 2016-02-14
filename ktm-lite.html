@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <!--
- * KanTanMarkdown v1.20160214.01
+ * KanTanMarkdown v1.20160214.02
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
@@ -389,36 +389,27 @@ pre {
   overflow:auto;
 }
 </style>
-<title>* undefined</title>
+
+<title>無題</title>
 </head>
 <body>
 <nav>
 	<span id="messageArea"></span>
-	<input id="autoSyncButton" name="autoSyncButton" checked="checked" type="checkbox"><label for="autoSyncButton">自動同期</label>
+	<input type="checkbox" id="autoSyncButton" name="autoSyncButton" checked="checked"><label for="autoSyncButton">自動同期</label>
 	<button id="syncButton">同期(F5)</button><button id="toggleButton">編集/閲覧(ESC)</button><button id="saveButton">保存(Ctrl+S)</button>
 </nav>
-<div style="display: none;" id="attach">
-	<form id="attachForm"><input id="attachButton" multiple="" type="file"></form>
+<div id="attach">
+	<form id="attachForm"><input type="file" id="attachButton" multiple multiple></form>
 	<div id="filer">
 		<ul id="fileList">
 		</ul>
 	</div>
 	<button id="attachToggleButton">添付ファイルを表示(Alt+↓)</button><button id="previewToggleButton">プレビューを隠す(Alt+→)</button>
 </div>
-<div style="height: 529px;" id="wrapper">
+<div id="wrapper">
 	<noscript>このファイルはJavaScriptを有効にしないと閲覧できません。</noscript>
-	<textarea style="display: none;" id="editor"># かんたんMarkdown新規作成
-
-ご利用になるエディションを選んでください。
-
-||&lt;a href="ktm-lite.html"&gt;Lite&lt;/a&gt;| &lt;a href="ktm-std.html"&gt;Standard&lt;/a&gt;|&lt;a href="ktm-full.html"&gt;Full&lt;/a&gt;    |
-|------------------------|:------:|:--------:|:-------:|
-| 空の容量               | 約50kb | 約100kb  | 約300kb |
-| Markdown               | ○     | ○       | ○      |
-| シンタックスハイライト |        | ○       | ○      |
-| シーケンス図           |        |          | ○      |
-| フローチャート         |        |          | ○      |</textarea>
-	<div style="width: 980px;" id="previewer"></div>
+	<textarea id="editor"></textarea>
+	<div id="previewer"></div>
 </div>
 <script>
 /**
@@ -798,13 +789,6 @@ function setViewMode() {
 /* エディタに機能追加 */
 toKantanEditor(document.getElementById("editor"));
 
-/* シンタックスハイライト設定 */
-marked.setOptions({
-	highlight: function (code, lang) {
-		return hljs.highlightAuto(code, [lang]).value;
-	}
-});
-
 /* 起動時にコンテンツ読み込み */
 if (document.getElementById("editor").innerHTML == "") {
 	// 内容が空であれば初期状態を編集モードにする
@@ -944,24 +928,6 @@ function doPreview() {
 		if (img != null) {
 			elem.src = img.innerHTML;
 		}
-	}
-	
-	// シーケンス図
-	var sequences = document.getElementsByClassName("sequence");
-	for (var i = 0; i < sequences.length; i++) {
-		var sequence = sequences[i];
-		var diagram = Diagram.parse(sequence.textContent);
-		sequence.innerHTML = "";
-		diagram.drawSVG(sequence, {theme: 'simple'});
-	}
-	
-	// フローチャート
-	var flows = document.getElementsByClassName("flow");
-	for (var i = 0; i < flows.length; i++) {
-		var flow = flows[i];
-		var diagram = flowchart.parse(flow.textContent);
-		flow.innerHTML = "";
-		diagram.drawSVG(flow);
 	}
 	
 	// スクロールバーが最下部にある場合、更新後も最下部にする。
