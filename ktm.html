@@ -942,8 +942,12 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	}
 	
 	function setViewMode() {
-		$("#messageArea").text("このブラウザでは編集できません。");
-		$("nav > *").attr("disabled", "disabled");
+		document.getElementById("messageArea").innerText
+				 = "このブラウザでは編集できません。";
+		var navElems = document.querySelectorAll("nav > *");
+		for (var i = 0; i < navElems.length; i++) {
+			navElems[i].setAttribute("disabled", "disabled");
+		}
 	}
 	
 	/* エディタに機能追加 */
@@ -957,7 +961,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	});
 
 	/* 起動時にコンテンツ読み込み */
-	if ($("#editor").val() == "") {
+	if (document.getElementById("editor").innerHTML == "") {
 		// 内容が空であれば初期状態を編集モードにする
 		toggleMode();
 	} else {
