@@ -1028,18 +1028,19 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	});
 	
 	//更新ボタンを押したら更新する 
-	$("#syncButton").on("click", doPreview);
+	document.getElementById("syncButton").addEventListener("click", doPreview);
 	
 	// エディタに変化があったらプレビュー予約
-	$("#editor").on("change", queuePreview)
-			.on("keyup",  queuePreview);
+	document.getElementById("editor").addEventListener("change", queuePreview);
+	document.getElementById("editor").addEventListener("keyup", queuePreview);
 	
 	// 自動更新がONならプレビューする
 	// ただし、onkeyupなど呼ばれる頻度が高いので一定時間待って最後の呼び出しのみ実行する
 	var queue = null, // キューをストック 
 	wait = 300; // 0.3秒後に実行の場合 
 	function queuePreview() {
-		if (!$("#autoSyncButton").is(":checked")) {
+		var autoSyncButton = document.getElementById("autoSyncButton");
+		if (!autoSyncButton.checked) {
 			return;
 		}
 	
