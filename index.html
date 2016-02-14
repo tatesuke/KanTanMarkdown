@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <!--
- * KanTanMarkdown v1.20160214.02
+ * KanTanMarkdown v1.20160214.03
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
@@ -964,11 +964,6 @@ function toKantanEditor(editor) {
 				editor.selectionEnd   = undo.selectionEnd;
 				updateScrollPos(e.target);
 				previousVal = undo;
-				
-				if (undoStack.length == 0) {
-					var event = new CustomEvent("undoStackEmpty");
-					editor.dispatchEvent(event);
-				}
 			}
 		}
 	});
@@ -1106,8 +1101,9 @@ marked.setOptions({
 });
 
 /* 起動時にコンテンツ読み込み */
-if (document.getElementById("editor").innerHTML == "") {
-	// 内容が空であれば初期状態を編集モードにする
+if (isEnable(document.getElementById("toggleButton")) 
+		&& (document.getElementById("editor").innerHTML == "")) {
+	// 編集モードでなく、内容が空であれば初期状態を編集モードにする
 	toggleMode();
 } else {
 	doPreview();
@@ -1227,14 +1223,13 @@ function doPreview() {
 	// タイトル変更
 	var h1 = document.querySelector("h1");
 	if(h1) {
-		document.title = h1.innerText;
+		document.title = h1.textContent;
 	} else {
 		document.title = "無題";
 	}
 	if (saved == false) {
 		document.title = "* " + document.title;
 	}
-	
 	
 	// 画像埋め込み
 	var images = document.getElementsByTagName("img");
@@ -1458,7 +1453,7 @@ function save() {
 	var editor = document.getElementById("editor");
 	editor.innerHTML = editor.value.replace(/</g, "&lt;");
 	
-	var toggleFlag = isEnable(editor);
+	var toggleFlag = isVisible(editor);
 	if (toggleFlag == true) {
 		toggleMode();
 	}
@@ -1509,9 +1504,6 @@ document.getElementById("editor").addEventListener("input", function(e) {
 	if (saved == true) {
 		saved = false;
 	}
-});
-document.getElementById("editor").addEventListener("undoStackEmpty", function(e){
-	saved = true;
 });
 
 /* ショートカットキー */
