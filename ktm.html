@@ -1114,37 +1114,38 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	}
 	
 	/* ファイル添付 */
-	$("#attachButton").on("change", function(e) {
+	document.getElementById("attachButton").addEventListener("change", function(e) {
 		var elem = e.target;
 	    var files = elem.files;
 	    attachFiles(files);
 	});
-	
-	$("body").on('dragover', function(e) {
+	document.getElementsByTagName("body")[0].addEventListener("dragover", function(e) {
 		e.stopPropagation();
 		e.preventDefault();
-		e.originalEvent.dataTransfer.dropEffect = 'copy';
-		
-		$(this).addClass("onDragover");
+		e.dataTransfer.dropEffect = 'copy';
+		this.classList.add('onDragover');
 	});
-	$("body").on('drop', function(e) {
+	document.getElementsByTagName("body")[0].addEventListener("drop", function(e) {
 		e.stopPropagation();
 		e.preventDefault();
-		attachFiles(e.originalEvent.dataTransfer.files);
-		$(this).removeClass("onDragover");
+		attachFiles(e.dataTransfer.files);
+		this.classList.remove("onDragover");
 		
-		if (0 < e.originalEvent.dataTransfer.files.length) {
-			if (!$("#editor").is(":visible")) {
-				$("#toggleButton").click();
+		// ファイルドロップ時にfilerが閉じていたら開く
+		if (0 < e.dataTransfer.files.length) {
+			var editor = document.getElementById("editor");
+			var toggleButton = document.getElementById("toggleButton");
+			var filer = document.getElementById("filer");
+			if (!isVisible(editor)) {
+				toggleButton.click();
 			}
-			if (!$("#filer").is(":visible")) {
+			if (!isVisible(filer)) {
 				openFiler();
 			}
 		}
 	});
-	
-	$("body").on("dragleave", function() {
-		$(this).removeClass("onDragover");
+	document.getElementsByTagName("body")[0].addEventListener("dragleave", function(e){
+		this.classList.remove("onDragover");
 	});
 	
 	function attachFiles(files){
@@ -1173,7 +1174,7 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		    	
 		    	var detachButton = document.createElement("button");
 		    	detachButton.classList.add('detachButton');
-		    	detachButton.innerText = "×";
+		    	detachButton.innerHTML = "×";
 		    	detachButton.addEventListener("click", onDetachButtonClicked);
 		    	li.appendChild(detachButton);
 		    	
