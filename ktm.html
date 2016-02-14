@@ -1101,15 +1101,14 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	}
 	
 	function isMaxScroll(id) {
-		var isMaxScroll = false;
-		var scrollHeight = $("#" + id)[0].scrollHeight;
-		var offsetHeight = $("#" + id)[0].offsetHeight;
-		var borderTop = Number($("#" + id).css('border-top-width').replace(/px/, ""));
-		var borderBottom = Number($("#" + id).css('border-bottom-width').replace(/px/, ""));
-		var borderHeight = borderTop + borderBottom;
-		var scrollTop = $("#" + id)[0].scrollTop;
-		var diff = (scrollTop + offsetHeight - borderHeight) - scrollHeight
-		// Firefoxではborder-*-widthで小数点付きの数値が返ることがあるため数ピクセルの誤差を許容する
+		var elem = document.getElementById(id);
+		
+		var scrollHeight = elem.scrollHeight;
+		var clientHeight = elem.clientHeight;
+		var scrollTop = elem.scrollTop;
+		var diff = scrollHeight - (clientHeight + scrollTop)
+		
+		// 小数点付きの計算なので数ピクセルの誤差を許容する
 		return (-1.0 <= diff) && (diff <= 1.0);
 	}
 	
