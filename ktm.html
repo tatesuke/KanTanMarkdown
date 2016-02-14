@@ -1072,9 +1072,9 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		previewer.innerHTML = marked(editor.value);
 		
 		// タイトル変更
-		var h1 = $("h1:first");
-		if(h1.length != 0) {
-			document.title = h1.text();
+		var h1 = document.querySelector("h1");
+		if(h1) {
+			document.title = h1.innerText;
 		} else {
 			document.title = "無題";
 		}
