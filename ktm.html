@@ -1154,11 +1154,32 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		    fr.onload = function(e) {
 		    	var target = e.target;
 		    	var name = target.fileName;
-		    	var script = '<script type="text/template" id="attach-' + name + '" title="' + name + '">' + target.result + '<' + '/script>'; 
-				$("#fileList").append('<li>' + script + '<input type="text" class="fileName"><button class="detachButton">×</button></li>\n');
-				// なぜかinputタグのvale属性の変更が保存されないので動的に変更する
-				$("#fileList :last-child input").each(function(){$(this).val(name);});
-				queuePreview();
+		    	
+		    	var li = document.createElement("li");
+		    	
+		    	var script = document.createElement("script");
+		    	script.type  = "text/template";
+		    	script.id    = "attach-" + name;
+		    	script.title = name;
+		    	script.innerHTML = target.result;
+		    	li.appendChild(script);
+		    	
+		    	var input  = document.createElement("input");
+		    	input.type = "text";
+		    	input.classList.add('fileName');
+		    	input.value = name;
+		    	input.addEventListener("change", onFileNameChanged);
+		    	li.appendChild(input);
+		    	
+		    	var detachButton = document.createElement("button");
+		    	detachButton.classList.add('detachButton');
+		    	detachButton.innerText = "×";
+		    	detachButton.addEventListener("click", onDetachButtonClicked);
+		    	li.appendChild(detachButton);
+		    	
+		    	document.getElementById("fileList").appendChild(li);
+		    	
+		    	queuePreview();
 			}
 			
 			fr.fileName = files[i].name;
@@ -1167,12 +1188,14 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 	}
 	
 	/* ファイル削除 */
-	$(document).on("click", ".detachButton", function(){
+	var onDetachButtonClicked = function(e) {
+		// 削除ボタンが押されたら親要素(li)ごと削除
 		if(window.confirm('削除していいですか?')){
-			$(this).closest("li").remove();
+			var parent = e.target.parentNode;
+			parent.parentNode.removeChild(parent);
 			saved = false;
 		}
-	});
+	}
 	
 	/* ファイル名変更 */
 	var fileNameElems = document.getElementsByClassName("fileName");
@@ -1183,16 +1206,19 @@ var DIAGRAM_MARGIN=10,ACTOR_MARGIN=10,ACTOR_PADDING=10,SIGNAL_MARGIN=5,SIGNAL_PA
 		fileNameElem.value = fileName;
 	}
 	
-	$(document).on("change", ".fileName", function(){
-		if ($(this).val().trim() == "") {
+	var onFileNameChanged = function(e) {
+		var target = e.target;
+		if (target.value.trim() == "") {
 			alert("名前は必ず入力してください");
-			$(this).focus();
+			target.focus();
 		} else {
-			$(this).prev("script").attr("id", "attach-" + $(this).val()).attr("title", $(this).val());
+			var scriptTag = target.previousElementSibling;
+			scriptTag.id =  "attach-" + target.value;
+			scriptTag.title = target.value;
 			saved = false;
 			queuePreview();
 		}
-	});
+	}
 
 	/* 添付ファイル領域開け閉め */
 	document.getElementById("attachToggleButton")
