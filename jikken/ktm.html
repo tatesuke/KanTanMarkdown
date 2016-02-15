@@ -1005,7 +1005,8 @@ marked.setOptions({
 
 /* 起動時にコンテンツ読み込み */
 if (window.opener) {
-	console.log(window.opener);
+	document.getElementById("editor").value = 
+		window.opener.document.getElementById("editor").value;
 }
 
 if (isEnable(document.getElementById("toggleButton")) 
