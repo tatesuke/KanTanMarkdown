@@ -104,6 +104,10 @@ input[type="file"] {
 	border: 0;
 }
 
+#previewer:focus {
+	outline:none;
+}
+
 #previewer:after {
 	content: "."; 
 	display: block; 
@@ -568,7 +572,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <div id="wrapper">
 	<noscript>このファイルはJavaScriptを有効にしないと閲覧できません。</noscript>
 	<textarea id="editor"></textarea>
-	<div id="previewer"></div>
+	<div id="previewer" tabIndex="-1"></div>
 </div>
 <div id="onlineMenu">
 	<ul>
@@ -1058,6 +1062,7 @@ function toggleMode() {
 	if (isVisible(editor)) {
 		hide(attach);
 		hide(editor);
+		previewer.focus();
 	} else {
 		showBlock(attach);
 		showBlock(editor);
