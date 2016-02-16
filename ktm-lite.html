@@ -1,16 +1,20 @@
 <!doctype html>
 <html>
 <!--
- * KanTanMarkdown v1.20160214.03
+ * KanTanMarkdown
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
  * http://opensource.org/licenses/mit-license.php
  --><head>
 <meta charset="utf-8">
+<script>
+var kantanVersion = "v1.20160216.01";
+</script>
 <style>
 body {
 	margin: 0;
 	padding: 0;
+	position:relative;
 }
 
 .onDragover {
@@ -19,7 +23,23 @@ body {
 
 nav {
 	margint:0;
-	text-align : right;
+}
+
+#leftNav{
+	float:left;
+}
+
+#rightNav {
+	float:right;
+}
+
+nav:after {
+	content: "."; 
+	display: block; 
+	height: 0; 
+	font-size:0;	
+	clear: both; 
+	visibility:hidden;
 }
 
 #attach {
@@ -84,6 +104,10 @@ input[type="file"] {
 	border: 0;
 }
 
+#previewer:focus {
+	outline:none;
+}
+
 #previewer:after {
 	content: "."; 
 	display: block; 
@@ -93,37 +117,38 @@ input[type="file"] {
 	visibility:hidden;
 }
 
-.info{
-	color : #3a87ad;
-	background-color: #d9edf7;
-	border: 1px solid #bce8f1;
-	font-size: 13px;
-	line-height: 19px;
-	padding: 6px 10px;
-	border-radius: 0px;
-	margin: 1em 0px 1em;
+#onlineMenu {
+	display:none;
+	border : 1px solid gray;
+	position:absolute;
+	margin:0;
+	padding:0;
 }
 
-.warn{
-	color : #c09853;
-	background-color: #fcf8e3;
-	border: 1px solid #fbeed5;
-	font-size: 13px;
-	line-height: 19px;
-	padding: 6px 10px;
-	border-radius: 0px;
-	margin: 1em 0px 1em;
+#onlineMenu > ul {
+	list-style-type: none;
+	margin:0;
+	padding:0;
 }
 
-.alert{
-	color : #b94a48;
-	background-color: #f2dede;
-	border: 1px solid #eed3d7;
-	font-size: 13px;
-	line-height: 19px;
-	padding: 6px 10px;
-	border-radius: 0px;
-	margin: 1em 0px 1em;
+#onlineMenu > ul > li {
+	margin:0;
+}
+
+#onlineMenu > ul > li > a {
+	box-sizing:border-box;
+	text-decoration:none;
+	display:block;
+	margin:0;
+	padding:10px;
+	width:100%;
+	height:100%;
+	color : black;
+	background-color:#ffffff;
+}
+
+#onlineMenu > ul > li > a:hover {
+	background-color:#99cde1;
 }
 
 @media print{
@@ -388,15 +413,52 @@ pre {
 .sequence, .flow {
   overflow:auto;
 }
+.info{
+	color : #3a87ad;
+	background-color: #d9edf7;
+	border: 1px solid #bce8f1;
+	font-size: 13px;
+	line-height: 19px;
+	padding: 6px 10px;
+	border-radius: 0px;
+	margin: 1em 0px 1em;
+}
+
+.warn{
+	color : #c09853;
+	background-color: #fcf8e3;
+	border: 1px solid #fbeed5;
+	font-size: 13px;
+	line-height: 19px;
+	padding: 6px 10px;
+	border-radius: 0px;
+	margin: 1em 0px 1em;
+}
+
+.alert{
+	color : #b94a48;
+	background-color: #f2dede;
+	border: 1px solid #eed3d7;
+	font-size: 13px;
+	line-height: 19px;
+	padding: 6px 10px;
+	border-radius: 0px;
+	margin: 1em 0px 1em;
+}
 </style>
 
 <title>無題</title>
 </head>
 <body>
 <nav>
-	<span id="messageArea"></span>
-	<input type="checkbox" id="autoSyncButton" name="autoSyncButton" checked="checked"><label for="autoSyncButton">自動同期</label>
-	<button id="syncButton">同期(F5)</button><button id="toggleButton">編集/閲覧(ESC)</button><button id="saveButton">保存(Ctrl+S)</button>
+	<div id="leftNav">
+		<button id="onlineMenuButton">オンラインメニュー</button>
+	</div>
+	<div id="rightNav">
+		<span id="messageArea"></span>
+		<input type="checkbox" id="autoSyncButton" name="autoSyncButton" checked="checked"><label for="autoSyncButton">自動プレビュー</label>
+		<button id="syncButton">プレビュー(F5)</button><button id="toggleButton">編集/閲覧(ESC)</button><button id="saveButton">保存(Ctrl+S)</button>
+	</div>
 </nav>
 <div id="attach">
 	<form id="attachForm"><input type="file" id="attachButton" multiple multiple></form>
@@ -409,7 +471,14 @@ pre {
 <div id="wrapper">
 	<noscript>このファイルはJavaScriptを有効にしないと閲覧できません。</noscript>
 	<textarea id="editor"></textarea>
-	<div id="previewer"></div>
+	<div id="previewer" tabIndex="-1"></div>
+</div>
+<div id="onlineMenu">
+	<ul>
+		<li><a href="http://tatesuke.github.io/KanTanMarkdown/ktm.html" target="_blank">新規作成</a></li>
+		<li><a href="http://tatesuke.github.io/KanTanMarkdown/syntax.html" id="helpButton" target="_blank">Markdown記法ヘルプ(F1)</a></li>
+		<li><a href="http://tatesuke.github.io/KanTanMarkdown/" target="_blank">かんたんMarkdown <span class="version"></span></a></li>
+	</ul>
 </div>
 <script>
 /**
@@ -781,8 +850,23 @@ function setViewMode() {
 	}
 }
 
+/* バージョン埋め込み */
+var versionElements = document.getElementsByClassName("version");
+for (var i = 0 ; i < versionElements.length; i++) {
+	versionElements[i].innerText = kantanVersion;
+}
+
 /* エディタに機能追加 */
 toKantanEditor(document.getElementById("editor"));
+
+/* シンタックスハイライト設定 */
+if (typeof hljs !== "undefined") {
+	marked.setOptions({
+		highlight: function (code, lang) {
+			return hljs.highlightAuto(code, [lang]).value;
+		}
+	});
+}
 
 /* 起動時にコンテンツ読み込み */
 if (isEnable(document.getElementById("toggleButton")) 
@@ -839,6 +923,7 @@ function toggleMode() {
 	if (isVisible(editor)) {
 		hide(attach);
 		hide(editor);
+		previewer.focus();
 	} else {
 		showBlock(attach);
 		showBlock(editor);
@@ -925,6 +1010,28 @@ function doPreview() {
 		}
 	}
 	
+	// シーケンス図
+	if (typeof Diagram !== "undefined") {
+		var sequences = document.getElementsByClassName("sequence");
+		for (var i = 0; i < sequences.length; i++) {
+			var sequence = sequences[i];
+			var diagram = Diagram.parse(sequence.textContent);
+			sequence.innerHTML = "";
+			diagram.drawSVG(sequence, {theme: 'simple'});
+		}
+	}
+	
+	// フローチャート
+	if (typeof flowchart !== "undefined") {
+		var flows = document.getElementsByClassName("flow");
+		for (var i = 0; i < flows.length; i++) {
+			var flow = flows[i];
+			var diagram = flowchart.parse(flow.textContent);
+			flow.innerHTML = "";
+			diagram.drawSVG(flow);
+		}
+	}
+	
 	// スクロールバーが最下部にある場合、更新後も最下部にする。
 	if (scrollLockFlag == true) {
 		previewer.scrollTop = previewer.scrollHeight;
@@ -981,41 +1088,97 @@ document.getElementsByTagName("body")[0].addEventListener("dragleave", function(
 function attachFiles(files){
     for (var i = 0; i < files.length; i++) {
 	    var fr = new FileReader();
+	    fr.fileName = files[i].name;
 	    
-	    fr.onload = function(e) {
-	    	var target = e.target;
-	    	var name = target.fileName;
-	    	
-	    	var li = document.createElement("li");
-	    	
-	    	var script = document.createElement("script");
-	    	script.type  = "text/template";
-	    	script.id    = "attach-" + name;
-	    	script.title = name;
-	    	script.innerHTML = target.result;
-	    	li.appendChild(script);
-	    	
-	    	var input  = document.createElement("input");
-	    	input.type = "text";
-	    	input.classList.add('fileName');
-	    	input.value = name;
-	    	input.addEventListener("change", onFileNameChanged);
-	    	li.appendChild(input);
-	    	
-	    	var detachButton = document.createElement("button");
-	    	detachButton.classList.add('detachButton');
-	    	detachButton.innerHTML = "×";
-	    	detachButton.addEventListener("click", onDetachButtonClicked);
-	    	li.appendChild(detachButton);
-	    	
-	    	document.getElementById("fileList").appendChild(li);
-	    	
-	    	queuePreview();
+	    var type = files[i].type;
+	    if (type == "text/html") {
+	    	// htmlファイルはかんたんMardownファイルでないか確認
+		    fr.onload = (function (file) {
+				return function(e) {  
+					// <html></html>の中身だけ取り出し疑似的にdomを作る
+					var result = e.target.result;
+					var innerHtml = result.substring(23, result.length - 8);
+					var dummyHtml = document.createElement("html");
+					dummyHtml.innerHTML = innerHtml;
+					
+					// 簡単HTMLの構造か調べる
+					var importFlag = false;
+					var fileListElement = dummyHtml.querySelector("ul#fileList");
+					var editorElement = dummyHtml.querySelector("textarea#editor");
+					if (fileListElement && editorElement) {
+						// 簡単HTMLであるなら、インポートするか尋ねる
+						importFlag = window.confirm(
+								"かんたんMarkdownのファイルを検出しました。インポートしますか？\n" + 
+								"インポートする場合、添付ファイルとテキストは末尾に挿入されます。\n" +
+								"\n" + 
+								"【OK】:インポートする\n");
+					}
+					if (importFlag == true) {
+						// インポートするなら、添付ファイルと本文をコピー
+						var fileList = document.getElementById("fileList");
+						var importScripts = fileListElement.querySelectorAll("script");
+						for (var i = 0; i < importScripts.length; i++) {
+							var scriptElement = importScripts[i];
+							var fileName = scriptElement.title;
+							var content = scriptElement.innerHTML;
+							attachFile(fileName, content);
+						}
+						
+						var editor = document.getElementById("editor");
+						editor.value = editor.textContent + editorElement.textContent;
+						delete dummyHtml;
+					} else {
+						// インポートしないなら他のファイルと同様の手順を踏む
+						var fr2 = new FileReader();;
+						fr2.fileName = file.name;
+						fr2.onload = function(e) {
+							var target = e.target;
+							attachFile(target.fileName, target.result);
+						};
+						fr2.readAsDataURL(file);
+						return;
+					}
+				};
+			})(files[i]); 
+		    fr.readAsText(files[i]); //テキストファイルとして読み込む
+		} else {
+			// htmlファイル以外はそのまま添付
+			fr.onload = function(e) {
+				var target = e.target;
+				attachFile(target.fileName, target.result);
+			};
+			fr.readAsDataURL(files[i]);
 		}
-		
-		fr.fileName = files[i].name;
-	    fr.readAsDataURL(files[i]);
 	}
+	
+}
+
+function attachFile(fileName, content) {
+	var li = document.createElement("li");
+
+	var script = document.createElement("script");
+	script.type  = "text/template";
+	script.id    = "attach-" + fileName;
+	script.title = fileName;
+	script.innerHTML = content;
+	li.appendChild(script);
+
+	var input  = document.createElement("input");
+	input.type = "text";
+	input.classList.add('fileName');
+	input.value = fileName;
+	input.addEventListener("change", onFileNameChanged);
+	li.appendChild(input);
+
+	var detachButton = document.createElement("button");
+	detachButton.classList.add('detachButton');
+	detachButton.innerHTML = "×";
+	detachButton.addEventListener("click", onDetachButtonClicked);
+	li.appendChild(detachButton);
+
+	document.getElementById("fileList").appendChild(li);
+
+	queuePreview();
 }
 
 /* ファイル削除 */
@@ -1172,17 +1335,39 @@ document.getElementById("editor").addEventListener("input", function(e) {
 	}
 });
 
+/* オンラインメニュー */
+document.getElementById("onlineMenuButton").addEventListener("click", function(){
+	var button = this;
+	var onlineMenu = document.getElementById("onlineMenu");
+	onlineMenu.style.top = (this.offsetTop + this.scrollHeight) + "px";
+	showBlock(onlineMenu);
+});
+
+window.addEventListener("click", function(e){
+	var onlineMenuButton = document.getElementById("onlineMenuButton");
+	if (e.target != onlineMenuButton) {
+		hide(document.getElementById("onlineMenu"));
+	}
+});
+
 /* ショートカットキー */
 window.addEventListener("keydown", function(event) {
 	var code = (event.keyCode ? event.keyCode : event.which);
 	
 	if (code == 27) {
-		// ESCキーで閲覧/編集モード切り替え
+		// ESCキー
 		event.preventDefault();
 		
-		var toggleButton = document.getElementById("toggleButton");
-		if (isEnable(toggleButton)) {
-			toggleButton.click();
+		var onlineMenu = document.getElementById("onlineMenu");
+		if (isVisible(onlineMenu)) {
+			// オンラインメニュー閉じる
+			hide(onlineMenu);
+		} else {
+			// 閲覧/編集モード切り替え
+			var toggleButton = document.getElementById("toggleButton");
+			if (isEnable(toggleButton)) {
+				toggleButton.click();
+			}
 		}
 		return false;
 	}
@@ -1208,6 +1393,16 @@ window.addEventListener("keydown", function(event) {
 		if (isEnable(syncButton)) {
 			doPreview();
 		}
+		return false;
+	}
+	
+	if (code == 112){
+		// F1でヘルプ
+		event.preventDefault();
+		
+		var helpButton = document.getElementById("helpButton");
+		helpButton.click();
+		
 		return false;
 	}
 
