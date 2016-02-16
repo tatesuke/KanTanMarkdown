@@ -1001,11 +1001,13 @@ for (var i = 0 ; i < versionElements.length; i++) {
 toKantanEditor(document.getElementById("editor"));
 
 /* シンタックスハイライト設定 */
-marked.setOptions({
-	highlight: function (code, lang) {
-		return hljs.highlightAuto(code, [lang]).value;
-	}
-});
+if (hljs) {
+	marked.setOptions({
+		highlight: function (code, lang) {
+			return hljs.highlightAuto(code, [lang]).value;
+		}
+	});
+}
 
 /* 起動時にコンテンツ読み込み */
 if (isEnable(document.getElementById("toggleButton")) 
@@ -1150,21 +1152,25 @@ function doPreview() {
 	}
 	
 	// シーケンス図
-	var sequences = document.getElementsByClassName("sequence");
-	for (var i = 0; i < sequences.length; i++) {
-		var sequence = sequences[i];
-		var diagram = Diagram.parse(sequence.textContent);
-		sequence.innerHTML = "";
-		diagram.drawSVG(sequence, {theme: 'simple'});
+	if (Diagram) {
+		var sequences = document.getElementsByClassName("sequence");
+		for (var i = 0; i < sequences.length; i++) {
+			var sequence = sequences[i];
+			var diagram = Diagram.parse(sequence.textContent);
+			sequence.innerHTML = "";
+			diagram.drawSVG(sequence, {theme: 'simple'});
+		}
 	}
 	
 	// フローチャート
-	var flows = document.getElementsByClassName("flow");
-	for (var i = 0; i < flows.length; i++) {
-		var flow = flows[i];
-		var diagram = flowchart.parse(flow.textContent);
-		flow.innerHTML = "";
-		diagram.drawSVG(flow);
+	if (flowchart) {
+		var flows = document.getElementsByClassName("flow");
+		for (var i = 0; i < flows.length; i++) {
+			var flow = flows[i];
+			var diagram = flowchart.parse(flow.textContent);
+			flow.innerHTML = "";
+			diagram.drawSVG(flow);
+		}
 	}
 	
 	// スクロールバーが最下部にある場合、更新後も最下部にする。
