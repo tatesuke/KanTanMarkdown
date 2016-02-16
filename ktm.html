@@ -573,7 +573,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 <div id="onlineMenu">
 	<ul>
 		<li><a href="http://tatesuke.github.io/KanTanMarkdown/ktm.html" target="_blank">新規作成</a></li>
-		<li><a href="http://tatesuke.github.io/KanTanMarkdown/syntax.html" id="helpButton" target="_blank">ヘルプ(F1)</a></li>
+		<li><a href="http://tatesuke.github.io/KanTanMarkdown/help.html" id="helpButton" target="_blank">ヘルプ(F1)</a></li>
 		<li><a href="http://tatesuke.github.io/KanTanMarkdown/" target="_blank">かんたんMarkdown <span class="version"></span></a></li>
 	</ul>
 </div>
@@ -1218,41 +1218,97 @@ document.getElementsByTagName("body")[0].addEventListener("dragleave", function(
 function attachFiles(files){
     for (var i = 0; i < files.length; i++) {
 	    var fr = new FileReader();
+	    fr.fileName = files[i].name;
 	    
-	    fr.onload = function(e) {
-	    	var target = e.target;
-	    	var name = target.fileName;
-	    	
-	    	var li = document.createElement("li");
-	    	
-	    	var script = document.createElement("script");
-	    	script.type  = "text/template";
-	    	script.id    = "attach-" + name;
-	    	script.title = name;
-	    	script.innerHTML = target.result;
-	    	li.appendChild(script);
-	    	
-	    	var input  = document.createElement("input");
-	    	input.type = "text";
-	    	input.classList.add('fileName');
-	    	input.value = name;
-	    	input.addEventListener("change", onFileNameChanged);
-	    	li.appendChild(input);
-	    	
-	    	var detachButton = document.createElement("button");
-	    	detachButton.classList.add('detachButton');
-	    	detachButton.innerHTML = "×";
-	    	detachButton.addEventListener("click", onDetachButtonClicked);
-	    	li.appendChild(detachButton);
-	    	
-	    	document.getElementById("fileList").appendChild(li);
-	    	
-	    	queuePreview();
+	    var type = files[i].type;
+	    if (type == "text/html") {
+	    	// htmlファイルはかんたんMardownファイルでないか確認
+		    fr.onload = (function (file) {
+				return function(e) {  
+					// <html></html>の中身だけ取り出し疑似的にdomを作る
+					var result = e.target.result;
+					var innerHtml = result.substring(23, result.length - 8);
+					var dummyHtml = document.createElement("html");
+					dummyHtml.innerHTML = innerHtml;
+					
+					// 簡単HTMLの構造か調べる
+					var importFlag = false;
+					var fileListElement = dummyHtml.querySelector("ul#fileList");
+					var editorElement = dummyHtml.querySelector("textarea#editor");
+					if (fileListElement && editorElement) {
+						// 簡単HTMLであるなら、インポートするか尋ねる
+						importFlag = window.confirm(
+								"かんたんMarkdownのファイルを検出しました。インポートしますか？\n" + 
+								"インポートする場合、添付ファイルとテキストは末尾に挿入されます。\n" +
+								"\n" + 
+								"【OK】:インポートする\n");
+					}
+					if (importFlag == true) {
+						// インポートするなら、添付ファイルと本文をコピー
+						var fileList = document.getElementById("fileList");
+						var importScripts = fileListElement.querySelectorAll("script");
+						for (var i = 0; i < importScripts.length; i++) {
+							var scriptElement = importScripts[i];
+							var fileName = scriptElement.title;
+							var content = scriptElement.innerHTML;
+							attachFile(fileName, content);
+						}
+						
+						var editor = document.getElementById("editor");
+						editor.value = editor.textContent + editorElement.textContent;
+						delete dummyHtml;
+					} else {
+						// インポートしないなら他のファイルと同様の手順を踏む
+						var fr2 = new FileReader();;
+						fr2.fileName = file.name;
+						fr2.onload = function(e) {
+							var target = e.target;
+							attachFile(target.fileName, target.result);
+						};
+						fr2.readAsDataURL(file);
+						return;
+					}
+				};
+			})(files[i]); 
+		    fr.readAsText(files[i]); //テキストファイルとして読み込む
+		} else {
+			// htmlファイル以外はそのまま添付
+			fr.onload = function(e) {
+				var target = e.target;
+				attachFile(target.fileName, target.result);
+			};
+			fr.readAsDataURL(files[i]);
 		}
-		
-		fr.fileName = files[i].name;
-	    fr.readAsDataURL(files[i]);
 	}
+	
+}
+
+function attachFile(fileName, content) {
+	var li = document.createElement("li");
+
+	var script = document.createElement("script");
+	script.type  = "text/template";
+	script.id    = "attach-" + fileName;
+	script.title = fileName;
+	script.innerHTML = content;
+	li.appendChild(script);
+
+	var input  = document.createElement("input");
+	input.type = "text";
+	input.classList.add('fileName');
+	input.value = fileName;
+	input.addEventListener("change", onFileNameChanged);
+	li.appendChild(input);
+
+	var detachButton = document.createElement("button");
+	detachButton.classList.add('detachButton');
+	detachButton.innerHTML = "×";
+	detachButton.addEventListener("click", onDetachButtonClicked);
+	li.appendChild(detachButton);
+
+	document.getElementById("fileList").appendChild(li);
+
+	queuePreview();
 }
 
 /* ファイル削除 */
