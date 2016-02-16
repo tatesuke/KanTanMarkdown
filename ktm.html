@@ -1152,7 +1152,7 @@ function doPreview() {
 	}
 	
 	// シーケンス図
-	if (Diagram) {
+	if (typeof Diagram !== "undefined") {
 		var sequences = document.getElementsByClassName("sequence");
 		for (var i = 0; i < sequences.length; i++) {
 			var sequence = sequences[i];
@@ -1163,7 +1163,7 @@ function doPreview() {
 	}
 	
 	// フローチャート
-	if (flowchart) {
+	if (typeof flowchart !== "undefined") {
 		var flows = document.getElementsByClassName("flow");
 		for (var i = 0; i < flows.length; i++) {
 			var flow = flows[i];
