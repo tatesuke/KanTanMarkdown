@@ -548,7 +548,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 }
 </style>
 
-<title>かんたんMarkdown</title>
+<title>* かんたんMarkdown</title>
 </head>
 <body class="">
 <nav>
@@ -569,7 +569,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 	</div>
 	<button id="attachToggleButton">添付ファイルを表示(Alt+↓)</button><button id="previewToggleButton">プレビューを隠す(Alt+→)</button>
 </div>
-<div id="wrapper" style="height: 753px;">
+<div id="wrapper" style="height: 868px;">
 	<noscript>このファイルはJavaScriptを有効にしないと閲覧できません。</noscript>
 	<textarea id="editor" style="display: none;"># かんたんMarkdown
 かんたんMarkdownはメモ帳感覚で使えるちょっと変わったMarkdownエディタ、プレビューアです。クロスプラットフォームで、リアルタイムプレビューにも対応しています。
@@ -591,7 +591,9 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 かんたんMarkdownは**完**全に**単**一のHTMLファイルで動作します。したがって、JavaScriptが動作するブラウザさえあればどこでもMarkdownを利用することができます。面倒な環境構築は不要です。Windows, Mac OSなどOSを意識する必要もほとんどありません。
 
 ### 非クラウドアプリ
-ウェブブラウザ上で動作しますがクラウドアプリではありません。また、編集内容を外部に送信する機能は一切備わっていません。セキュリティ上クラウドアプリを利用できない環境でも利用することができます。
+ウェブブラウザ上で動作しますがクラウドアプリではありません。また、編集内容を外部に送信する機能は一切備わっていません&lt;sup&gt;※1&lt;/sup&gt;。セキュリティ上クラウドアプリを利用できない環境でも利用することができます。
+
+&lt;small id="note1"&gt;※1 ユーザ調査のため新規作成画面のみ例外的にアクセス解析を行っています。他のページ・ファイルでは一切行っていないので編集内容が送信されることはありません。&lt;/small&gt;
 
 ### 変換不要
 かんたんMarkdown本体に編集機能も閲覧機能も備わっています。閲覧者や共有相手のためにhtmlやpdfに変換する必要はありません。
@@ -742,7 +744,7 @@ http://tatesuke.github.io/KanTanMarkdown/ktm.html
 </textarea>
 	<div id="previewer" tabindex="-1" style="width: 980px;"></div>
 </div>
-<div id="onlineMenu" style="display: none;">
+<div id="onlineMenu" style="display: none; top: 23px;">
 	<ul>
 		<li><a href="http://tatesuke.github.io/KanTanMarkdown/ktm.html" target="_blank">新規作成</a></li>
 		<li><a href="http://tatesuke.github.io/KanTanMarkdown/syntax.html" id="helpButton" target="_blank">Markdown記法ヘルプ(F1)</a></li>
