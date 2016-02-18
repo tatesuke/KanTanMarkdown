@@ -455,9 +455,9 @@ pre {
 		<button id="onlineMenuButton">オンラインメニュー</button>
 	</div>
 	<div id="rightNav">
-		<span id="messageArea"></span>
-		<input type="checkbox" id="autoSyncButton" name="autoSyncButton" checked="checked"><label for="autoSyncButton">自動プレビュー</label>
-		<button id="syncButton">プレビュー(F5)</button><button id="toggleButton">編集/閲覧(ESC)</button><button id="saveButton">保存(Ctrl+S)</button>
+		<span id="messageArea">このページは編集できません</span>
+		<input type="checkbox" id="autoSyncButton" name="autoSyncButton" checked="checked" disabled="disabled"><label for="autoSyncButton" disabled="disabled">自動プレビュー</label>
+		<button id="syncButton" disabled="disabled">プレビュー(F5)</button><button id="toggleButton" disabled="disabled">編集/閲覧(ESC)</button><button id="saveButton" disabled="disabled">保存(Ctrl+S)</button>
 	</div>
 </nav>
 <div id="attach" style="display: none;">
@@ -468,7 +468,7 @@ pre {
 	</div>
 	<button id="attachToggleButton">添付ファイルを表示(Alt+↓)</button><button id="previewToggleButton">プレビューを隠す(Alt+→)</button>
 </div>
-<div id="wrapper" style="height: 834px;">
+<div id="wrapper" style="height: 813px;">
 	<noscript>このファイルはJavaScriptを有効にしないと閲覧できません。</noscript>
 	<textarea id="editor" style="display: none;"># かんたんMarkdown新規作成
 
@@ -494,22 +494,7 @@ ____
 &lt;/p&gt;
 
 &lt;img name="インポート.png" width="80%"&gt;
-
-&lt;!--
- 新規作成ページのみアクセス解析を行っています
- どれくらい利用されているのか興味があるというのと、
- 利用ブラウザを知りたいからです。賛否やご意見あればgithubやtwitterまで。 
- --&gt;
-&lt;script&gt;
-  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-  ga('create', 'UA-73933002-1', 'auto');
-  ga('send', 'pageview');
-
-&lt;/script&gt;</textarea>
+</textarea>
 	<div id="previewer" tabindex="-1" style="width: 980px;"></div>
 </div>
 <div id="onlineMenu" style="display: none; top: 23px;">
@@ -1502,6 +1487,16 @@ function showBlock(elem) {
 function hide(elem) {
 	elem.style.display = "none";
 }
+</script>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-73933002-1', 'auto');
+  ga('send', 'pageview');
+
 </script>
 </body>
 </html>
