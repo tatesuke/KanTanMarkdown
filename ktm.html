@@ -1043,6 +1043,7 @@ var editorScrollBarPos = 0;
 var previewerScrollBarPos = 0;
 var caretStartPos = 0;
 var caretEndPos = 0;
+var isPreviewerOpened = true;
 document.getElementById("toggleButton").addEventListener("click", toggleMode);
 
 function toggleMode() {
@@ -1056,18 +1057,22 @@ function toggleMode() {
 		caretEndPos = editor.selectionEnd;
 	}
 
-	//プレビュー領域を必ず表示
-	if (!isVisible(previewer)) {
-		openPreview();
-	}
-	
 	if (isVisible(editor)) {
+		// プレビューモードへ
+		isPreviewerOpened = isVisible(previewer);
+		if (isPreviewerOpened == false) {
+			openPreview();
+		}
 		hide(attach);
 		hide(editor);
 		previewer.focus();
 	} else {
+		// 編集モードへ
 		showBlock(attach);
 		showBlock(editor);
+		if (isPreviewerOpened == false) {
+			closePreview();
+		}
 	}
 	
 	doPreview();
