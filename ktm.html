@@ -1425,8 +1425,8 @@ function closePreview() {
 }
 
 /* 保存 */
+var contentAtSave = editor.value;
 document.getElementById("saveButton").addEventListener("click", save);
-
 function save() {
 	// テキストエリアは値を入れなおさないと保存されない。
 	var editor = document.getElementById("editor");
@@ -1464,6 +1464,8 @@ function save() {
 		a.dispatchEvent(ev);
 		delete a;
 	}
+	
+	contentAtSave = editor.value;
 	saved = true;
 	doPreview();
 	if (toggleFlag == true) {
@@ -1480,7 +1482,9 @@ window.onbeforeunload = function() {
 }
 
 document.getElementById("editor").addEventListener("input", function(e) {
-	if (saved == true) {
+	if (contentAtSave == editor.value) {
+		saved = true;
+	} else {
 		saved = false;
 	}
 });
