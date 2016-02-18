@@ -808,11 +808,13 @@ function toKantanEditor(editor) {
 			saveUndo(e.target);
 		} 
 		var code = (e.keyCode ? e.keyCode : e.which);
-		if ((37 <= code) && (code <= 40)) {
+		if ((33 <= code) && (code <= 40)) {
+			// PageUp, Pagedown, Home, End, 矢印キーはIME OFF判定
 			keyCache[e.code] = true;
 		}
 	});
 	editor.addEventListener("keypress", function(e){
+		// keypressが発生するキーはIME OFFと判定
 		keyCache[e.code] = true;
 	});
 	editor.addEventListener("keyup", function(e){
@@ -824,8 +826,11 @@ function toKantanEditor(editor) {
 			
 			saveUndo(e.target);
 		} else if (keyCache[e.code] == true) {
+			// keypressが発生していた(IME OFF)なら、Undo可能にする
+			
 			var code = (e.keyCode ? e.keyCode : e.which);
-			if ((37 <= code) && (code <= 40)) {
+			if ((33 <= code) && (code <= 40)) {
+				// PageUp, Pagedown, Home, End, 矢印キー
 				valueAtArrowOrClick = {
 					val: editor.value,
 					selectionStart: editor.selectionStart,
@@ -833,7 +838,6 @@ function toKantanEditor(editor) {
 				};
 				keyCache[e.code] = false;
 			} else {
-				// keypressが発生していた(IME OFF)なら、Undo可能にする
 				keyCache[e.code] = false;
 				saveUndo(e.target);
 			}
