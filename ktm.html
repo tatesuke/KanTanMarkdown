@@ -1285,6 +1285,9 @@ function attachFiles(files){
 						var editor = document.getElementById("editor");
 						editor.value = editor.textContent + editorElement.textContent;
 						delete dummyHtml;
+						
+						saved = false;
+						doPreview();
 					} else {
 						// インポートしないなら他のファイルと同様の手順を踏む
 						var fr2 = new FileReader();;
