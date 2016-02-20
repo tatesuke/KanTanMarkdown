@@ -1549,7 +1549,6 @@ function headingSyncToPreviewer() {
 	
 	var num = getCurrentNumberOfHeading(editor);
 	scrollPreviewerToHeading(previewer, num);
-	console.log(num);
 }
 
 function headingSyncToEditor(e) {
@@ -1557,7 +1556,6 @@ function headingSyncToEditor(e) {
 	var previewer = document.getElementById("previewer");
 	var num = getNumberOfHeading(previewer, e.target);
 	scrollEditorToHeading(editor, num);
-	console.log(num);
 }
 
 function getNumberOfHeading(previewer, elem) {
@@ -1634,8 +1632,9 @@ function getCurrentNumberOfHeading(editor) {
 	length--;
 	
 	var processed = processForHeadingSync(value, length);
-	if (processed[processed.length - 1].match(/^#{1,6}\s(.+)$/)) {
-		// 最後の行(キャレットの次の行)がheadingだったら捨てる
+	if ((lineBreakCount == 2)
+			&& processed[processed.length - 1].match(/^#{1,6}\s(.+)$/)) {
+		// 後ろ2行が両方共headingだったら最後の行を捨てる
 		processed.pop();
 	}
 	return processed.join().split("# ").length - 1;
