@@ -1069,6 +1069,11 @@ function toggleMode() {
 
 	if (isVisible(editor)) {
 		// プレビューモードへ
+		isPreviewerOpened = isVisible(previewer);
+		if (isPreviewerOpened == false) {
+			openPreview();
+		}
+		
 		hide(attach);
 		hide(editor);
 		doPreview();
