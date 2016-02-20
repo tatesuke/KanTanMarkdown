@@ -1607,8 +1607,7 @@ function scrollEditorToHeading(editor, num) {
 	
 	editor.selectionStart = j;
 	editor.selectionEnd = end;
-	
-	var originalSaved = saved;
+	updateScrollPos(editor);
 	// chromeだとupdateScrollPosのバグで強制的にsaved=trueになってしまう
 	// そのため、updateSavedFlagを呼び出して元に戻す。
 	// TODO いつか治したい
