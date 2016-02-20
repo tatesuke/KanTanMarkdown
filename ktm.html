@@ -8,7 +8,7 @@
  --><head>
 <meta charset="utf-8">
 <script>
-var kantanVersion = "v1.20160216.01_に手を加え中";
+var kantanVersion = "v1.20160221.01";
 </script>
 <style>
 body {
@@ -1677,7 +1677,7 @@ function getCurrentNumberOfHeading(editor) {
 	var processed = processForHeadingSync(value, length);
 	if ((lineBreakCount == 2)
 			&& processed[processed.length - 1].match(/^#{1,6}\s(.+)$/)) {
-		// 後ろ2行が両方共headingだったら最後の行を捨てる
+		// キャレットの次の行がheadingだったらそれは捨てる
 		processed.pop();
 	}
 	return processed.join().split("# ").length - 1;
