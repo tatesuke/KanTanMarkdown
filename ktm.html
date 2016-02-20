@@ -558,7 +558,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 	<div id="rightNav">
 		<span id="messageArea"></span>
 		<input type="checkbox" id="autoSyncButton" name="autoSyncButton" checked="checked"><label for="autoSyncButton">自動プレビュー</label>
-		<button id="syncButton">プレビュー(F5)</button><button id="toggleButton">編集/閲覧(ESC)</button><button id="saveButton">保存(Ctrl+S)</button>
+		<button id="syncButton">プレビュー(F5)</button><button id="headingSyncButton">見出し同期(F2)</button><button id="toggleButton">編集/閲覧(ESC)</button><button id="saveButton">保存(Ctrl+S)</button>
 	</div>
 </nav>
 <div id="attach">
@@ -1120,8 +1120,8 @@ document.getElementById("editor").addEventListener("keyup", queuePreview);
 
 // 自動更新がONならプレビューする
 // ただし、onkeyupなど呼ばれる頻度が高いので一定時間待って最後の呼び出しのみ実行する
-var queue = null, // キューをストック 
-wait = 300; // 0.3秒後に実行の場合 
+var previewQueue = null; // キューをストック 
+var queuePreviewWait = 300; // 0.3秒後に実行の場合 
 function queuePreview() {
 	var autoSyncButton = document.getElementById("autoSyncButton");
 	if (!autoSyncButton.checked) {
@@ -1129,12 +1129,12 @@ function queuePreview() {
 	}
 
 	// イベント発生の都度、キューをキャンセル 
-	clearTimeout( queue );
+	clearTimeout( previewQueue );
 	 
 	// waitで指定したミリ秒後に所定の処理を実行 
 	// 経過前に再度イベントが発生した場合
 	// キューをキャンセルして再カウント 
-	queue = setTimeout(doPreview, wait);
+	previewQueue = setTimeout(doPreview, queuePreviewWait);
 }
 
 
@@ -1194,6 +1194,11 @@ function doPreview() {
 	if (scrollLockFlag == true) {
 		previewer.scrollTop = previewer.scrollHeight;
 	}
+	
+	// previewedイベントをディスパッチ
+	var event = document.createEvent("Event");
+	event.initEvent("previewed", true, true);
+	previewer.dispatchEvent(event);
 }
 
 function isMaxScroll (id) {
@@ -1515,6 +1520,225 @@ window.addEventListener("click", function(e){
 	}
 });
 
+/* 見出し同期 */
+document.getElementById("headingSyncButton")
+		.addEventListener("click", headingSyncToPreviewer);
+
+document.getElementById("previewer").addEventListener("previewed", function(e) {
+	if (isVisible(document.getElementById("editor"))) {
+		var headings = e.target.querySelectorAll("h1, h2, h3, h4, h5, h6");
+		for (var i = 0; i < headings.length; i++) {
+			headings[i].addEventListener("mouseover", function(){
+				this.style.cursor = "pointer";
+			});
+			headings[i].addEventListener("click", headingSyncToEditor);
+		}
+	}
+});
+
+function headingSyncToPreviewer() {
+	var editor = document.getElementById("editor");
+	var previewer = document.getElementById("previewer");
+	
+	var num = getCurrentNumberOfHeading(editor);
+	scrollPreviewerToHeading(previewer, num);
+	console.log(num);
+}
+
+function headingSyncToEditor(e) {
+	var editor = document.getElementById("editor");
+	var previewer = document.getElementById("previewer");
+	var num = getNumberOfHeading(previewer, e.target);
+	scrollEditorToHeading(editor, num);
+	console.log(num);
+}
+
+function getNumberOfHeading(previewer, elem) {
+	var headings = previewer.querySelectorAll("h1, h2, h3, h4, h5, h6");
+	var i;
+	for (i = 0; i < headings.length; i++) {
+		if (headings[i] == elem) {
+			break;
+		}
+	}
+	return i + 1;
+}
+
+function scrollEditorToHeading(editor, num) {
+	var value = editor.value;
+	var processedLines = processForHeadingSync(value, value.length);
+
+	
+	var headingCount = 0;
+	var i;
+	for (var i = 0; i < processedLines.length; i++) {
+		var line = processedLines[i];
+		if (line.match(/^# .+$/)) {
+			headingCount++;
+			
+			if (headingCount == num) {
+				break;
+			}
+		}
+	}
+	
+	var j = 0;
+	if (i != 0) {
+		var lineBreakCount = 0;
+		for (j = 0; j < value.length ; j++) {
+			var c = value.charAt(j);
+			if (c == "\n") {
+				lineBreakCount++;
+				if (lineBreakCount == i) {
+					j++;
+					break;
+				}
+			}
+		}
+	}
+	
+	var end = editor.value.indexOf("\n", j);
+	end = (end == -1) ? editor.value.length : end;
+	
+	editor.selectionStart = j;
+	editor.selectionEnd = end;
+	updateScrollPos(editor);
+	editor.focus();
+}
+
+function getCurrentNumberOfHeading(editor) {
+	var length = editor.selectionStart;
+	while ((length < editor.value.length) && editor.value.charAt(length) != "\n") {
+		length++;
+	}
+	
+	var processed = processForHeadingSync(editor.value, length).join("\n");
+	return processed.split("# ").length - 1;
+}
+
+function scrollPreviewerToHeading(previewer, numberOfHeading) {
+	if (numberOfHeading == 0) {
+		previewer.scrollTop = 0;
+	} else {
+		var hElems = previewer.querySelectorAll("h1, h2, h3, h4, h5, h6");
+		var elem = hElems[numberOfHeading - 1];
+		previewer.scrollTop = elem.offsetTop - previewer.offsetTop;
+	}
+}
+
+function processForHeadingSync(str, length) {
+	var text = str.substring(0, length);
+	var lines = text.split("\n");
+	var newLines = [];
+	
+	var style = editor.currentStyle 
+			|| document.defaultView.getComputedStyle(editor, '');
+	var tabSize = style.tabSize
+				|| style.MozTabSize
+				|| 8;
+	tabSize = Number(tabSize);
+	
+	var tildeCodeBlockFlag = false;
+	var backQuoteCodeBlockFlag = false;
+	var i;
+	for (i = 0; i < lines.length; i++) {
+		var line = lines[i];
+		// 行頭にtabSize以上のスペースがある行は削除
+		line = line.replace(new RegExp("^ {" + tabSize + ",}.*"), "");
+		// 行頭にtabがある行は削除
+		line = line.replace(/^\t+.*/, "");
+		// trim
+		line = line.replace(/^\s+|\s+$/g, "");
+		
+		if (tildeCodeBlockFlag == true) {
+			if (line == "~~~") {
+				tildeCodeBlockFlag = false;
+			}
+			newLines.push("");
+			continue;
+		}
+		if (backQuoteCodeBlockFlag == true) {
+			if (line == "```") {
+				backQuoteCodeBlockFlag = false;
+			}
+			newLines.push("");
+			continue;
+		}
+		
+		if (line.substring(0, 3) == "~~~"){
+			tildeCodeBlockFlag = true;
+			newLines.push("");
+			continue;
+		}
+		if (line.substring(0, 3) == "```"){
+			backQuoteCodeBlockFlag = true;
+			newLines.push("");
+			continue;
+		}
+		
+		if (line.match(/^={2,}$|^-{2,}$/) && (newLines[i - 1] != "# h") && (newLines[i - 1] != "")) {
+			newLines[i - 1] = "# " + newLines[i - 1];
+			newLines.push("");
+			continue;
+		}
+		if (line.match(/^#{1,6}\s(.+)$/)) {
+			newLines.push("# " + RegExp.$1);
+			continue;
+		}
+		
+		newLines.push(line.replace(/#/g, ""));
+	}
+	
+	return newLines;
+}
+
+function updateScrollPos(editor) {
+	// 初期状態を保存
+	var text = editor.value;
+	var selectionStart = editor.selectionStart;
+	var selectionEnd   = editor.selectionEnd;
+
+	// insertTextコマンドで適当な文字(X)の追加を試みる
+	var isInsertEnabled;
+	try {
+		isInsertEnabled = document.execCommand("insertText", false, "X");
+	} catch(e) {
+		// IE10では何故かfalseを返さずに例外が発生するのでcatchで対応する
+		isInsertEnabled = false;
+	}
+	
+	if (isInsertEnabled) {
+		// insertTextに成功したらChrome
+		// chromeはどう頑張ってもまっとうな手段が通用しない。
+		// 苦肉の策としてselectionStart,endを揃えてから
+		// 一旦フォーカスを外してすぐに戻す。そうするとスクロールバーが追従する
+		// これにより、chromeではblurやfocusイベントはまともに使えなくなる黒魔術
+		editor.value = text;
+		editor.selectionStart = selectionStart;
+		editor.selectionEnd = selectionStart;
+		editor.blur();
+		editor.focus();
+		
+		// valは戻してあるのでキャレット位置のみ元に戻す
+		editor.selectionStart = selectionStart;
+		editor.selectionEnd = selectionEnd;
+	} else {
+		// IE,FirefoxはinsertTextに失敗するのでval関数で適当な文字(X)を挿入する。
+		// IEではその後にその文字を選択してdeleteコマンドで削除するとスクロールバーが追従する
+		var part1 = text.substring(0, selectionStart);
+		var part2 = text.substr(selectionEnd);
+		editor.value = part1 + "X" + part2;
+		editor.selectionStart = part1.length;
+		editor.selectionEnd = part1.length + 1;
+		var isDeleteEnabled = document.execCommand("delete", false, null);
+		
+		// 追従した後はvalとキャレットを元に戻す
+		editor.value = text;
+		editor.selectionStart = selectionStart;
+		editor.selectionEnd = selectionEnd;
+	}
+}
+
 /* ショートカットキー */
 window.addEventListener("keydown", function(event) {
 	var code = (event.keyCode ? event.keyCode : event.which);
@@ -1596,6 +1820,16 @@ window.addEventListener("keydown", function(event) {
 		// Alt+↓
 		event.preventDefault();
 		openFiler();
+		return false;
+	}
+	
+	if (code == 113) {
+		// F2で見出し同期（エディタ→プレビューア）
+		event.preventDefault();
+		
+		var headingSyncButton = document.getElementById("headingSyncButton");
+		headingSyncButton.click();
+		
 		return false;
 	}
 	
