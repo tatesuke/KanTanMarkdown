@@ -1612,13 +1612,26 @@ function scrollEditorToHeading(editor, num) {
 }
 
 function getCurrentNumberOfHeading(editor) {
+	var value = editor.value;
+	
+	// ==や--によるheadingに対応するため
+	// キャレットの次の行まで読み込む
 	var length = editor.selectionStart;
-	while ((length < editor.value.length) && editor.value.charAt(length) != "\n") {
+	var lineBreakCount = 0;
+	while ((length < value.length) && (lineBreakCount < 2)) {
+		if (value.charAt(length) == "\n") {
+			lineBreakCount++;
+		}
 		length++;
 	}
+	length--;
 	
-	var processed = processForHeadingSync(editor.value, length).join("\n");
-	return processed.split("# ").length - 1;
+	var processed = processForHeadingSync(value, length);
+	if (processed[processed.length - 1].match(/^#{1,6}\s(.+)$/)) {
+		// 最後の行(キャレットの次の行)がheadingだったら捨てる
+		processed.pop();
+	}
+	return processed.join().split("# ").length - 1;
 }
 
 function scrollPreviewerToHeading(previewer, numberOfHeading) {
@@ -1681,7 +1694,9 @@ function processForHeadingSync(str, length) {
 			continue;
 		}
 		
-		if (line.match(/^={2,}$|^-{2,}$/) && (newLines[i - 1] != "# h") && (newLines[i - 1] != "")) {
+		if (line.match(/^={2,}$|^-{2,}$/)
+				&& !newLines[i - 1].match(/^#{1,6}\s(.+)$/)
+				&& (newLines[i - 1] != "")) {
 			newLines[i - 1] = "# " + newLines[i - 1];
 			newLines.push("");
 			continue;
@@ -1693,7 +1708,7 @@ function processForHeadingSync(str, length) {
 		
 		newLines.push(line.replace(/#/g, ""));
 	}
-	
+
 	return newLines;
 }
 
