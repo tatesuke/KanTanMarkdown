@@ -1502,13 +1502,15 @@ window.onbeforeunload = function() {
 	}
 }
 
-document.getElementById("editor").addEventListener("input", function(e) {
-	if (contentAtSave == editor.value) {
+document.getElementById("editor").addEventListener("input", updateSavedFlag);
+
+function updateSavedFlag() {
+	if (contentAtSave == document.getElementById("editor").value) {
 		saved = true;
 	} else {
 		saved = false;
 	}
-});
+}
 
 /* オンラインメニュー */
 document.getElementById("onlineMenuButton").addEventListener("click", function(){
@@ -1607,7 +1609,12 @@ function scrollEditorToHeading(editor, num) {
 	
 	editor.selectionStart = j;
 	editor.selectionEnd = end;
-	updateScrollPos(editor);
+	
+	var originalSaved = saved;
+	// chromeだとupdateScrollPosのバグで強制的にsaved=trueになってしまう
+	// そのため、updateSavedFlagを呼び出して元に戻す。
+	// TODO いつか治したい
+	updateSavedFlag();
 	editor.focus();
 }
 
