@@ -1052,7 +1052,6 @@ function doLayout() {
 
 /* 編集・閲覧切り替え */
 var editorScrollBarPos = 0;
-var previewerScrollBarPos = 0;
 var caretStartPos = 0;
 var caretEndPos = 0;
 var isPreviewerOpened = true;
@@ -1064,35 +1063,69 @@ function toggleMode() {
 	var previewer = document.getElementById("previewer");
 	if (isVisible(editor)) {
 		editorScrollBarPos    = editor.scrollTop;
-		previewerScrollBarPos = previewer.scrollTop;
 		caretStartPos = editor.selectionStart;
 		caretEndPos = editor.selectionEnd;
 	}
 
 	if (isVisible(editor)) {
 		// プレビューモードへ
-		isPreviewerOpened = isVisible(previewer);
-		if (isPreviewerOpened == false) {
-			openPreview();
-		}
 		hide(attach);
 		hide(editor);
+		doPreview();
+		
+		// スクロールバー位置記憶
+		var minDiff = null;
+		var minElem = null;
+		var elems = previewer.querySelectorAll("*");
+		for (var i = 0; i < elems.length; i++) {
+			var diff = previewer.scrollTop - (elems[i].offsetTop - previewer.offsetTop);
+			if ((minDiff == null) || (Math.abs(diff) < Math.abs(minDiff))) {
+				minDiff = diff;
+				minElem = elems[i];
+			}
+		}	
+		
+		// レイアウト修正
+		doLayout();
+		
 		previewer.focus();
+		
+		if (minElem) {
+			wrapper.scrollTop = (minElem.offsetTop - previewer.offsetTop) + minDiff;
+		}
 	} else {
 		// 編集モードへ
 		showBlock(attach);
 		showBlock(editor);
+		doPreview();
+		
+		// スクロールバー位置記憶
+		var minDiff = null;
+		var minElem = null;
+		var elems = previewer.querySelectorAll("*");
+		for (var i = 0; i < elems.length; i++) {
+			var diff = wrapper.scrollTop - (elems[i].offsetTop - previewer.offsetTop);
+			if ((minDiff == null) || (Math.abs(diff) < Math.abs(minDiff))) {
+				minDiff = diff;
+				minElem = elems[i];
+			}
+		}		
+		
 		if (isPreviewerOpened == false) {
 			closePreview();
 		}
+		
+		// レイアウト修正
+		doLayout();
+		
+		if (minElem) {
+			previewer.scrollTop = (minElem.offsetTop - previewer.offsetTop) + minDiff;
+		}
 	}
 	
-	doPreview();
-	doLayout();
-	
+
 	if (isVisible(editor)) {
 		editor.scrollTop    = editorScrollBarPos;
-		previewer.scrollTop = previewerScrollBarPos;
 		editor.selectionStart = caretStartPos;
 		editor.selectionEnd = caretEndPos;
 		editor.focus();
