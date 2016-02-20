@@ -1482,6 +1482,9 @@ function closePreview() {
 var contentAtSave = editor.value;
 document.getElementById("saveButton").addEventListener("click", save);
 function save() {
+	var wrapperScrollTop = document.getElementById("wrapper").scrollTop;
+	var previewerScrollTop = document.getElementById("previewer").scrollTop;
+	
 	// テキストエリアは値を入れなおさないと保存されない。
 	var editor = document.getElementById("editor");
 	editor.innerHTML = editor.value.replace(/</g, "&lt;");
@@ -1525,6 +1528,9 @@ function save() {
 	if (toggleFlag == true) {
 		toggleMode();
 	}
+	
+	document.getElementById("previewer").scrollTop = previewerScrollTop;
+	document.getElementById("wrapper").scrollTop = wrapperScrollTop;
 }
 
 /* 更新時、終了時の警告 */
