@@ -4,8 +4,9 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-text-replace');
 	grunt.loadNpmTasks("grunt-inline");
+	grunt.loadNpmTasks('grunt-contrib-watch');
 	
-	//Grunt�̐ݒ�
+	//Gruntの設定
 	grunt.initConfig({
 		copy: {
 			beforeBuild:{
@@ -170,9 +171,16 @@ module.exports = function(grunt) {
 				}]
 			}
 		},
+		watch: {
+			doc: {
+				files: ["src/**"],
+				// 変更されたらどのタスクを実行するか
+				tasks: ["build-dev"]
+			}
+		},
 	});
-	//default�^�X�N�̒�`
-	grunt.registerTask("default", "inline:dev");
+	//defaultタスクの定義
+	grunt.registerTask("default", "watch");
 	grunt.registerTask("build-dev", [
 		"copy:beforeBuild",
 		"concat:previewerAndHljs",
