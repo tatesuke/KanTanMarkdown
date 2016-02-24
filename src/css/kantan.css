@@ -1,0 +1,153 @@
+body {
+	margin: 0;
+	padding: 0;
+	position:relative;
+}
+
+.onDragover {
+	border : 5px dashed #99cde1;
+}
+
+nav {
+	margint:0;
+}
+
+#leftNav{
+	float:left;
+}
+
+#rightNav {
+	float:right;
+}
+
+nav:after {
+	content: "."; 
+	display: block; 
+	height: 0; 
+	font-size:0;	
+	clear: both; 
+	visibility:hidden;
+}
+
+#attach {
+	width:100%;
+	border-top:1px solid gray;
+	border-bottom:1px solid gray;
+	display:none;
+}
+#attachForm {
+	box-sizing:border-box;
+	width:100%;
+	height:100%;
+	display:none;
+}
+
+input[type="file"] {
+	width:100%;
+}
+
+#filer{
+	box-sizing:border-box;
+	width:100%;
+	height:150px;
+	overflow: auto;
+	display:none;
+}
+
+#attachToggleButton,
+#previewToggleButton{
+	width: 50%;
+}
+
+#wrapper {
+	overflow: auto;
+}
+
+#editor {
+	box-sizing:border-box;
+	resize:none; 
+	width:50%;
+	height:100%;
+	float:left;
+	border-top:none;
+	display:none;
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+	border:1px solid gray;
+	margin: 0;
+}
+
+#previewer {
+	box-sizing:border-box;
+	width:100%;
+	margin: 0 auto;
+	overflow:auto;
+	word-wrap: break-word;
+	border:1px solid gray;
+}
+
+#previewer:empty {
+	border: 0;
+}
+
+#previewer:focus {
+	outline:none;
+}
+
+#previewer:after {
+	content: "."; 
+	display: block; 
+	height: 0; 
+	font-size:0;	
+	clear: both; 
+	visibility:hidden;
+}
+
+#onlineMenu {
+	display:none;
+	border : 1px solid gray;
+	position:absolute;
+	margin:0;
+	padding:0;
+}
+
+#onlineMenu > ul {
+	list-style-type: none;
+	margin:0;
+	padding:0;
+}
+
+#onlineMenu > ul > li {
+	margin:0;
+}
+
+#onlineMenu > ul > li > a {
+	box-sizing:border-box;
+	text-decoration:none;
+	display:block;
+	margin:0;
+	padding:10px;
+	width:100%;
+	height:100%;
+	color : black;
+	background-color:#ffffff;
+}
+
+#onlineMenu > ul > li > a:hover {
+	background-color:#99cde1;
+}
+
+@media print{
+	nav {
+		display:none;
+	}
+
+	#wrapper {
+		overflow: visible;
+	}
+	
+	#previewer {
+		border: 0;
+	}
+}
