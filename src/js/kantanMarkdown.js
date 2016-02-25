@@ -293,19 +293,6 @@
 		e.preventDefault();
 		attachFiles(e.dataTransfer.files);
 		this.classList.remove("onDragover");
-		
-		// ファイルドロップ時にfilerが閉じていたら開く
-		if (0 < e.dataTransfer.files.length) {
-			var editor = document.getElementById("editor");
-			var toggleButton = document.getElementById("toggleButton");
-			var filer = document.getElementById("filer");
-			if (!isVisible(editor)) {
-				toggleButton.click();
-			}
-			if (!isVisible(filer)) {
-				openFiler();
-			}
-		}
 	});
 	document.getElementsByTagName("body")[0].addEventListener("dragleave", function(e){
 		this.classList.remove("onDragover");
@@ -321,7 +308,6 @@
 				attachFile(file);
 			}
 		}
-		
 	}
 	
 	function attachFile(file) {
@@ -462,7 +448,18 @@
 		li.appendChild(detachButton);
 
 		document.getElementById("fileList").appendChild(li);
-
+		
+		// ファイル添付領域を開く
+		var editor = document.getElementById("editor");
+		var toggleButton = document.getElementById("toggleButton");
+		var filer = document.getElementById("filer");
+		if (!isVisible(editor)) {
+			toggleButton.click();
+		}
+		if (!isVisible(filer)) {
+			openFiler();
+		}
+		
 		queuePreview();
 	}
 
