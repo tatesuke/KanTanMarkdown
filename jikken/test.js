@@ -546,7 +546,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>\n\
 	<div id=\"rightNav\">\n\
 		<span id=\"messageArea\"></span>\n\
 		<input type=\"checkbox\" id=\"autoSyncButton\" name=\"autoSyncButton\" checked=\"checked\"><label for=\"autoSyncButton\">自動プレビュー</label>\n\
-		<button id=\"syncButton\">プレビュー(F5)</button><button id=\"headingSyncButton\">見出し同期(F2)</button><button id=\"toggleButton\">編集/閲覧(ESC)</button><button id=\"saveButton\">保存(Ctrl+S)</button>\n\
+		<button id=\"syncButton\">プレビューですよ(F5)</button><button id=\"headingSyncButton\">見出し同期(F2)</button><button id=\"toggleButton\">編集/閲覧(ESC)</button><button id=\"saveButton\">保存(Ctrl+S)</button>\n\
 	</div>\n\
 </nav>\n\
 <div id=\"attach\">\n\
