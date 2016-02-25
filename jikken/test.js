@@ -570,7 +570,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>\
 	</ul>\
 </div>\
 </body>",
-js:{[
+js:[
 "var kantanVersion = \"v1.20160221.01\";",
 "/**\
  * marked - a markdown parser\
