@@ -1,4 +1,4 @@
-update({"content":"<head>\n\
+update({"content" : "<head>\n\
 <meta charset=\"utf-8\">\n\
 <style>\n\
 body {\n\
