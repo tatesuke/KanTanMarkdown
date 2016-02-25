@@ -1,7 +1,10 @@
 # かんたんMarkdown
 かんたんMarkdownは完全に単一のHTMLファイルで動作するMarkdownエディタ・プレビューアです。
 
-次のURLに、使い方のもう少し詳しい説明があります。
+
+
+## 使い方
+次のURLに、もう少し詳しい説明があります。
 
 http://tatesuke.github.io/KanTanMarkdown/
 
