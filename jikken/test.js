@@ -1,1 +1,1 @@
-hoge({message:"fuga"});
+hoge({"message":"fuga"});
