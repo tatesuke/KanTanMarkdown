@@ -568,7 +568,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>\n\
 		<li><a href=\"http://tatesuke.github.io/KanTanMarkdown/syntax.html\" id=\"helpButton\" target=\"_blank\">Markdown記法ヘルプ(F1)</a></li>\n\
 		<li><a href=\"http://tatesuke.github.io/KanTanMarkdown/\" target=\"_blank\">かんたんMarkdown <span class=\"version\"></span></a></li>\n\
 	</ul>\n\
-</div>
+</div>\n\
 \n\
 </body>",
 "js":[
