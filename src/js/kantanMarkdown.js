@@ -312,77 +312,133 @@
 	});
 
 	function attachFiles(files){
-	    for (var i = 0; i < files.length; i++) {
-		    var fr = new FileReader();
-		    fr.fileName = files[i].name;
-		    
-		    var type = files[i].type;
-		    if (type == "text/html") {
-		    	// htmlファイルはかんたんMardownファイルでないか確認
-			    fr.onload = (function (file) {
-					return function(e) {  
-						// <html></html>の中身だけ取り出し疑似的にdomを作る
-						var result = e.target.result;
-						var innerHtml = result.substring(23, result.length - 8);
-						var dummyHtml = document.createElement("html");
-						dummyHtml.innerHTML = innerHtml;
-						
-						// 簡単HTMLの構造か調べる
-						var importFlag = false;
-						var fileListElement = dummyHtml.querySelector("ul#fileList");
-						var editorElement = dummyHtml.querySelector("textarea#editor");
-						if (fileListElement && editorElement) {
-							// 簡単HTMLであるなら、インポートするか尋ねる
-							importFlag = window.confirm(
-									"かんたんMarkdownのファイルを検出しました。インポートしますか？\n" + 
-									"インポートする場合、添付ファイルとテキストは末尾に挿入されます。\n" +
-									"\n" + 
-									"【OK】:インポートする\n");
-						}
-						if (importFlag == true) {
-							// インポートするなら、添付ファイルと本文をコピー
-							var fileList = document.getElementById("fileList");
-							var importScripts = fileListElement.querySelectorAll("script");
-							for (var i = 0; i < importScripts.length; i++) {
-								var scriptElement = importScripts[i];
-								var fileName = scriptElement.title;
-								var content = scriptElement.innerHTML;
-								attachFile(fileName, content);
-							}
-							
-							var editor = document.getElementById("editor");
-							editor.value = editor.textContent + editorElement.textContent;
-							delete dummyHtml;
-							
-							saved = false;
-							doPreview();
-						} else {
-							// インポートしないなら他のファイルと同様の手順を踏む
-							var fr2 = new FileReader();;
-							fr2.fileName = file.name;
-							fr2.onload = function(e) {
-								var target = e.target;
-								attachFile(target.fileName, target.result);
-							};
-							fr2.readAsDataURL(file);
-							return;
-						}
-					};
-				})(files[i]); 
-			    fr.readAsText(files[i]); //テキストファイルとして読み込む
+		for (var i = 0; i < files.length; i++) {
+			var file = files[i];
+			var type = files[i].type;
+			if (type == "text/html") {
+				attachHtmlFile(file)
 			} else {
-				// htmlファイル以外はそのまま添付
-				fr.onload = function(e) {
-					var target = e.target;
-					attachFile(target.fileName, target.result);
-				};
-				fr.readAsDataURL(files[i]);
+				attachFile(file);
 			}
 		}
 		
 	}
+	
+	function attachFile(file) {
+		var fr = new FileReader();
+	    fr.fileName = file.name;
+	    fr.onload = function(e) {
+			var target = e.target;
+			addAttachFileElements(target.fileName, target.result);
+		};
+		fr.readAsDataURL(file);
+	}
+	
+	function attachHtmlFile(file) {
+		var fr = new FileReader();
+		fr.fileName = file.name;
+		fr.onload = (function (file) {
+			return function(e) {
+				// <html></html>の中身だけ取り出し疑似的にdomを作る
+				var result = e.target.result;
+				var innerHtml = result.substring(23, result.length - 8);
+				var dummyHtml = document.createElement("html");
+				dummyHtml.innerHTML = innerHtml;
+				
+				// 簡単HTMLの構造か調べる
+				var importFlag = false;
+				var fileListElement = dummyHtml.querySelector("ul#fileList");
+				var editorElement = dummyHtml.querySelector("textarea#editor");
+				if (fileListElement && editorElement) {
+					showImportDialog(
+							"かんたんMarkdownのファイルを検出しました。どの項目をインポートしますか？\n" + 
+							"インポートする場合、項目は末尾に挿入されます", function(result){
+						if (result.result == true) {
+							importKantanMarkdown(result, dummyHtml, file);
+						} else {
+							attachFile(file);
+						}
+					});
+					
+				} else {
+					attachFile(file);
+				}
+			}
+		})(file);
+		fr.readAsText(file)
+	}
+	
+	function importKantanMarkdown(result, dummyHtml, file) {
+		if (result.attach == true) {
+			var fileListElement = dummyHtml.querySelector("ul#fileList");
+			var fileList = document.getElementById("fileList");
+			var importScripts = fileListElement.querySelectorAll("script");
+			for (var i = 0; i < importScripts.length; i++) {
+				var scriptElement = importScripts[i];
+				var fileName = scriptElement.title;
+				var content = scriptElement.innerHTML;
+				addAttachFileElements(fileName, content);
+			}
+			saved = false;
+		}
+		
+		if (result.markdown == true) {
+			var editorElement = dummyHtml.querySelector("textarea#editor")
+			var editor = document.getElementById("editor");
+			editor.value = editor.textContent + editorElement.textContent;
+			saved = false;
+		}
+		
+		doPreview();
+	} 
+	
+	function showImportDialog(msg, callback) {
+		document.getElementById("saveButton").disabled =  true;
+		document.getElementById("importDialogMessage").innerText = msg;
+		var dialogElement = document.getElementById("importDialog");
+		dialogElement.querySelector("form").reset();
+		
+		document.getElementById("importDialogOkButton").onclick = function(e){
+			e.preventDefault();
+			hide(dialogElement = document.getElementById("importDialog"));
+			
+			var result = {
+				result: true,
+				attach: document.getElementById("importDialogAttach").checked,
+				markdown:document.getElementById("importDialogMarkdown").checked,
+				css:false
+			}
+			callback(result);
+			
+			delete document.getElementById("importDialogOkButton").onclick;
+			delete document.getElementById("importDialogCancelButton").onclick;
+			document.getElementById("saveButton").disabled =  false;
+			
+			return false;
+		};
+		
+		
+		document.getElementById("importDialogCancelButton").onclick = function(e) {
+			e.preventDefault();
+			hide(dialogElement = document.getElementById("importDialog"));
+			
+			callback({result:false});
+			
+			delete document.getElementById("importDialogOkButton").onclick;
+			delete document.getElementById("importDialogCancelButton").onclick;
+			document.getElementById("saveButton").disabled =  false;
+			
+			return false;
+		}
+		
+		showBlock(dialogElement);
+		
+		var body = document.querySelector("body");
+		dialogElement.style.top = "10px";
+		dialogElement.style.left = ((body.offsetWidth / 2.0) - (dialogElement.offsetWidth / 2.0)) + "px";
+	}
 
-	function attachFile(fileName, content) {
+	function addAttachFileElements(fileName, content) {
 		var li = document.createElement("li");
 
 		var script = document.createElement("script");

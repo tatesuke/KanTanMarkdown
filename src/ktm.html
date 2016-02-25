@@ -46,6 +46,20 @@ var kantanVersion = "v1.20160221.01";
 		<li><a href="http://tatesuke.github.io/KanTanMarkdown/" target="_blank">かんたんMarkdown <span class="version"></span></a></li>
 	</ul>
 </div>
+<div id="importDialog">
+	<p id="importDialogMessage">HOGEHOGE</p>
+	<form>
+	<ul>
+		<li><input type="checkBox" checked="checked" id="importDialogAttach"><label for="importDialogAttach">添付ファイル</label></li>
+		<li><input type="checkBox" checked="checked" id="importDialogMarkdown"><label for="importDialogMarkdown">Markdown</label></li>
+		<!--<li><input type="checkBox" checked="checked" id="importDialogCss"><label for="importDialogCss">CSS</label></li>-->
+	</ul>
+	<ul class="buttonArea">
+		<li><button id="importDialogOkButton">OK</button></li>
+		<li><button id="importDialogCancelButton">キャンセル</button></li>
+	</ul>
+	</form>
+</div>
 <script src="js/marked.min.js?__inline_marked_min_js=true"></script>
 <script src="js/highlight.min.js?__inline_highlight_min_js=true"></script>
 <script src="js/raphael.min.js?__inline_raphael_min_js=true"></script>
