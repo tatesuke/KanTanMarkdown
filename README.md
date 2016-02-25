@@ -1,9 +1,79 @@
 # かんたんMarkdown
 かんたんMarkdownは完全に単一のHTMLファイルで動作するMarkdownエディタ・プレビューアです。
 
-次のURLにもう少し詳しい説明があります。
+
+
+## 使い方
+次のURLに、もう少し詳しい説明があります。
 
 http://tatesuke.github.io/KanTanMarkdown/
+
+
+
+## ビルド方法
+かんたんMarkdownをカスタムされる方向けに、ビルド方法を説明します。
+
+
+### Grunt必須
+かんたんMarkdownはGruntでビルドを行っています。開発環境にGruntを未導入なら、まずGruntを導入してください。Node.jsをインストールした後、次のコマンドでgrantを導入すれば準備完了です。
+
+~~~
+npm install -g grunt-cli
+~~~
+
+### ビルド
+プロジェクトのルートディレクトリに移動して、``grunt build``コマンドを実行すると、必要なファイルを圧縮・結合した後、``dist/``ディレクトリ配下にビルドしたファイルが配置されます。
+
+~~~
+grunt build
+~~~
+
+配置されるファイルは次の4つです。
+
+* ktm-dev.html
+* ktm-lite.html
+* ktm-std.htm
+* ktm-full.html
+
+
+``grunt build-dev``コマンドだと、開発用の``ktm-dev.html``のみビルドされます。
+
+単に``grunt``のみで実行すると、``src``ディレクトリを監視し、ファイルの変更があると自動的に``ktm-dev.html``をビルドするようになります。
+
+### ディレクトリ構成
+参考のために、ディレクトリ構成を示します。
+
+```
+.
+│  .gitignore
+│  Gruntfile.js
+│  package.json	
+│  README.md
+│  
+├─dist------------------------ビルドしたファイルが格納されるディレクトリです。
+│  │  ktm-dev.html------------開発向けの非圧縮のかんたんMarkdownです
+│  │  ktm-full.html-----------リリース向けのfullエディションのかんたんMarkdownです
+│  │  ktm-lite.html-----------リリース向けのliteエディションのかんたんMarkdownです
+│  │  ktm-std.htm-------------リリース向けのstandardエディションのかんたんMarkdownです
+│  │  
+│  └─temp--------------------ビルド時の一時ファイルです
+│                  
+├─node_modules
+└─src-------------------------簡単Markdownのソースを格納するディレクトリです。
+    │  ktm.html----------------かんたんMarkdownのHTML部分です
+    │  
+    ├─css---------------------かんたんMarkdownのCSSを格納するディレクトリです。
+    │      kantan.css----------かんたんマークダウンのCSSです。
+    │      previewer-hljs.css--コードハイライトのCSSです。
+    │      previewer-lite.css--プレビュー領域用のCSSです。
+    │      
+    └─js----------------------かんたんMarkdownのjsソースを格納するディレクトリです
+            kantanEditor.js-----テキストエリアを拡張するjsです
+            kantanMarkdown.js---かんたんMarkdownのjsです
+            ・・・--------------その他かんたんMarkdownが利用するjsです。
+```
+
+
 
 ## リリースノート
 
