@@ -573,7 +573,6 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>\n\
 </body>",
 "js":[
 "var kantanVersion = \"v1.20160221.01\";",
-\n\
 "/**\n\
  * marked - a markdown parser\n\
  * Copyright (c) 2011-2014, Christopher Jeffrey. (MIT Licensed)\n\
