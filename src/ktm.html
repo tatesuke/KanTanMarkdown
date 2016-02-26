@@ -7,11 +7,13 @@
  * http://opensource.org/licenses/mit-license.php
  --><head>
 <meta charset="utf-8">
-<script>
-var kantanVersion = "v1.20160221.01";
-</script>
-<link href="css/kantan.css?__inline_kantan_css=true" rel="stylesheet" />
-<link href="css/previewer.css?__inline_previewer_css=true" rel="stylesheet" />
+<style>
+<inline src="css/kantan.css" />
+</style>
+<style id="previewerCss">
+<inline src="css/previewer.css" />
+<inline src="css/hljs.css" />
+</style>
 
 <title>無題</title>
 </head>
@@ -60,13 +62,32 @@ var kantanVersion = "v1.20160221.01";
 	</ul>
 	</form>
 </div>
-<script src="js/marked.min.js?__inline_marked_min_js=true"></script>
-<script src="js/highlight.min.js?__inline_highlight_min_js=true"></script>
-<script src="js/raphael.min.js?__inline_raphael_min_js=true"></script>
-<script src="js/underscore.min.js?__inline_underscore_min_js=true"></script>
-<script src="js/js-sequence-diagrams.min.js?__inline_js_sequence_diagrams_min_js=true"></script>
-<script src="js/flowchart.min.js?__inline_flowchart_min_js=true"></script>
-<script src="js/kantanEditor.js?__inline_kantan_editor_js=true"></script>
-<script src="js/kantanMarkdown.js?__inline_kantan_markdown_js=true"></script>
+<script id="markedJs">
+<inline src="js/marked.min.js" />
+</script>
+<script id="highlightJs">
+<inline src="js/highlight.min.js" />
+</script>
+<script id="raphaelJs">
+<inline src="js/raphael.min.js" />
+</script>
+<script id="underscoreJs">
+<inline src="js/underscore.min.js" />
+</script>
+<script id="jsSequenceDiagramsJs">
+<inline src="js/js-sequence-diagrams.min.js" />
+</script>
+<script id="flowchartJs">
+<inline src="js/flowchart.min.js" />
+</script>
+<script id="kantanVersionJS">
+var kantanVersion = <inline src="kantanVersion.js" />;
+</script>
+<script id="kantanEditorJS">
+<inline src="js/kantanEditor.js" />
+</script>
+<script id="kantanMarkdownJs">
+<inline src="js/kantanMarkdown.js" />
+</script>
 </body>
 </html>
