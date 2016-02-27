@@ -1,6 +1,6 @@
 function toKantanEditor(editor) {
 	/* tabキーでtabを入力 */
-	editor.addEventListener('keydown', function(e) {
+	on(editor, 'keydown', function(e) {
 		if ((e.which != 9) && (e.keyCode != 9)) {
 			return true;
 		}
@@ -118,7 +118,7 @@ function toKantanEditor(editor) {
 	});
 	
 	/* オートインデント */
-	editor.addEventListener('keydown', function(e) {
+	on(editor, 'keydown', function(e) {
 		
 		// Enterキー
 		if (e.which == 13 || e.keyCode == 13) {
@@ -164,7 +164,7 @@ function toKantanEditor(editor) {
 	var redoStack = [];
 	var previousVal = {val:editor.value, selectionStart:undefined, selectionEnd:undefined};
 	var valueAtArrowOrClick = undefined;
-	editor.addEventListener("keydown", function(e){
+	on(editor, "keydown", function(e){
 		if (e.code == "Enter") {
 			saveUndo(e.target);
 		} else if ((e.which == 86 || e.keyCode == 86) && (e.ctrlKey || e.metaKey) && !isCtrlVDowning) {
@@ -181,11 +181,11 @@ function toKantanEditor(editor) {
 			keyCache[e.code] = true;
 		}
 	});
-	editor.addEventListener("keypress", function(e){
+	on(editor, "keypress", function(e){
 		// keypressが発生するキーはIME OFFと判定
 		keyCache[e.code] = true;
 	});
-	editor.addEventListener("keyup", function(e){
+	on(editor, "keyup", function(e){
 		if ((e.which == 13 || e.keyCode == 13)                          // ENTER
 				|| (e.which == 8 || e.keyCode == 8)                      // BS
 				|| (e.which == 46 || e.keyCode == 46)                    // DELETE
@@ -215,7 +215,7 @@ function toKantanEditor(editor) {
 			isCtrlVDowning = false;
 		}
 	});
-	editor.addEventListener("mouseup", function(e) {
+	on(editor, "mouseup", function(e) {
 		valueAtArrowOrClick = {
 			val: editor.value,
 			selectionStart: editor.selectionStart,
@@ -223,7 +223,7 @@ function toKantanEditor(editor) {
 		};
 	});
 	
-	editor.addEventListener("keydown", function(e) {
+	on(editor, "keydown", function(e) {
 		// Ctrl+Z
 		if (e.keyCode == 90 && (e.ctrlKey || e.metaKey) && !e.shiftKey) {
 			e.preventDefault();
@@ -242,7 +242,7 @@ function toKantanEditor(editor) {
 		}
 	});
 	
-	editor.addEventListener("keydown", function(e) {
+	on(editor, "keydown", function(e) {
 		// Ctrl+Y or Ctrl + Shift + Z or Cmd + Shift + Z
 		if ((e.keyCode == 89 && (e.ctrlKey || e.metaKey))
 				|| (e.keyCode == 90 && e.ctrlKey && e.shiftKey)

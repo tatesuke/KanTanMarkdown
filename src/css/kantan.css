@@ -138,6 +138,38 @@ input[type="file"] {
 	background-color:#99cde1;
 }
 
+#importDialog {
+	border : 1px solid gray;
+	position:absolute;
+	width:440px;
+}
+
+#importDialog {
+	border : 1px solid gray;
+	position:absolute;
+	width:440px;
+	padding:20px;
+	display:none;
+	background-color:white;
+}
+
+#importDialog  ul.buttonArea {
+	list-style-type: none;
+	margin:0;
+	padding:0;
+}
+
+#importDialog ul.buttonArea li {
+	display:block;
+	float:left;
+}
+
+#importDialog  ul.buttonArea li button {
+	height : 35px;
+	padding-left:  20px;
+	padding-right:  20px;
+}
+
 @media print{
 	nav {
 		display:none;
