@@ -1,5 +1,5 @@
 kantanUpdate({
-	"newVersion": "v1.20160221.01",
+	"newVersion": "v1.20160227.01",
 	"ktmString": "<!--\n" + 
 " * KanTanMarkdown\n" + 
 " * Copyright (c) 2016 tatesuke\n" + 
@@ -490,7 +490,7 @@ kantanUpdate({
 "//# sourceMappingURL=flowchart.min.js.map\n" + 
 "</script>\n" + 
 "<script id=\"kantanVersionJS\">\n" + 
-"var kantanVersion = \"v1.20160221.01\";\n" + 
+"var kantanVersion = \"v1.20160227.01\";\n" + 
 "var kantanEdition = \"__KANTAN_EDITION__\";\n" + 
 "</script>\n" + 
 "<script id=\"kantanEditorJS\">\n" + 
