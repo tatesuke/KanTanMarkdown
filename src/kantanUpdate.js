@@ -1,8 +1,7 @@
 kantanUpdate({
-	"newVersion": <inline src="kantanVersion.js" /> + "hoge",
+	"newVersion": <inline src="kantanVersion.js" />,
 	"ktmString": <inline src="ktmString.js" />,
 	"doUpdate": function() {
-		console.log(kantanVersion + " " + this.newVersion);
 		if (kantanVersion == this.newVersion) {
 			alert("お使いのKantanMarkdownは最新です。アップデートの必要はありません。");
 			return;
