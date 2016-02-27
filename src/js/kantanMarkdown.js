@@ -87,12 +87,13 @@
 		
 		var script = document.createElement("script");
 		script.src = "http://tatesuke.github.io/KanTanMarkdown/kantanUpdate.js";
+		script.class = "kantanUpdateScript";
 		script.onerror = function () {
 			alert("アップデートに失敗しました。\n" + 
 			"アップデート用のファイルにアクセスできませんでした。\n" + 
 			"インターネットに接続されていないか、サーバーダウンです");
 		};
-		document.querySelector("body").appendChild(script);
+		document.querySelector("#updateScriptArea").appendChild(script);
 		
 		return false;
 	})
@@ -641,6 +642,9 @@
 	function save() {
 		var wrapperScrollTop = document.getElementById("wrapper").scrollTop;
 		var previewerScrollTop = document.getElementById("previewer").scrollTop;
+		
+		// アップデート用のscriptタグを消す
+		document.querySelector("#updateScriptArea").innerHTML = "";
 		
 		// テキストエリアは値を入れなおさないと保存されない。
 		var editor = document.getElementById("editor");
