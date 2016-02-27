@@ -66,9 +66,10 @@
 
 	function updateKantanVersion (version) {
 		document.getElementById("kantanVersion").value = version;
+		var edition = document.getElementById("kantanEdition").value;
 		var versionElements = document.getElementsByClassName("version");
 		for (var i = 0 ; i < versionElements.length; i++) {
-			versionElements[i].innerText = version;
+			versionElements[i].innerText = version + "_" + edition;
 		}
 	}
 	
