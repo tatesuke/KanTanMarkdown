@@ -15,10 +15,16 @@ http://tatesuke.github.io/KanTanMarkdown/
 
 
 ### Grunt必須
-かんたんMarkdownはGruntでビルドを行っています。開発環境にGruntを未導入なら、まずGruntを導入してください。Node.jsをインストールした後、次のコマンドでgrantを導入すれば準備完了です。
+かんたんMarkdownはGruntでビルドを行っています。開発環境にGruntを未導入なら、まずGruntを導入してください。Node.jsをインストールした後、次のコマンドでgrantを導入してください。
 
 ~~~
 npm install -g grunt-cli
+~~~
+
+プロジェクトのルートディレクトリに移動して、次のコマンドで必要ファイルをインストールすれば準備完了です
+
+~~~
+npm install
 ~~~
 
 ### ビルド
@@ -28,13 +34,13 @@ npm install -g grunt-cli
 grunt build
 ~~~
 
-配置されるファイルは次の4つです。
+配置されるファイルは次の5つです。
 
 * ktm-dev.html
 * ktm-lite.html
 * ktm-std.htm
 * ktm-full.html
-
+* kantanUpdate.js
 
 ``grunt build-dev``コマンドだと、開発用の``ktm-dev.html``のみビルドされます。
 
@@ -51,6 +57,7 @@ grunt build
 │  README.md
 │  
 ├─dist------------------------ビルドしたファイルが格納されるディレクトリです。
+│  │  kantanUpdate.js---------アップデート機能用のjsファイルです。
 │  │  ktm-dev.html------------開発向けの非圧縮のかんたんMarkdownです
 │  │  ktm-full.html-----------リリース向けのfullエディションのかんたんMarkdownです
 │  │  ktm-lite.html-----------リリース向けのliteエディションのかんたんMarkdownです
@@ -64,8 +71,8 @@ grunt build
     │  
     ├─css---------------------かんたんMarkdownのCSSを格納するディレクトリです。
     │      kantan.css----------かんたんマークダウンのCSSです。
-    │      previewer-hljs.css--コードハイライトのCSSです。
-    │      previewer-lite.css--プレビュー領域用のCSSです。
+    │      hljs.css------------コードハイライトのCSSです。
+    │      previewer.css-------プレビュー領域用のCSSです。
     │      
     └─js----------------------かんたんMarkdownのjsソースを格納するディレクトリです
             kantanEditor.js-----テキストエリアを拡張するjsです
@@ -76,6 +83,17 @@ grunt build
 
 
 ## リリースノート
+
+### v1.20160227.01
+
+#### バグ修正
+* Firefoxで閉じるボタンなどの文言が変わらない問題を修正
+
+#### 機能追加・修正
+* アップデート機能を追加(実験的機能)
+
+#### 内部改善
+* js圧縮など
 
 ### v1.20160221.01
 
