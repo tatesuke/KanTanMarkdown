@@ -8,7 +8,7 @@
             });
         }
     })();
-
+    
 	/* 編集不可ブラウザ判定 */
 
 	// Blobが使用できないブラウザは保存不可(IE9等)
@@ -34,6 +34,8 @@
 	}
 
 	/* アップデート */
+    updateKantanVersion(document.getElementById("kantanVersion").value);
+	
 	var eventListeners = [];
 	function on(elementOrQuery, eventName, callback) {
 		var element;
@@ -62,11 +64,16 @@
 		eventListeners = [];
 	}
 
-	function updateVersion() {
+	function updateKantanVersion (version) {
+		document.getElementById("kantanVersion").value = version;
 		var versionElements = document.getElementsByClassName("version");
 		for (var i = 0 ; i < versionElements.length; i++) {
-			versionElements[i].innerText = kantanVersion;
+			versionElements[i].innerText = version;
 		}
+	}
+	
+	function updateKantanEdition (edition) {
+		document.getElementById("kantanEdition").value = edition;
 	}
 	
 	function kantanUpdate(json) {
@@ -87,6 +94,7 @@
 		
 		var script = document.createElement("script");
 		script.src = "http://tatesuke.github.io/KanTanMarkdown/kantanUpdate.js";
+		//script.src = "http://localhost:3000/kantanUpdate.js";
 		script.class = "kantanUpdateScript";
 		script.onerror = function () {
 			alert("アップデートに失敗しました。\n" + 
@@ -97,9 +105,6 @@
 		
 		return false;
 	})
-	
-	/* バージョン埋め込み */
-	updateVersion();
 
 	/* エディタに機能追加 */
 	toKantanEditor(document.getElementById("editor"));
