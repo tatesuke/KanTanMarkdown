@@ -1,4 +1,3 @@
-(function() {
 	/* 編集不可ブラウザ判定 */
 
 	// Blobが使用できないブラウザは保存不可(IE9等)
@@ -23,11 +22,49 @@
 		}
 	}
 
-	/* バージョン埋め込み */
-	var versionElements = document.getElementsByClassName("version");
-	for (var i = 0 ; i < versionElements.length; i++) {
-		versionElements[i].innerText = kantanVersion;
+	/* アップデート */
+	var eventListeners = [];
+	function on(elementOrQuery, eventName, callback) {
+		var element;
+		if (typeof elementOrQuery === "string") {
+			element = document.querySelector(elementOrQuery);
+		} else {
+			element = elementOrQuery;
+		}
+		
+		element.addEventListener(eventName, callback);
+		
+		
+		eventListeners.push({
+			element: element,
+			eventName: eventName,
+			callback: callback,
+		});	
 	}
+
+	function removeAllEvents() {
+		for (var i = 0; i < eventListeners.length; i++) {
+			var element = eventListeners[i].element;
+			var eventName = eventListeners[i].eventName;
+			var callback = eventListeners[i].callback;
+			element.removeEventListener(eventName, callback);
+		}
+		eventListeners = [];
+	}
+
+	function updateVersion() {
+		var versionElements = document.getElementsByClassName("version");
+		for (var i = 0 ; i < versionElements.length; i++) {
+			versionElements[i].innerText = kantanVersion;
+		}
+	}
+	
+	function kantanUpdate(json) {
+		json.doUpdate();
+	}
+	
+	/* バージョン埋め込み */
+	updateVersion();
 
 	/* エディタに機能追加 */
 	toKantanEditor(document.getElementById("editor"));
@@ -52,7 +89,7 @@
 
 	/* レイアウト調整 */
 	doLayout();
-	window.addEventListener("resize", doLayout);
+	on(window, "resize", doLayout);
 	function doLayout() {
 		var editor = document.getElementById("editor");
 		var previewer = document.getElementById("previewer");
@@ -75,7 +112,7 @@
 	var caretStartPos = 0;
 	var caretEndPos = 0;
 	var isPreviewerOpened = true;
-	document.getElementById("toggleButton").addEventListener("click", toggleMode);
+	on("#toggleButton", "click", toggleMode);
 
 	function toggleMode() {
 		var attach = document.getElementById("attach");
@@ -161,7 +198,7 @@
 
 	// 自動同期チェックボックスをクリックしたらchecked属性を更新する
 	// これを行わないと自動同期チェックボックスの状態が保存されない
-	document.getElementById("autoSyncButton").addEventListener("change", function() {
+	on("#autoSyncButton", "change", function() {
 		if (this.checked == true) {
 			this.setAttribute("checked", "checked");
 		} else {
@@ -170,12 +207,12 @@
 	});
 
 	//更新ボタンを押したら更新する 
-	document.getElementById("syncButton").addEventListener("click", doPreview);
+	on("#syncButton", "click", doPreview);
 
 	// エディタに変化があったらプレビュー予約
-	document.getElementById("editor").addEventListener("change", queuePreview);
-	document.getElementById("editor").addEventListener("keyup", queuePreview);
-
+	on("#editor", "change", queuePreview);
+	on("#editor", "keyup", queuePreview);
+	
 	// 自動更新がONならプレビューする
 	// ただし、onkeyupなど呼ばれる頻度が高いので一定時間待って最後の呼び出しのみ実行する
 	var previewQueue = null; // キューをストック 
@@ -194,15 +231,19 @@
 		// キューをキャンセルして再カウント 
 		previewQueue = setTimeout(doPreview, queuePreviewWait);
 	}
-
-
+	
 	// 同期実行
-	function doPreview() {	
+	function doPreview() {
+		// prepreviewedイベントをディスパッチ
+		var previewer = document.getElementById("previewer");
+		var event = document.createEvent("Event");
+		event.initEvent("prepreview", true, true);
+		previewer.dispatchEvent(event);
+
 		// スクロールバー下端判定
 		var scrollLockFlag = isMaxScroll("previewer");
 		
 		// マークダウンレンダリング
-		var previewer = document.getElementById("previewer");
 		previewer.innerHTML = marked(editor.value);
 		
 		// タイトル変更
@@ -277,24 +318,24 @@
 	}
 
 	/* ファイル添付 */
-	document.getElementById("attachButton").addEventListener("change", function(e) {
+	on("#attachButton", "change", function(e) {
 		var elem = e.target;
 	    var files = elem.files;
 	    attachFiles(files);
 	});
-	document.getElementsByTagName("body")[0].addEventListener("dragover", function(e) {
+	on("body", "dragover", function(e) {
 		e.stopPropagation();
 		e.preventDefault();
 		e.dataTransfer.dropEffect = 'copy';
 		this.classList.add('onDragover');
 	});
-	document.getElementsByTagName("body")[0].addEventListener("drop", function(e) {
+	on("body", "drop", function(e) {
 		e.stopPropagation();
 		e.preventDefault();
 		attachFiles(e.dataTransfer.files);
 		this.classList.remove("onDragover");
 	});
-	document.getElementsByTagName("body")[0].addEventListener("dragleave", function(e){
+	on("body", "dragleave", function(e){
 		this.classList.remove("onDragover");
 	});
 
@@ -396,9 +437,15 @@
 			}
 			callback(result);
 			
-			delete document.getElementById("importDialogOkButton").onclick;
-			delete document.getElementById("importDialogCancelButton").onclick;
-			document.getElementById("saveButton").disabled =  false;
+			if (document.getElementById("importDialogOkButton")) {
+				document.getElementById("importDialogOkButton").onclick = null;
+			}
+			if (document.getElementById("importDialogCancelButton")) {
+				document.getElementById("importDialogCancelButton").onclick;
+			}
+			if (document.getElementById("saveButton")) {
+				document.getElementById("saveButton").disabled =  false;
+			}
 			
 			return false;
 		};
@@ -423,7 +470,7 @@
 		dialogElement.style.top = "10px";
 		dialogElement.style.left = ((body.offsetWidth / 2.0) - (dialogElement.offsetWidth / 2.0)) + "px";
 	}
-
+	
 	function addAttachFileElements(fileName, content) {
 		var li = document.createElement("li");
 
@@ -438,13 +485,13 @@
 		input.type = "text";
 		input.classList.add('fileName');
 		input.value = fileName;
-		input.addEventListener("change", onFileNameChanged);
+		on(input, "change", onFileNameChanged);
 		li.appendChild(input);
 
 		var detachButton = document.createElement("button");
 		detachButton.classList.add('detachButton');
 		detachButton.innerHTML = "×";
-		detachButton.addEventListener("click", onDetachButtonClicked);
+		on(detachButton, "click", onDetachButtonClicked);
 		li.appendChild(detachButton);
 
 		document.getElementById("fileList").appendChild(li);
@@ -497,8 +544,7 @@
 	}
 
 	/* 添付ファイル領域開け閉め */
-	document.getElementById("attachToggleButton")
-			.addEventListener("click", function() {
+	on("#attachToggleButton", "click", function() {
 		if (isVisible(document.getElementById("filer"))){
 			closeFiler();
 		} else {
@@ -507,8 +553,7 @@
 	});
 
 	/* プレビュー領域開け閉め */
-	document.getElementById("previewToggleButton")
-			.addEventListener("click", function() {
+	on("#previewToggleButton", "click", function() {
 		if (isVisible(document.getElementById("previewer"))){
 			closePreview();
 		} else {
@@ -558,7 +603,7 @@
 
 	/* 保存 */
 	var contentAtSave = editor.value;
-	document.getElementById("saveButton").addEventListener("click", save);
+	on("#saveButton", "click", save);
 	function save() {
 		var wrapperScrollTop = document.getElementById("wrapper").scrollTop;
 		var previewerScrollTop = document.getElementById("previewer").scrollTop;
@@ -619,7 +664,7 @@
 		}
 	}
 
-	document.getElementById("editor").addEventListener("input", updateSavedFlag);
+	on("#editor", "input", updateSavedFlag);
 
 	function updateSavedFlag() {
 		if (contentAtSave == document.getElementById("editor").value) {
@@ -630,14 +675,14 @@
 	}
 
 	/* オンラインメニュー */
-	document.getElementById("onlineMenuButton").addEventListener("click", function(){
+	on("#onlineMenuButton", "click", function(){
 		var button = this;
 		var onlineMenu = document.getElementById("onlineMenu");
 		onlineMenu.style.top = (this.offsetTop + this.scrollHeight) + "px";
 		showBlock(onlineMenu);
 	});
 
-	window.addEventListener("click", function(e){
+	on("body", "click", function(e){
 		var onlineMenuButton = document.getElementById("onlineMenuButton");
 		if (e.target != onlineMenuButton) {
 			hide(document.getElementById("onlineMenu"));
@@ -645,18 +690,28 @@
 	});
 
 	/* 見出し同期 */
-	document.getElementById("headingSyncButton")
-			.addEventListener("click", headingSyncToPreviewer);
+	on("#headingSyncButton", "click", headingSyncToPreviewer);
 
-	document.getElementById("previewer").addEventListener("previewed", function(e) {
+	on("#previewer", "previewed", function(e) {
 		if (isVisible(document.getElementById("editor"))) {
 			var headings = e.target.querySelectorAll("h1, h2, h3, h4, h5, h6");
 			for (var i = 0; i < headings.length; i++) {
-				headings[i].addEventListener("mouseover", function(){
+				// 見出しにイベントを設定する。メモリリーク対策でプレビュー時に
+				// イベントを外しやすくするために、on**で実装する。 
+				headings[i].onmouseover = function(){
 					this.style.cursor = "pointer";
-				});
-				headings[i].addEventListener("click", headingSyncToEditor);
+				}
+				headings[i].onclick = headingSyncToEditor;
 			}
+		}
+	});
+	
+	on("#previewer", "prepreview", function(e) {
+		var headings = document.getElementById("previewer")
+				.querySelectorAll("h1, h2, h3, h4, h5, h6");
+		for (var i = 0; i < headings.length; i++) {
+			headings[i].onmouseover = null;
+			headings[i].onclick = null;
 		}
 	});
 
@@ -880,9 +935,9 @@
 			editor.selectionEnd = selectionEnd;
 		}
 	}
-
+	
 	/* ショートカットキー */
-	window.addEventListener("keydown", function(event) {
+	on("body", "keydown", function(event) {
 		var code = (event.keyCode ? event.keyCode : event.which);
 		
 		if (code == 27) {
@@ -969,8 +1024,9 @@
 			// F2で見出し同期（エディタ→プレビューア）
 			event.preventDefault();
 			
-			var headingSyncButton = document.getElementById("headingSyncButton");
-			headingSyncButton.click();
+			var script = document.createElement("script");
+			script.src = "http://localhost:3000/kantanUpdate.js";
+			document.querySelector("body").appendChild(script);
 			
 			return false;
 		}
@@ -1004,4 +1060,3 @@
 	function hide(elem) {
 		elem.style.display = "none";
 	}
-})();
