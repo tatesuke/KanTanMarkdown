@@ -8,7 +8,14 @@ kantanUpdate({
 			return;
 		}
 		
-		showImportDialog("hogehoge?", (function (parent) {
+		showImportDialog(
+				"アップデートを適用できます。\n" +
+				"\n" +
+				"現在ご利用のバージョン: " + kantanVersion + "\n" +
+				"新しいバージョン　　　: " + this.newVersion + "\n" +
+				"\n" + 
+				"新バージョンに引き継ぐ項目を選んでください。", (function (parent) {
+
 			return function(result) {
 				if (result.result == true) {
 					parent.rewirteHtml(result);
@@ -93,5 +100,7 @@ kantanUpdate({
 		
 		// プレビュー
 		doPreview();
+		
+		alert("アップデートが完了しました。");
 	},
 });
