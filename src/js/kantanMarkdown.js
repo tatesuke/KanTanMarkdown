@@ -63,6 +63,16 @@
 		json.doUpdate();
 	}
 	
+	on("#updateButton", "click", function() {
+		event.preventDefault();
+			
+		var script = document.createElement("script");
+		script.src = "http://localhost:3000/kantanUpdate.js";
+		document.querySelector("body").appendChild(script);
+		
+		return false;
+	})
+	
 	/* バージョン埋め込み */
 	updateVersion();
 
@@ -1024,9 +1034,8 @@
 			// F2で見出し同期（エディタ→プレビューア）
 			event.preventDefault();
 			
-			var script = document.createElement("script");
-			script.src = "http://localhost:3000/kantanUpdate.js";
-			document.querySelector("body").appendChild(script);
+			var headingSyncButton = document.getElementById("headingSyncButton");
+			headingSyncButton.click();
 			
 			return false;
 		}

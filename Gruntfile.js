@@ -83,10 +83,10 @@ module.exports = function(grunt) {
 		},
 		replace: {
 			removeHighlightCss: {
-				src: ['dist/temp/src/css/hljs.css'],
+				src: ["dist/temp/src/css/hljs.css"],
 				overwrite: true,
 				replacements: [
-					{from: /.*/g, to: ""},
+					{from: /[\s|\S]*/g, to: ""},
 				],
 			},
 			removeHighlightJs: {
@@ -124,6 +124,34 @@ module.exports = function(grunt) {
 					{from: /\s<script id="flowchartJs"[\s|\S]+?<\/script>/g, to: ""},
 				],
 			},
+			replaceKantanEdition_dev:{
+				src: ['dist/temp/src/ktm.html'],
+				overwrite: true,
+				replacements: [
+					{from: /__KANTAN_EDITION__/g, to: "dev"},
+				],
+			},
+			replaceKantanEdition_lite:{
+				src: ['dist/temp/src/ktm.html'],
+				overwrite: true,
+				replacements: [
+					{from: /__KANTAN_EDITION__/g, to: "lite"},
+				],
+			},
+			replaceKantanEdition_std:{
+				src: ['dist/temp/src/ktm.html'],
+				overwrite: true,
+				replacements: [
+					{from: /__KANTAN_EDITION__/g, to: "std"},
+				],
+			},
+			replaceKantanEdition_full:{
+				src: ['dist/temp/src/ktm.html'],
+				overwrite: true,
+				replacements: [
+					{from: /__KANTAN_EDITION__/g, to: "full"},
+				],
+			},
 			makeKtmStringJs: {
 				src: ["dist/temp/src/ktm.html"],
 				dest: "dist/temp/src/ktmString.js",
@@ -142,7 +170,7 @@ module.exports = function(grunt) {
 			doc: {
 				files: ["src/**"],
 				// 変更されたらどのタスクを実行するか
-				tasks: ["build-dev"]
+				tasks: ["build-dev", "build-updateJs"]
 			}
 		},
 	});
@@ -152,6 +180,7 @@ module.exports = function(grunt) {
 		"clean:temp",
 		"copy:beforeBuild",
 		"inline:makeKtmHtml",
+		"replace:replaceKantanEdition_dev",
 		"copy:afterBuild_dev",
 	]);
 	grunt.registerTask("build-lite", [
@@ -166,6 +195,7 @@ module.exports = function(grunt) {
 		"replace:removeJsSequenceDiagramsJs",
 		"replace:removeFlowChartJs",
 		"inline:makeKtmHtml",
+		"replace:replaceKantanEdition_lite",
 		"copy:afterBuild_lite",
 	]);
 	grunt.registerTask("build-std", [
@@ -178,6 +208,7 @@ module.exports = function(grunt) {
 		"replace:removeJsSequenceDiagramsJs",
 		"replace:removeFlowChartJs",
 		"inline:makeKtmHtml",
+		"replace:replaceKantanEdition_std",
 		"copy:afterBuild_std",
 	]);
 	grunt.registerTask("build-full", [
@@ -186,6 +217,7 @@ module.exports = function(grunt) {
 		"cssmin:css",
 		"uglify:js",
 		"inline:makeKtmHtml",
+		"replace:replaceKantanEdition_full",
 		"copy:afterBuild_full",
 	]);
 	grunt.registerTask("build-updateJs", [

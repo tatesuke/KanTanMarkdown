@@ -1,5 +1,5 @@
 kantanUpdate({
-	"newVersion": <inline src="kantanVersion.js" />,
+	"newVersion": <inline src="kantanVersion.js" /> + "hoge",
 	"ktmString": <inline src="ktmString.js" />,
 	"doUpdate": function() {
 		console.log(kantanVersion + " " + this.newVersion);
@@ -24,9 +24,15 @@ kantanUpdate({
 		// メモリリーク対策のためにイベントをすべて消す。
 		removeAllEvents();
 		
+		// liteバージョンではhljsのcssを消す
+		var newHtml = this.ktmString;
+		if (kantanEdition == "lite") {
+			newHtml = newHtml.replace(/\/\* START_HLJS_CSS \*\/[\s|\S]+\/\* END_HLJS_CSS \*\//, "");
+		}
+		
 		// 本体をアップデート
 		var html = document.querySelector("html");
-		html.innerHTML = this.ktmString;
+		html.innerHTML = newHtml;
 		
 		// innerHTMLではscriptタグが実行されないのでいったん外して付け直す
 		var scriptElements = document.querySelectorAll("script");
@@ -37,9 +43,24 @@ kantanUpdate({
 		}
 		for (var i = 0; i < scriptElements.length; i++) {
 			var scriptElement = scriptElements[i];
+			if (kantanEdition == "lite" &&
+					(  (scriptElement.id == "highlightJs")
+					|| (scriptElement.id == "raphaelJs")
+					|| (scriptElement.id == "underscoreJs")
+					|| (scriptElement.id == "jsSequenceDiagramsJs")
+					|| (scriptElement.id == "flowchartJs") )) {
+				continue;
+			} else if (kantanEdition == "std" && 
+					(  (scriptElement.id == "raphaelJs")
+					|| (scriptElement.id == "underscoreJs")
+					|| (scriptElement.id == "jsSequenceDiagramsJs")
+					|| (scriptElement.id == "flowchartJs") )) {
+				continue;
+			}
 			var newScript = document.createElement("script");
 			newScript.id = scriptElement.id;
 			newScript.innerHTML = scriptElement.innerHTML;
+			
 			document.querySelector("body").appendChild(newScript);
 		}
 		
