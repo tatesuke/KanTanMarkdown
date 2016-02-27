@@ -86,7 +86,7 @@
 		}
 		
 		var script = document.createElement("script");
-		script.src = "http://localhost:3000/kantanUpdate.js";
+		script.src = "http://tatesuke.github.io/KanTanMarkdown/kantanUpdate.js";
 		script.onerror = function () {
 			alert("アップデートに失敗しました。\n" + 
 			"アップデート用のファイルにアクセスできませんでした。\n" + 
