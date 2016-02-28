@@ -145,6 +145,11 @@ nav:after {
 	overflow:auto;
 }
 
+.previewMode #previewer {
+	height: auto;
+	overflow:auto;
+}
+
 .editMode #previewer {
 	width:50%;
 	height:100%;
