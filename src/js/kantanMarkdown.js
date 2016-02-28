@@ -15,16 +15,16 @@
 	try {
 		new Blob(["temp"]);
 	} catch(e) {
-		setViewMode(); 
+		setViewOnly(); 
 	}
 
 	// Safariはdownload属性に対応していないので閲覧のみ
 	var ua = window.navigator.userAgent.toLowerCase();
 	if ((ua.indexOf("chrome") == -1) && (ua.indexOf('safari') != -1)) {
-		setViewMode();
+		setViewOnly();
 	}
 
-	function setViewMode() {
+	function setViewOnly() {
 		document.getElementById("messageArea").innerText
 				 = "このブラウザでは編集できません。";
 		var navElems = document.querySelectorAll("nav > *");
@@ -109,6 +109,7 @@
 
 	/* エディタに機能追加 */
 	toKantanEditor(document.getElementById("editor"));
+	toKantanEditor(document.getElementById("cssEditor"));
 
 	/* シンタックスハイライト設定 */
 	if (typeof hljs !== "undefined") {
@@ -118,8 +119,14 @@
 			}
 		});
 	}
-
+	
 	/* 起動時にコンテンツ読み込み */
+	document.querySelector("body").classList.add("previewMode");
+	document.querySelector("body").classList.remove("editMode");
+	document.querySelector("#cssEditor").value = 
+			document.querySelector("#previewerStyle").innerHTML.trim();
+	document.querySelector("#cssEditor").selectionStart = 0;
+	document.querySelector("#cssEditor").selectionEnd = 0;
 	if (isEnable(document.getElementById("toggleButton")) 
 			&& (document.getElementById("editor").innerHTML == "")) {
 		// 編集モードでなく、内容が空であれば初期状態を編集モードにする
@@ -132,20 +139,10 @@
 	doLayout();
 	on(window, "resize", doLayout);
 	function doLayout() {
-		var editor = document.getElementById("editor");
-		var previewer = document.getElementById("previewer");
 		var wrapper = document.getElementById("wrapper");
 		
-		var height = window.innerHeight - wrapper.offsetTop - 10;
-		wrapper.style.height = height + "px";
-		
-		if (isVisible(editor)) {
-			previewer.style.width = "50%";
-			previewer.style.height = "100%";
-		} else {
-			previewer.style.width = "980px";
-			previewer.style.height = "";
-		}
+		var wrapperHeight = window.innerHeight - wrapper.offsetTop - 10;
+		wrapper.style.height = wrapperHeight + "px";
 	}
 
 	/* 編集・閲覧切り替え */
@@ -157,23 +154,27 @@
 
 	function toggleMode() {
 		var attach = document.getElementById("attach");
+		var editorTabWrapper = document.getElementById("editorTabWrapper");
 		var editor = document.getElementById("editor");
 		var previewer = document.getElementById("previewer");
-		if (isVisible(editor)) {
+		if (isEditMode()) {
 			editorScrollBarPos    = editor.scrollTop;
 			caretStartPos = editor.selectionStart;
 			caretEndPos = editor.selectionEnd;
 		}
 
-		if (isVisible(editor)) {
+		if (isEditMode()) {
 			// プレビューモードへ
 			isPreviewerOpened = isVisible(previewer);
 			if (isPreviewerOpened == false) {
 				openPreview();
 			}
 			
+			document.querySelector("body").classList.add("previewMode");
+			document.querySelector("body").classList.remove("editMode");
+			
 			hide(attach);
-			hide(editor);
+			hide(editorTabWrapper);
 			doPreview();
 			
 			// スクロールバー位置記憶
@@ -198,8 +199,11 @@
 			}
 		} else {
 			// 編集モードへ
+			document.querySelector("body").classList.remove("previewMode");
+			document.querySelector("body").classList.add("editMode");
+			
 			showBlock(attach);
-			showBlock(editor);
+			showBlock(editorTabWrapper);
 			doPreview();
 			
 			// スクロールバー位置記憶
@@ -227,7 +231,7 @@
 		}
 		
 
-		if (isVisible(editor)) {
+		if (isEditMode()) {
 			editor.scrollTop    = editorScrollBarPos;
 			editor.selectionStart = caretStartPos;
 			editor.selectionEnd = caretEndPos;
@@ -235,7 +239,7 @@
 		}
 	}
 
-	/* エディタとプレビューの同期 */
+	/* Markdownエディタとプレビューの同期 */
 
 	// 自動同期チェックボックスをクリックしたらchecked属性を更新する
 	// これを行わないと自動同期チェックボックスの状態が保存されない
@@ -286,6 +290,12 @@
 		
 		// マークダウンレンダリング
 		previewer.innerHTML = marked(editor.value);
+		
+		// CSS修正
+		var previewerStyle = document.querySelector("#previewerStyle");
+		var cssEditor = document.querySelector("#cssEditor");
+		previewerStyle.innerHTML = cssEditor.value;
+		
 		
 		// タイトル変更
 		var h1 = document.querySelector("h1");
@@ -357,6 +367,19 @@
 		// 小数点付きの計算なので数ピクセルの誤差を許容する
 		return (-1.0 <= diff) && (diff <= 1.0);
 	}
+	
+	/* CSSエディタ変更周り */
+	// エディタに変化があったらプレビュー予約
+	on("#cssEditor", "change", cssChanged);
+	on("#cssEditor", "keyup", cssChanged);
+
+	function cssChanged() {
+		saved = false;
+		var title = document.title;
+		if (!title.match(/^\*/)) {
+			document.title = "* " + title;
+		}
+	}
 
 	/* ファイル添付 */
 	on("#attachButton", "change", function(e) {
@@ -419,8 +442,8 @@
 				var editorElement = dummyHtml.querySelector("textarea#editor");
 				if (fileListElement && editorElement) {
 					showImportDialog(
-							"かんたんMarkdownのファイルを検出しました。どの項目をインポートしますか？\n" + 
-							"インポートする場合、項目は末尾に挿入されます", function(result){
+							"かんたんMarkdownのファイルを検出しました。どの項目をインポートしますか？"
+							, function(result){
 						if (result.result == true) {
 							importKantanMarkdown(result, dummyHtml, file);
 						} else {
@@ -453,8 +476,17 @@
 		if (result.markdown == true) {
 			var editorElement = dummyHtml.querySelector("textarea#editor")
 			var editor = document.getElementById("editor");
-			editor.value = editor.textContent + editorElement.textContent;
+			editor.value = editorElement.value + editorElement.value;
 			saved = false;
+		}
+		
+		if (result.css == true) {
+			var styleElement = dummyHtml.querySelector("#previewerStyle");
+			if (styleElement) {
+				var cssEditor = document.getElementById("cssEditor");
+				cssEditor.value = cssEditor.textContent + styleElement.innerHTML;
+				saved = false;
+			}
 		}
 		
 		doPreview();
@@ -468,13 +500,13 @@
 		
 		document.getElementById("importDialogOkButton").onclick = function(e){
 			e.preventDefault();
-			hide(dialogElement = document.getElementById("importDialog"));
+			hide(dialogElement);
 			
 			var result = {
 				result: true,
 				attach: document.getElementById("importDialogAttach").checked,
 				markdown:document.getElementById("importDialogMarkdown").checked,
-				css:false
+				css:document.getElementById("importDialogCss").checked,
 			}
 			callback(result);
 			
@@ -494,7 +526,7 @@
 		
 		document.getElementById("importDialogCancelButton").onclick = function(e) {
 			e.preventDefault();
-			hide(dialogElement = document.getElementById("importDialog"));
+			hide(dialogElement);
 			
 			callback({result:false});
 			
@@ -541,7 +573,7 @@
 		var editor = document.getElementById("editor");
 		var toggleButton = document.getElementById("toggleButton");
 		var filer = document.getElementById("filer");
-		if (!isVisible(editor)) {
+		if (!isEditMode()) {
 			toggleButton.click();
 		}
 		if (!isVisible(filer)) {
@@ -619,11 +651,11 @@
 	function openPreview() {
 		// エディタサイズに相対値を利用しているためプレビュー表示されていない場合のみ実行
 		// 閲覧モード時は実行しない
-		var editor = document.getElementById("editor");
+		var editorTabWrapper = document.getElementById("editorTabWrapper");
 		var previewer = document.getElementById("previewer");
-		if (isVisible(editor) && !isVisible(previewer)) {
+		if (isEditMode() && !isVisible(previewer)) {
 			document.getElementById("previewToggleButton").innerText = "プレビューを隠す(Alt+→)";
-			editor.style.width = "50%";
+			editorTabWrapper.classList.remove("fullWidth");
 			showBlock(previewer);
 			doLayout();
 		}
@@ -632,11 +664,11 @@
 	function closePreview() {
 		// エディタサイズに相対値を利用しているためプレビュー表示されている場合のみ実行
 		// 閲覧モード時は実行しない
-		var editor = document.getElementById("editor");
+		var editorTabWrapper = document.getElementById("editorTabWrapper");
 		var previewer = document.getElementById("previewer");
-		if (isVisible(editor) && isVisible(previewer)) {
+		if (isEditMode() && isVisible(previewer)) {
 			document.getElementById("previewToggleButton").innerText = "プレビューを表示(Alt+←)";
-			editor.style.width = "100%";
+			editorTabWrapper.classList.add("fullWidth");
 			hide(previewer);
 			doLayout();
 		}
@@ -656,7 +688,7 @@
 		var editor = document.getElementById("editor");
 		editor.innerHTML = editor.value.replace(/</g, "&lt;");
 		
-		var toggleFlag = isVisible(editor);
+		var toggleFlag = isEditMode();
 		if (toggleFlag == true) {
 			toggleMode();
 		}
@@ -664,6 +696,8 @@
 		/* ファイルの肥大化を防ぐため中身を消去 */
 		document.getElementById("previewer").innerHTML = "";
 		document.getElementById("messageArea").innerHTML = "";
+		// cssエディタはテキストエリアなので保存されない
+		// document.getElementById("cssEditor").value = "";
 		
 		var html = "<!doctype html>\n<html>\n";
 		html += document.getElementsByTagName("html")[0].innerHTML;
@@ -737,7 +771,7 @@
 	on("#headingSyncButton", "click", headingSyncToPreviewer);
 
 	on("#previewer", "previewed", function(e) {
-		if (isVisible(document.getElementById("editor"))) {
+		if (isEditMode()) {
 			var headings = e.target.querySelectorAll("h1, h2, h3, h4, h5, h6");
 			for (var i = 0; i < headings.length; i++) {
 				// 見出しにイベントを設定する。メモリリーク対策でプレビュー時に
@@ -980,6 +1014,45 @@
 		}
 	}
 	
+	/* Markdown, CSS切り替え */
+	on("#markdownTab", "click", function(e) {
+		e.preventDefault();
+		showMarkdown();
+		return false;
+	});
+	
+	on("#cssTab", "click", function(e) {
+		e.preventDefault();
+		showCss(e);
+		return false;
+	});
+	
+	function showMarkdown() {
+		var markdownTab = document.querySelector("#markdownTab").parentNode;
+		markdownTab.classList.add("selected");
+		var editor = document.querySelector("#editor");
+		showBlock(editor);
+		editor.focus();
+		
+		var cssTab = document.querySelector("#cssTab").parentNode;
+		cssTab.classList.remove("selected");
+		var cssEditor = document.querySelector("#cssEditor");
+		hide(cssEditor);
+	}
+	
+	function showCss() {
+		var markdownTab = document.querySelector("#markdownTab").parentNode;
+		markdownTab.classList.remove("selected");
+		var editor = document.querySelector("#editor");
+		hide(document.querySelector("#editor"));
+		
+		var cssTab = document.querySelector("#cssTab").parentNode;
+		cssTab.classList.add("selected");
+		var cssEditor = document.querySelector("#cssEditor");
+		showBlock(cssEditor);
+		cssEditor.focus();
+	}
+	
 	/* ショートカットキー */
 	on("body", "keydown", function(event) {
 		var code = (event.keyCode ? event.keyCode : event.which);
@@ -1021,7 +1094,7 @@
 			
 			var syncButton = document.getElementById("syncButton");
 			if (isEnable(syncButton)) {
-				doPreview();
+				syncButton.click();
 			}
 			return false;
 		}
@@ -1076,7 +1149,11 @@
 		
 		return true;
 	});
-
+	
+	function isEditMode() {
+		return document.querySelector("body").classList.contains("editMode");
+	}
+	
 	function isEnable(elem) {
 		return elem &&
 				((typeof elem.disabled === "undefined")
@@ -1097,9 +1174,11 @@
 	}
 
 	function showBlock(elem) {
-		elem.style.display = "block";
+		elem.classList.add("showBlock");
+		elem.classList.remove("hide");
 	}
 
 	function hide(elem) {
-		elem.style.display = "none";
+		elem.classList.remove("showBlock")
+		elem.classList.add("hide");
 	}

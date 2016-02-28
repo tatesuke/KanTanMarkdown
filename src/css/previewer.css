@@ -1,11 +1,20 @@
+/* CSSは明示的にプレビュー(F5)しないと反映されません */
+.previewMode #previewer {
+	width: 980px;
+	height: auto;
+	overflow:auto;
+}
+
 #previewer {
-  font-family: Helvetica, arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.6;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  background-color: white;
-  padding: 45px; }
+	word-wrap: break-word;
+	border:1px solid gray;
+	font-family: Helvetica, arial, sans-serif;
+	font-size: 14px;
+	line-height: 1.6;
+	background-color: white;
+	padding: 45px;
+}
+
 #previewer > *:first-child {
   margin-top: 0 !important; }
 #previewer > *:last-child {
@@ -275,4 +284,18 @@ pre {
 	padding: 6px 10px;
 	border-radius: 0px;
 	margin: 1em 0px 1em;
+}
+
+@media print{
+	nav {
+		display:none;
+	}
+
+	#wrapper {
+		overflow: visible;
+	}
+	
+	#previewer {
+		border: 0;
+	}
 }

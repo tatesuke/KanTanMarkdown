@@ -4,7 +4,7 @@ body {
 	position:relative;
 }
 
-.onDragover {
+body .onDragover {
 	border : 5px dashed #99cde1;
 }
 
@@ -12,11 +12,11 @@ nav {
 	margint:0;
 }
 
-#leftNav{
+nav #leftNav{
 	float:left;
 }
 
-#rightNav {
+nav #rightNav {
 	float:right;
 }
 
@@ -35,18 +35,18 @@ nav:after {
 	border-bottom:1px solid gray;
 	display:none;
 }
-#attachForm {
+#attach #attachForm {
 	box-sizing:border-box;
 	width:100%;
 	height:100%;
 	display:none;
 }
 
-input[type="file"] {
+#attach #attachForm input[type="file"] {
 	width:100%;
 }
 
-#filer{
+#attach #filer{
 	box-sizing:border-box;
 	width:100%;
 	height:150px;
@@ -54,8 +54,8 @@ input[type="file"] {
 	display:none;
 }
 
-#attachToggleButton,
-#previewToggleButton{
+#attach #attachToggleButton,
+#attach #previewToggleButton{
 	width: 50%;
 }
 
@@ -63,28 +63,91 @@ input[type="file"] {
 	overflow: auto;
 }
 
-#editor {
+#wrapper #editorTabWrapper {
 	box-sizing:border-box;
-	resize:none; 
 	width:50%;
 	height:100%;
 	float:left;
 	border-top:none;
 	display:none;
+	margin: 0;
+	padding: 0;
+}
+
+#wrapper #editorTabWrapper #editorTabContents {
+	box-sizing:border-box;
+	width: 100%;
+	height: calc(100% - 20px); /* #editorTabの高さと合わせる */
+	marign: 0;
+	padding: 0;
+}
+
+#wrapper #editorTabWrapper #editorTabContents #editor,
+#wrapper #editorTabWrapper #editorTabContents #cssEditor{
+	box-sizing:border-box;
+	resize:none; 
+	width: 100%;
+	height:100%;
 	-moz-tab-size: 4;
 	-o-tab-size: 4;
 	tab-size: 4;
-	border:1px solid gray;
 	margin: 0;
+}
+
+#wrapper #editorTabWrapper #editorTabContents #cssEditor {
+	display:none;
+}
+
+#wrapper #editorTabWrapper #editorTabs {
+	box-sizing:border-box;
+	border:0;
+	width: 100%;
+	height:20px; /* #editorTabContentsの高さと合わせる */
+	margin: 0;
+	padding: 0;
+}
+
+#wrapper #editorTabWrapper #editorTabs li {
+	box-sizing:border-box;
+	list-style: none;
+	float:left;
+	width:50%;
+	height:100%;
+	text-align:center;
+	margin-left:0;
+	border-top:0;
+	border-right:1px solid gray;
+	border-bottom:1px solid gray;
+	border-left:1px solid gray;
+	border-radius: 0 0 10px 10px/0 0 10px 10px;
+}
+
+#wrapper #editorTabWrapper #editorTabs li a {
+	display:block;
+	width:100%;
+	height:100%;
+	text-decoration:none;
+	color:black;
+}
+
+#wrapper #editorTabWrapper #editorTabs li.selected {
+	background-color:#7a9cd3;
+}
+
+#wrapper #editorTabWrapper.fullWidth {
+	width:100%;
 }
 
 #previewer {
 	box-sizing:border-box;
-	width:100%;
 	margin: 0 auto;
+	height:auto;
 	overflow:auto;
-	word-wrap: break-word;
-	border:1px solid gray;
+}
+
+.editMode #previewer {
+	width:50%;
+	height:100%;
 }
 
 #previewer:empty {
@@ -170,16 +233,21 @@ input[type="file"] {
 	padding-right:  20px;
 }
 
-@media print{
-	nav {
-		display:none;
-	}
+.showBlock {
+	display:block !important;
+}
 
-	#wrapper {
-		overflow: visible;
-	}
-	
-	#previewer {
-		border: 0;
-	}
+.hide {
+	display: none  !important;
+}
+
+@media print {
+  nav {
+  	display:none;
+  }
+  #previewer {
+  	border:0 !important;
+  	margin:0 !important;
+  	padding:0 !important;
+  }
 }
