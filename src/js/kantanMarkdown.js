@@ -476,7 +476,7 @@
 		if (result.markdown == true) {
 			var editorElement = dummyHtml.querySelector("textarea#editor")
 			var editor = document.getElementById("editor");
-			editor.value = editorElement.value + editorElement.value;
+			editor.value = editor.value + editorElement.value;
 			saved = false;
 		}
 		
