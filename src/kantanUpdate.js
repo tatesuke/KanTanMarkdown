@@ -4,15 +4,17 @@ kantanUpdate({
 	"doUpdate": function() {
 		var kantanVersion = document.getElementById("kantanVersion").value;
 		if (kantanVersion == this.newVersion) {
-			alert("お使いのKantanMarkdownは最新です。アップデートの必要はありません。");
-			return;
+			var confirm = window.confirm("お使いのKantanMarkdownは最新です。それでも強制的にアップデートを実行しますか？");		
+			if (confirm == false) {
+				return;
+			}
 		}
 		
 		showImportDialog(
 				"アップデートを適用できます。\n" +
 				"\n" +
-				"現在ご利用のバージョン: " + kantanVersion + "\n" +
-				"新しいバージョン　　　: " + this.newVersion + "\n" +
+				"現在ご利用のバージョン：\t" + kantanVersion + "\n" +
+				"新しいバージョン　　　：\t" + this.newVersion + "\n" +
 				"\n" + 
 				"新バージョンに引き継ぐ項目を選んでください。", (function (parent) {
 
@@ -25,8 +27,9 @@ kantanUpdate({
 	},
 	"rewirteHtml":function(dialogResult) {
 		// アップデート前の値を記憶しておく
-		var fileListElement = document.querySelector("ul#fileList");
-		var originalMarkdown = document.querySelector("textarea#editor").value;
+		var fileListElement  = document.querySelector("#fileList");
+		var originalMarkdown = document.querySelector("#editor");
+		var originalCss      = document.querySelector("#cssEditor");
 		
 		// エディションを読み込み
 		var kantanEdition = document.querySelector("#kantanEdition").value;
@@ -93,8 +96,15 @@ kantanUpdate({
 		
 		// Markdown引継ぎ
 		if (dialogResult.markdown == true) {
-			var editor = document.getElementById("editor");
-			editor.value = originalMarkdown;
+			var editor = document.querySelector("#editor");
+			editor.value = originalMarkdown.value;
+			saved = false;
+		}
+		
+		// CSS引継ぎ
+		if ((dialogResult.css == true) && originalCss) {
+			var cssEditor = document.querySelector("#cssEditor");
+			cssEditor.value = originalCss.value;
 			saved = false;
 		}
 		

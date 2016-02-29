@@ -1,5 +1,5 @@
 kantanUpdate({
-	"newVersion": "v1.20160221.03",
+	"newVersion": "v1.20160229.01",
 	"ktmString": "<!--\n" + 
 " * KanTanMarkdown\n" + 
 " * Copyright (c) 2016 tatesuke\n" + 
@@ -7,289 +7,419 @@ kantanUpdate({
 " * http://opensource.org/licenses/mit-license.php\n" + 
 " --><head>\n" + 
 "<meta charset=\"utf-8\">\n" + 
-"<style>\n" + 
-"#attachForm,#editor,#filer{box-sizing:border-box;display:none}#attach,#filer,input[type=file]{width:100%}#attachToggleButton,#editor,#previewToggleButton{width:50%}#filer,#previewer,#wrapper{overflow:auto}#attach,#attachForm,#editor,#filer,#onlineMenu{display:none}body{margin:0;padding:0;position:relative}.onDragover{border:5px dashed #99cde1}#editor,#importDialog,#onlineMenu,#previewer{border:1px solid gray}nav{margint:0}#leftNav{float:left}#rightNav{float:right}#previewer:after,nav:after{content:\".\";display:block;height:0;font-size:0;clear:both;visibility:hidden}#attach{border-top:1px solid gray;border-bottom:1px solid gray}#attachForm{width:100%;height:100%}#filer{height:150px}#editor{resize:none;height:100%;float:left;-moz-tab-size:4;-o-tab-size:4;tab-size:4;margin:0}#onlineMenu>ul>li>a,#previewer{box-sizing:border-box;width:100%}#previewer{margin:0 auto;word-wrap:break-word}#previewer:empty{border:0}#previewer:focus{outline:0}#onlineMenu{position:absolute;margin:0;padding:0}#importDialog ul.buttonArea,#onlineMenu>ul{list-style-type:none;margin:0;padding:0}#onlineMenu>ul>li{margin:0}#onlineMenu>ul>li>a{text-decoration:none;display:block;margin:0;padding:10px;height:100%;color:#000;background-color:#fff}#onlineMenu>ul>li>a:hover{background-color:#99cde1}#importDialog{position:absolute;width:440px;padding:20px;display:none;background-color:#fff}#importDialog ul.buttonArea li{display:block;float:left}#importDialog ul.buttonArea li button{height:35px;padding-left:20px;padding-right:20px}@media print{nav{display:none}#wrapper{overflow:visible}#previewer{border:0}}\n" + 
-"</style>\n" + 
-"<style id=\"previewerCss\">\n" + 
+"<style>#previewer:after,nav:after{content:\".\";display:block;font-size:0;clear:both;visibility:hidden}body{margin:0;padding:0;position:relative}body .onDragover{border:5px dashed #99cde1}nav{margint:0}nav #leftNav{float:left}nav #rightNav{float:right}nav:after{height:0}#attach{width:100%;border-top:1px solid gray;border-bottom:1px solid gray;display:none}#attach #attachForm{box-sizing:border-box;width:100%;height:100%;display:none}#attach #attachForm input[type=file]{width:100%}#attach #filer{box-sizing:border-box;width:100%;height:150px;overflow:auto;display:none}#attach #attachToggleButton,#attach #previewToggleButton{width:50%}#wrapper{overflow:auto}#wrapper #editorTabWrapper{box-sizing:border-box;width:50%;height:100%;float:left;border-top:none;display:none;margin:0;padding:0}#wrapper #editorTabWrapper #editorTabContents{box-sizing:border-box;width:100%;height:calc(100% - 20px);marign:0;padding:0}#wrapper #editorTabWrapper #editorTabContents #cssEditor,#wrapper #editorTabWrapper #editorTabContents #editor{box-sizing:border-box;resize:none;width:100%;height:100%;-moz-tab-size:4;-o-tab-size:4;tab-size:4;margin:0}#wrapper #editorTabWrapper #editorTabContents #cssEditor{display:none}#wrapper #editorTabWrapper #editorTabs{box-sizing:border-box;border:0;width:100%;height:20px;margin:0;padding:0}#wrapper #editorTabWrapper #editorTabs li{box-sizing:border-box;list-style:none;float:left;width:50%;height:100%;text-align:center;margin-left:0;border-top:0;border-right:1px solid gray;border-bottom:1px solid gray;border-left:1px solid gray;border-radius:0 0 10px 10px}#importDialog,#onlineMenu{border:1px solid gray;position:absolute}#wrapper #editorTabWrapper #editorTabs li a{display:block;width:100%;height:100%;text-decoration:none;color:#000}#previewer,.previewMode #previewer{height:auto;overflow:auto}#wrapper #editorTabWrapper #editorTabs li.selected{background-color:#7a9cd3}#wrapper #editorTabWrapper.fullWidth{width:100%}#previewer{box-sizing:border-box;margin:0 auto}.editMode #previewer{width:50%;height:100%}#previewer:empty{border:0}#previewer:focus{outline:0}#previewer:after{height:0}#onlineMenu{display:none;margin:0;padding:0}#importDialog ul.buttonArea,#onlineMenu>ul{list-style-type:none;margin:0;padding:0}#onlineMenu>ul>li{margin:0}#onlineMenu>ul>li>a{box-sizing:border-box;text-decoration:none;display:block;margin:0;padding:10px;width:100%;height:100%;color:#000;background-color:#fff}#onlineMenu>ul>li>a:hover{background-color:#99cde1}#importDialog{width:440px;padding:20px;display:none;background-color:#fff}#importDialog ul.buttonArea li{display:block;float:left}#importDialog ul.buttonArea li button{height:35px;padding-left:20px;padding-right:20px}.showBlock{display:block!important}.hide{display:none!important}@media print{nav{display:none}#previewer{border:0!important;margin:0!important;padding:0!important}}</style>\n" + 
+"<style id=\"previewerStyle\">\n" + 
+"/*\n" + 
+" * CSSの設定を間違えると、最悪の場合\n" + 
+" * 内容を編集できなくなるので注意してください。\n" + 
+" * 標準のCSSに戻したいときはCSSを引き継がずに強制アップデートしてください\n" + 
+" * また、CSSの変更はプレビューしないと反映しません。\n" + 
+" */\n" + 
+" \n" + 
+".previewMode #previewer {\n" + 
+"    width: 980px;\n" + 
+"}\n" + 
 "#previewer {\n" + 
-"  font-family: Helvetica, arial, sans-serif;\n" + 
-"  font-size: 14px;\n" + 
-"  line-height: 1.6;\n" + 
-"  padding-top: 10px;\n" + 
-"  padding-bottom: 10px;\n" + 
-"  background-color: white;\n" + 
-"  padding: 45px; }\n" + 
+"    word-wrap: break-word;\n" + 
+"    border: 1px solid gray;\n" + 
+"    font-family: Helvetica, arial, sans-serif;\n" + 
+"    font-size: 14px;\n" + 
+"    line-height: 1.6;\n" + 
+"    background-color: white;\n" + 
+"    padding: 45px;\n" + 
+"}\n" + 
 "#previewer > *:first-child {\n" + 
-"  margin-top: 0 !important; }\n" + 
+"    margin-top: 0 !important;\n" + 
+"}\n" + 
 "#previewer > *:last-child {\n" + 
-"  margin-bottom: 0 !important; }\n" + 
+"    margin-bottom: 0 !important;\n" + 
+"}\n" + 
 "a {\n" + 
-"  color: #4183C4; }\n" + 
+"    color: #4183C4;\n" + 
+"}\n" + 
 "a.absent {\n" + 
-"  color: #cc0000; }\n" + 
+"    color: #cc0000;\n" + 
+"}\n" + 
 "a.anchor {\n" + 
-"  display: block;\n" + 
-"  padding-left: 30px;\n" + 
-"  margin-left: -30px;\n" + 
-"  cursor: pointer;\n" + 
-"  position: absolute;\n" + 
-"  top: 0;\n" + 
-"  left: 0;\n" + 
-"  bottom: 0; }\n" + 
-"h1, h2, h3, h4, h5, h6 {\n" + 
-"  margin: 20px 0 10px;\n" + 
-"  padding: 0;\n" + 
-"  font-weight: bold;\n" + 
-"  -webkit-font-smoothing: antialiased;\n" + 
-"  cursor: text;\n" + 
-"  position: relative; }\n" + 
-"h1:hover a.anchor, h2:hover a.anchor, h3:hover a.anchor, h4:hover a.anchor, h5:hover a.anchor, h6:hover a.anchor {\n" + 
-"  background: url(\"para.png\") no-repeat 10px center;\n" + 
-"  text-decoration: none; }\n" + 
-"h1 tt, h1 code {\n" + 
-"  font-size: inherit; }\n" + 
-"h2 tt, h2 code {\n" + 
-"  font-size: inherit; }\n" + 
-"h3 tt, h3 code {\n" + 
-"  font-size: inherit; }\n" + 
-"h4 tt, h4 code {\n" + 
-"  font-size: inherit; }\n" + 
-"h5 tt, h5 code {\n" + 
-"  font-size: inherit; }\n" + 
-"h6 tt, h6 code {\n" + 
-"  font-size: inherit; }\n" + 
-"h1 {\n" + 
-"  font-size: 28px;\n" + 
-"  color: black; }\n" + 
-"h2 {\n" + 
-"  font-size: 24px;\n" + 
-"  border-bottom: 1px solid #cccccc;\n" + 
-"  color: black; }\n" + 
-"h3 {\n" + 
-"  font-size: 18px; }\n" + 
-"h4 {\n" + 
-"  font-size: 16px; }\n" + 
-"h5 {\n" + 
-"  font-size: 14px; }\n" + 
+"    display: block;\n" + 
+"    padding-left: 30px;\n" + 
+"    margin-left: -30px;\n" + 
+"    cursor: pointer;\n" + 
+"    position: absolute;\n" + 
+"    top: 0;\n" + 
+"    left: 0;\n" + 
+"    bottom: 0;\n" + 
+"}\n" + 
+"h1,\n" + 
+"h2,\n" + 
+"h3,\n" + 
+"h4,\n" + 
+"h5,\n" + 
 "h6 {\n" + 
-"  color: #777777;\n" + 
-"  font-size: 14px; }\n" + 
-"p, blockquote, ul, ol, dl, li:first, table, pre {\n" + 
-"  margin: 15px 0; }\n" + 
+"    margin: 20px 0 10px;\n" + 
+"    padding: 0;\n" + 
+"    font-weight: bold;\n" + 
+"    -webkit-font-smoothing: antialiased;\n" + 
+"    cursor: text;\n" + 
+"    position: relative;\n" + 
+"}\n" + 
+"h1:hover a.anchor,\n" + 
+"h2:hover a.anchor,\n" + 
+"h3:hover a.anchor,\n" + 
+"h4:hover a.anchor,\n" + 
+"h5:hover a.anchor,\n" + 
+"h6:hover a.anchor {\n" + 
+"    background: url(\"para.png\") no-repeat 10px center;\n" + 
+"    text-decoration: none;\n" + 
+"}\n" + 
+"h1 tt,\n" + 
+"h1 code {\n" + 
+"    font-size: inherit;\n" + 
+"}\n" + 
+"h2 tt,\n" + 
+"h2 code {\n" + 
+"    font-size: inherit;\n" + 
+"}\n" + 
+"h3 tt,\n" + 
+"h3 code {\n" + 
+"    font-size: inherit;\n" + 
+"}\n" + 
+"h4 tt,\n" + 
+"h4 code {\n" + 
+"    font-size: inherit;\n" + 
+"}\n" + 
+"h5 tt,\n" + 
+"h5 code {\n" + 
+"    font-size: inherit;\n" + 
+"}\n" + 
+"h6 tt,\n" + 
+"h6 code {\n" + 
+"    font-size: inherit;\n" + 
+"}\n" + 
+"h1 {\n" + 
+"    font-size: 28px;\n" + 
+"    color: black;\n" + 
+"}\n" + 
+"h2 {\n" + 
+"    font-size: 24px;\n" + 
+"    border-bottom: 1px solid #cccccc;\n" + 
+"    color: black;\n" + 
+"}\n" + 
+"h3 {\n" + 
+"    font-size: 18px;\n" + 
+"}\n" + 
+"h4 {\n" + 
+"    font-size: 16px;\n" + 
+"}\n" + 
+"h5 {\n" + 
+"    font-size: 14px;\n" + 
+"}\n" + 
+"h6 {\n" + 
+"    color: #777777;\n" + 
+"    font-size: 14px;\n" + 
+"}\n" + 
+"p,\n" + 
+"blockquote,\n" + 
+"ul,\n" + 
+"ol,\n" + 
+"dl,\n" + 
+"li:first,\n" + 
+"table,\n" + 
+"pre {\n" + 
+"    margin: 15px 0;\n" + 
+"}\n" + 
 "hr {\n" + 
-"  background-color: #e7e7e7;\n" + 
-"  border: 0 none;\n" + 
-"  height: 4px;\n" + 
-"  padding: 0; }\n" + 
+"    background-color: #e7e7e7;\n" + 
+"    border: 0 none;\n" + 
+"    height: 4px;\n" + 
+"    padding: 0;\n" + 
+"}\n" + 
 "#previewer > h2:first-child {\n" + 
-"  margin-top: 0;\n" + 
-"  padding-top: 0; }\n" + 
-"#previewer > h1:first-child {\n" + 
-"  margin-top: 0;\n" + 
-"  padding-top: 0; }\n" + 
-"  #previewer > h1:first-child + h2 {\n" + 
 "    margin-top: 0;\n" + 
-"    padding-top: 0; }\n" + 
-"#previewer > h3:first-child, #previewer > h4:first-child, #previewer > h5:first-child, #previewer > h6:first-child {\n" + 
-"  margin-top: 0;\n" + 
-"  padding-top: 0; }\n" + 
-"a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4, a:first-child h5, a:first-child h6 {\n" + 
-"  margin-top: 0;\n" + 
-"  padding-top: 0; }\n" + 
-"h1 p, h2 p, h3 p, h4 p, h5 p, h6 p {\n" + 
-"  margin-top: 0; }\n" + 
+"    padding-top: 0;\n" + 
+"}\n" + 
+"#previewer > h1:first-child {\n" + 
+"    margin-top: 0;\n" + 
+"    padding-top: 0;\n" + 
+"}\n" + 
+"#previewer > h1:first-child + h2 {\n" + 
+"    margin-top: 0;\n" + 
+"    padding-top: 0;\n" + 
+"}\n" + 
+"#previewer > h3:first-child,\n" + 
+"#previewer > h4:first-child,\n" + 
+"#previewer > h5:first-child,\n" + 
+"#previewer > h6:first-child {\n" + 
+"    margin-top: 0;\n" + 
+"    padding-top: 0;\n" + 
+"}\n" + 
+"a:first-child h1,\n" + 
+"a:first-child h2,\n" + 
+"a:first-child h3,\n" + 
+"a:first-child h4,\n" + 
+"a:first-child h5,\n" + 
+"a:first-child h6 {\n" + 
+"    margin-top: 0;\n" + 
+"    padding-top: 0;\n" + 
+"}\n" + 
+"h1 p,\n" + 
+"h2 p,\n" + 
+"h3 p,\n" + 
+"h4 p,\n" + 
+"h5 p,\n" + 
+"h6 p {\n" + 
+"    margin-top: 0;\n" + 
+"}\n" + 
 "li p.first {\n" + 
-"  display: inline-block; }\n" + 
-"ul, ol {\n" + 
-"  padding-left: 30px; }\n" + 
-"ul :first-child, ol :first-child {\n" + 
-"  margin-top: 0; }\n" + 
-"ul :last-child, ol :last-child {\n" + 
-"  margin-bottom: 0; }\n" + 
+"    display: inline-block;\n" + 
+"}\n" + 
+"ul,\n" + 
+"ol {\n" + 
+"    padding-left: 30px;\n" + 
+"}\n" + 
+"ul:first-child,\n" + 
+"ol:first-child {\n" + 
+"    margin-top: 0;\n" + 
+"}\n" + 
+"ul:last-child,\n" + 
+"ol:last-child {\n" + 
+"    margin-bottom: 0;\n" + 
+"}\n" + 
 "dl {\n" + 
-"  padding: 0; }\n" + 
-"  dl dt {\n" + 
+"    padding: 0;\n" + 
+"}\n" + 
+"dl dt {\n" + 
 "    font-size: 14px;\n" + 
 "    font-weight: bold;\n" + 
 "    font-style: italic;\n" + 
 "    padding: 0;\n" + 
-"    margin: 15px 0 5px; }\n" + 
-"    dl dt:first-child {\n" + 
-"      padding: 0; }\n" + 
-"    dl dt > :first-child {\n" + 
-"      margin-top: 0; }\n" + 
-"    dl dt > :last-child {\n" + 
-"      margin-bottom: 0; }\n" + 
-"  dl dd {\n" + 
+"    margin: 15px 0 5px;\n" + 
+"}\n" + 
+"dl dt:first-child {\n" + 
+"    padding: 0;\n" + 
+"}\n" + 
+"dl dt >:first-child {\n" + 
+"    margin-top: 0;\n" + 
+"}\n" + 
+"dl dt >:last-child {\n" + 
+"    margin-bottom: 0;\n" + 
+"}\n" + 
+"dl dd {\n" + 
 "    margin: 0 0 15px;\n" + 
-"    padding: 0 15px; }\n" + 
-"    dl dd > :first-child {\n" + 
-"      margin-top: 0; }\n" + 
-"    dl dd > :last-child {\n" + 
-"      margin-bottom: 0; }\n" + 
+"    padding: 0 15px;\n" + 
+"}\n" + 
+"dl dd >:first-child {\n" + 
+"    margin-top: 0;\n" + 
+"}\n" + 
+"dl dd >:last-child {\n" + 
+"    margin-bottom: 0;\n" + 
+"}\n" + 
 "blockquote {\n" + 
-"  border-left: 4px solid #dddddd;\n" + 
-"  padding: 0 15px;\n" + 
-"  color: #777777; }\n" + 
-"  blockquote > :first-child {\n" + 
-"    margin-top: 0; }\n" + 
-"  blockquote > :last-child {\n" + 
-"    margin-bottom: 0; }\n" + 
+"    border-left: 4px solid #dddddd;\n" + 
+"    padding: 0 15px;\n" + 
+"    color: #777777;\n" + 
+"}\n" + 
+"blockquote >:first-child {\n" + 
+"    margin-top: 0;\n" + 
+"}\n" + 
+"blockquote >:last-child {\n" + 
+"    margin-bottom: 0;\n" + 
+"}\n" + 
 "table {\n" + 
-"  border-collapse : collapse; \n" + 
-"  padding: 0; }\n" + 
-"  table tr {\n" + 
+"    border-collapse: collapse;\n" + 
+"    padding: 0;\n" + 
+"}\n" + 
+"table tr {\n" + 
 "    border-top: 1px solid #cccccc;\n" + 
 "    background-color: white;\n" + 
 "    margin: 0;\n" + 
-"    padding: 0; }\n" + 
-"    table tr:nth-child(2n) {\n" + 
-"      background-color: #f8f8f8; }\n" + 
-"    table tr th {\n" + 
-"      font-weight: bold;\n" + 
-"      border: 1px solid #cccccc;\n" + 
-"      text-align: left;\n" + 
-"      margin: 0;\n" + 
-"      padding: 6px 13px; }\n" + 
-"    table tr td {\n" + 
-"      border: 1px solid #cccccc;\n" + 
-"      text-align: left;\n" + 
-"      margin: 0;\n" + 
-"      padding: 6px 13px; }\n" + 
-"    table tr th :first-child, table tr td :first-child {\n" + 
-"      margin-top: 0; }\n" + 
-"    table tr th :last-child, table tr td :last-child {\n" + 
-"      margin-bottom: 0; }\n" + 
+"    padding: 0;\n" + 
+"}\n" + 
+"table tr:nth-child(2n) {\n" + 
+"    background-color: #f8f8f8;\n" + 
+"}\n" + 
+"table tr th {\n" + 
+"    font-weight: bold;\n" + 
+"    border: 1px solid #cccccc;\n" + 
+"    text-align: left;\n" + 
+"    margin: 0;\n" + 
+"    padding: 6px 13px;\n" + 
+"}\n" + 
+"table tr td {\n" + 
+"    border: 1px solid #cccccc;\n" + 
+"    text-align: left;\n" + 
+"    margin: 0;\n" + 
+"    padding: 6px 13px;\n" + 
+"}\n" + 
+"table tr th:first-child,\n" + 
+"table tr td:first-child {\n" + 
+"    margin-top: 0;\n" + 
+"}\n" + 
+"table tr th:last-child,\n" + 
+"table tr td:last-child {\n" + 
+"    margin-bottom: 0;\n" + 
+"}\n" + 
 "img {\n" + 
-"  max-width: 100%; }\n" + 
+"    max-width: 100%;\n" + 
+"}\n" + 
 "span.frame {\n" + 
-"  display: block;\n" + 
-"  overflow: hidden; }\n" + 
-"  span.frame > span {\n" + 
+"    display: block;\n" + 
+"    overflow: hidden;\n" + 
+"}\n" + 
+"span.frame > span {\n" + 
 "    border: 1px solid #dddddd;\n" + 
 "    display: block;\n" + 
 "    float: left;\n" + 
 "    overflow: hidden;\n" + 
 "    margin: 13px 0 0;\n" + 
 "    padding: 7px;\n" + 
-"    width: auto; }\n" + 
-"  span.frame span img {\n" + 
+"    width: auto;\n" + 
+"}\n" + 
+"span.frame span img {\n" + 
 "    display: block;\n" + 
-"    float: left; }\n" + 
-"  span.frame span span {\n" + 
+"    float: left;\n" + 
+"}\n" + 
+"span.frame span span {\n" + 
 "    clear: both;\n" + 
 "    color: #333333;\n" + 
 "    display: block;\n" + 
-"    padding: 5px 0 0; }\n" + 
+"    padding: 5px 0 0;\n" + 
+"}\n" + 
 "span.align-center {\n" + 
-"  display: block;\n" + 
-"  overflow: hidden;\n" + 
-"  clear: both; }\n" + 
-"  span.align-center > span {\n" + 
+"    display: block;\n" + 
+"    overflow: hidden;\n" + 
+"    clear: both;\n" + 
+"}\n" + 
+"span.align-center > span {\n" + 
 "    display: block;\n" + 
 "    overflow: hidden;\n" + 
 "    margin: 13px auto 0;\n" + 
-"    text-align: center; }\n" + 
-"  span.align-center span img {\n" + 
+"    text-align: center;\n" + 
+"}\n" + 
+"span.align-center span img {\n" + 
 "    margin: 0 auto;\n" + 
-"    text-align: center; }\n" + 
+"    text-align: center;\n" + 
+"}\n" + 
 "span.align-right {\n" + 
-"  display: block;\n" + 
-"  overflow: hidden;\n" + 
-"  clear: both; }\n" + 
-"  span.align-right > span {\n" + 
+"    display: block;\n" + 
+"    overflow: hidden;\n" + 
+"    clear: both;\n" + 
+"}\n" + 
+"span.align-right > span {\n" + 
 "    display: block;\n" + 
 "    overflow: hidden;\n" + 
 "    margin: 13px 0 0;\n" + 
-"    text-align: right; }\n" + 
-"  span.align-right span img {\n" + 
+"    text-align: right;\n" + 
+"}\n" + 
+"span.align-right span img {\n" + 
 "    margin: 0;\n" + 
-"    text-align: right; }\n" + 
+"    text-align: right;\n" + 
+"}\n" + 
 "span.float-left {\n" + 
-"  display: block;\n" + 
-"  margin-right: 13px;\n" + 
-"  overflow: hidden;\n" + 
-"  float: left; }\n" + 
-"  span.float-left span {\n" + 
-"    margin: 13px 0 0; }\n" + 
+"    display: block;\n" + 
+"    margin-right: 13px;\n" + 
+"    overflow: hidden;\n" + 
+"    float: left;\n" + 
+"}\n" + 
+"span.float-left span {\n" + 
+"    margin: 13px 0 0;\n" + 
+"}\n" + 
 "span.float-right {\n" + 
-"  display: block;\n" + 
-"  margin-left: 13px;\n" + 
-"  overflow: hidden;\n" + 
-"  float: right; }\n" + 
-"  span.float-right > span {\n" + 
+"    display: block;\n" + 
+"    margin-left: 13px;\n" + 
+"    overflow: hidden;\n" + 
+"    float: right;\n" + 
+"}\n" + 
+"span.float-right > span {\n" + 
 "    display: block;\n" + 
 "    overflow: hidden;\n" + 
 "    margin: 13px auto 0;\n" + 
-"    text-align: right; }\n" + 
-"code, tt {\n" + 
-"  margin: 0 2px;\n" + 
-"  padding: 0 5px;\n" + 
-"  white-space: nowrap;\n" + 
-"  border: 1px solid #eaeaea;\n" + 
-"  background-color: #f8f8f8;\n" + 
-"  border-radius: 3px; }\n" + 
+"    text-align: right;\n" + 
+"}\n" + 
+"code,\n" + 
+"tt {\n" + 
+"    margin: 0 2px;\n" + 
+"    padding: 0 5px;\n" + 
+"    white-space: nowrap;\n" + 
+"    border: 1px solid #eaeaea;\n" + 
+"    background-color: #f8f8f8;\n" + 
+"    border-radius: 3px;\n" + 
+"}\n" + 
 "pre code {\n" + 
-"  margin: 0;\n" + 
-"  padding: 0;\n" + 
-"  white-space: pre-wrap;\n" + 
-"  border: none;\n" + 
-"  background: transparent; }\n" + 
+"    margin: 0;\n" + 
+"    padding: 0;\n" + 
+"    white-space: pre-wrap;\n" + 
+"    border: none;\n" + 
+"    background: transparent;\n" + 
+"}\n" + 
 ".highlight pre {\n" + 
-"  background-color: #f8f8f8;\n" + 
-"  border: 1px solid #cccccc;\n" + 
-"  font-size: 13px;\n" + 
-"  line-height: 19px;\n" + 
-"  overflow: auto;\n" + 
-"  padding: 6px 10px;\n" + 
-"  border-radius: 3px; }\n" + 
+"    background-color: #f8f8f8;\n" + 
+"    border: 1px solid #cccccc;\n" + 
+"    font-size: 13px;\n" + 
+"    line-height: 19px;\n" + 
+"    overflow: auto;\n" + 
+"    padding: 6px 10px;\n" + 
+"    border-radius: 3px;\n" + 
+"}\n" + 
 "pre {\n" + 
-"  background-color: #f8f8f8;\n" + 
-"  border: 1px solid #cccccc;\n" + 
-"  font-size: 13px;\n" + 
-"  line-height: 19px;\n" + 
-"  overflow: auto;\n" + 
-"  padding: 6px 10px;\n" + 
-"  border-radius: 3px; }\n" + 
-"  pre code, pre tt {\n" + 
+"    background-color: #f8f8f8;\n" + 
+"    border: 1px solid #cccccc;\n" + 
+"    font-size: 13px;\n" + 
+"    line-height: 19px;\n" + 
+"    overflow: auto;\n" + 
+"    padding: 6px 10px;\n" + 
+"    border-radius: 3px;\n" + 
+"}\n" + 
+"pre code,\n" + 
+"pre tt {\n" + 
 "    background-color: transparent;\n" + 
-"    border: none; }\n" + 
-".sequence, .flow {\n" + 
-"  overflow:auto;\n" + 
+"    border: none;\n" + 
 "}\n" + 
-".info{\n" + 
-"	color : #3a87ad;\n" + 
-"	background-color: #d9edf7;\n" + 
-"	border: 1px solid #bce8f1;\n" + 
-"	font-size: 13px;\n" + 
-"	line-height: 19px;\n" + 
-"	padding: 6px 10px;\n" + 
-"	border-radius: 0px;\n" + 
-"	margin: 1em 0px 1em;\n" + 
+".sequence,\n" + 
+".flow {\n" + 
+"    overflow: auto;\n" + 
 "}\n" + 
-"\n" + 
-".warn{\n" + 
-"	color : #c09853;\n" + 
-"	background-color: #fcf8e3;\n" + 
-"	border: 1px solid #fbeed5;\n" + 
-"	font-size: 13px;\n" + 
-"	line-height: 19px;\n" + 
-"	padding: 6px 10px;\n" + 
-"	border-radius: 0px;\n" + 
-"	margin: 1em 0px 1em;\n" + 
+".info {\n" + 
+"    color: #3a87ad;\n" + 
+"    background-color: #d9edf7;\n" + 
+"    border: 1px solid #bce8f1;\n" + 
+"    font-size: 13px;\n" + 
+"    line-height: 19px;\n" + 
+"    padding: 6px 10px;\n" + 
+"    border-radius: 0px;\n" + 
+"    margin: 1em 0px 1em;\n" + 
 "}\n" + 
-"\n" + 
-".alert{\n" + 
-"	color : #b94a48;\n" + 
-"	background-color: #f2dede;\n" + 
-"	border: 1px solid #eed3d7;\n" + 
-"	font-size: 13px;\n" + 
-"	line-height: 19px;\n" + 
-"	padding: 6px 10px;\n" + 
-"	border-radius: 0px;\n" + 
-"	margin: 1em 0px 1em;\n" + 
+".warn {\n" + 
+"    color: #c09853;\n" + 
+"    background-color: #fcf8e3;\n" + 
+"    border: 1px solid #fbeed5;\n" + 
+"    font-size: 13px;\n" + 
+"    line-height: 19px;\n" + 
+"    padding: 6px 10px;\n" + 
+"    border-radius: 0px;\n" + 
+"    margin: 1em 0px 1em;\n" + 
 "}\n" + 
-"\n" + 
+".alert {\n" + 
+"    color: #b94a48;\n" + 
+"    background-color: #f2dede;\n" + 
+"    border: 1px solid #eed3d7;\n" + 
+"    font-size: 13px;\n" + 
+"    line-height: 19px;\n" + 
+"    padding: 6px 10px;\n" + 
+"    border-radius: 0px;\n" + 
+"    margin: 1em 0px 1em;\n" + 
+"}\n" + 
+"@media print {\n" + 
+"    nav {\n" + 
+"        display: none;\n" + 
+"    }\n" + 
+"    #wrapper {\n" + 
+"        overflow: visible;\n" + 
+"    }\n" + 
+"    #previewer {\n" + 
+"        border: 0;\n" + 
+"    }\n" + 
+"}\n" + 
 "/* START_HLJS_CSS */\n" + 
 "/*\n" + 
 "\n" + 
@@ -415,7 +545,16 @@ kantanUpdate({
 "</div>\n" + 
 "<div id=\"wrapper\">\n" + 
 "	<noscript>このファイルはJavaScriptを有効にしないと閲覧できません。</noscript>\n" + 
-"	<textarea id=\"editor\"></textarea>\n" + 
+"	<div id=\"editorTabWrapper\">\n" + 
+"		<div id=\"editorTabContents\">\n" + 
+"			<textarea id=\"editor\"></textarea>\n" + 
+"			<textarea id=\"cssEditor\"></textarea>\n" + 
+"		</div>\n" + 
+"		<ol id=\"editorTabs\">\n" + 
+"			<li class=\"selected\"><a href=\"#\" id=\"markdownTab\">Markdown</a></li>\n" + 
+"			<li><a href=\"#\" id=\"cssTab\">CSS</a></li>\n" + 
+"		</ol>\n" + 
+"	</div>\n" + 
 "	<div id=\"previewer\" tabIndex=\"-1\"></div>\n" + 
 "</div>\n" + 
 "<div id=\"onlineMenu\">\n" + 
@@ -430,9 +569,9 @@ kantanUpdate({
 "	<p id=\"importDialogMessage\"></p>\n" + 
 "	<form>\n" + 
 "	<ul>\n" + 
-"		<li><input type=\"checkBox\" checked=\"checked\" id=\"importDialogAttach\"><label for=\"importDialogAttach\">添付ファイル</label></li>\n" + 
-"		<li><input type=\"checkBox\" checked=\"checked\" id=\"importDialogMarkdown\"><label for=\"importDialogMarkdown\">Markdown</label></li>\n" + 
-"		<!--<li><input type=\"checkBox\" checked=\"checked\" id=\"importDialogCss\"><label for=\"importDialogCss\">CSS</label></li>-->\n" + 
+"		<li><input type=\"checkBox\" checked=\"checked\" id=\"importDialogAttach\"><label for=\"importDialogAttach\">添付ファイル(末尾に挿入)</label></li>\n" + 
+"		<li><input type=\"checkBox\" checked=\"checked\" id=\"importDialogMarkdown\"><label for=\"importDialogMarkdown\">Markdown(末尾に挿入)</label></li>\n" + 
+"		<li><input type=\"checkBox\" id=\"importDialogCss\"><label for=\"importDialogCss\">CSS(上書き)</label></li>\n" + 
 "	</ul>\n" + 
 "	<ul class=\"buttonArea\">\n" + 
 "		<li><button id=\"importDialogOkButton\">OK</button></li>\n" + 
@@ -440,7 +579,7 @@ kantanUpdate({
 "	</ul>\n" + 
 "	</form>\n" + 
 "</div>\n" + 
-"<input type=\"hidden\" id=\"kantanVersion\" value=\"v1.20160221.03\">\n" + 
+"<input type=\"hidden\" id=\"kantanVersion\" value=\"v1.20160229.01\">\n" + 
 "<input type=\"hidden\" id=\"kantanEdition\" value=\"__KANTAN_EDITION__\">\n" + 
 "<div id=\"updateScriptArea\"></div>\n" + 
 "<script id=\"markedJs\">\n" + 
@@ -495,22 +634,24 @@ kantanUpdate({
 "function toKantanEditor(a){on(a,\"keydown\",function(b){if(9!=b.which&&9!=b.keyCode)return!0;b.preventDefault();var c=a.selectionStart,d=a.selectionEnd;if(c==d){var e=a.value;a.value=e.substr(0,c)+\"	\"+e.substr(c,e.length),a.setSelectionRange(c+1,c+1),j(b.target),h(b.target)}else if(b.shiftKey){var f=a.currentStyle||document.defaultView.getComputedStyle(a,\"\"),g=f.tabSize||f.MozTabSize||8;g=Number(g);for(var i=a.value;c>0&&\"\\n\"!=i.charAt(c-1);)c--;for(\"\\n\"==i.charAt(d-1)&&(d-=1);d<i.length&&\"\\n\"!=i.charAt(d);)d++;d--;for(var k=0,l=i.substring(0,c),m=c;d>m;){for(var n=i.charAt(m),o=0;g>o;){if(\" \"==n)o+=1,k++;else if(\" \"==n)o+=2,k++;else{if(\"	\"!=n){l+=n,m++;break}o+=g,k++}n=i.charAt(++m)}for(;\"\\n\"!=n&&d>m;)n=i.charAt(m++),l+=n}l+=i.substr(d),a.value=l,a.selectionStart=c,a.selectionEnd=d-k+1,j(b.target),h(b.target)}else{for(var i=a.value;c>0&&\"\\n\"!=i.charAt(c-1);)c--;for(\"\\n\"==i.charAt(d-1)&&(d-=1);d<i.length&&\"\\n\"!=i.charAt(d);)d++;for(var p=1,l=i.substring(0,c)+\"	\",m=c;d>m;m++){var n=i.charAt(m);l+=n,\"\\n\"==n&&(l+=\"	\",p++)}l+=i.substr(d),a.value=l,a.selectionStart=c,a.selectionEnd=d+p,j(b.target),h(b.target)}return!1}),on(a,\"keydown\",function(b){if(13==b.which||13==b.keyCode){b.preventDefault();for(var c=0,d=a.value,e=a.selectionStart;e>0&&\"\\n\"!=d.charAt(e-1);)e--,c++;for(var f=\"\",g=0;c>g;g++){var i=d.charAt(e+g);if(\" \"!=i&&\"　\"!=i&&\"	\"!=i)break;f+=i}var k=a.selectionStart+f.length+1,l=d.substring(0,a.selectionStart),m=d.substr(a.selectionEnd);a.value=l+\"\\n\"+f+m,a.selectionStart=k,a.selectionEnd=k,j(b.target),h(b.target)}});var b=!1,c={},d=[],e=[],f={val:a.value,selectionStart:void 0,selectionEnd:void 0},g=void 0;on(a,\"keydown\",function(a){\"Enter\"==a.code?h(a.target):86!=a.which&&86!=a.keyCode||!a.ctrlKey&&!a.metaKey||b?86!=a.which&&86!=a.keyCode||!a.ctrlKey&&!a.metaKey||!b||h(a.target):(i(a.target),b=!0);var d=a.keyCode?a.keyCode:a.which;d>=33&&40>=d&&(c[a.code]=!0)}),on(a,\"keypress\",function(a){c[a.code]=!0}),on(a,\"keyup\",function(d){if(13==d.which||13==d.keyCode||8==d.which||8==d.keyCode||46==d.which||46==d.keyCode||(86==d.which||86==d.keyCode)&&(d.ctrlKey||d.metaKey)||(88==d.which||88==d.keyCode)&&(d.ctrlKey||d.metaKey))h(d.target);else if(1==c[d.code]){var e=d.keyCode?d.keyCode:d.which;e>=33&&40>=e?(g={val:a.value,selectionStart:a.selectionStart,selectionEnd:a.selectionEnd},c[d.code]=!1):(c[d.code]=!1,h(d.target))}d.ctrlKey||d.metaKey||!b||(b=!1)}),on(a,\"mouseup\",function(b){g={val:a.value,selectionStart:a.selectionStart,selectionEnd:a.selectionEnd}}),on(a,\"keydown\",function(b){if(90==b.keyCode&&(b.ctrlKey||b.metaKey)&&!b.shiftKey&&(b.preventDefault(),0<d.length)){e.push(f);var c=d.pop();a.value=c.val,a.selectionStart=c.selectionStart,a.selectionEnd=c.selectionEnd,j(b.target),f=c,k(a)}}),on(a,\"keydown\",function(b){(89==b.keyCode&&(b.ctrlKey||b.metaKey)||90==b.keyCode&&b.ctrlKey&&b.shiftKey||90==b.keyCode&&b.metaKey&&b.shiftKey)&&(b.preventDefault(),0<e.length&&(d.push(f),f=e.pop(),a.value=f.val,a.selectionStart=f.selectionStart,a.selectionEnd=f.selectionEnd,j(b.target),k(a)))});var h=function(a){f.val!=a.value&&(g?(d.push(g),g=void 0):d.push(f),e=[],f={val:a.value,selectionStart:a.selectionStart,selectionEnd:a.selectionEnd})},i=function(a){e=[],f={val:a.value,selectionStart:a.selectionStart,selectionEnd:a.selectionEnd}},j=function(a){var b,c=a.value,d=a.selectionStart,e=a.selectionEnd;try{b=document.execCommand(\"insertText\",!1,\"X\")}catch(f){b=!1}if(b)a.value=c,a.selectionStart=d,a.selectionEnd=d,a.blur(),a.focus(),a.selectionStart=d,a.selectionEnd=e;else{var g=c.substring(0,d),h=c.substr(e);a.value=g+\"X\"+h,a.selectionStart=g.length,a.selectionEnd=g.length+1;document.execCommand(\"delete\",!1,null);a.value=c,a.selectionStart=d,a.selectionEnd=e}},k=function(a){var b=document.createEvent(\"Event\");b.initEvent(\"input\",!0,!0),a.dispatchEvent(b)}}\n" + 
 "</script>\n" + 
 "<script id=\"kantanMarkdownJs\">\n" + 
-"function setViewMode(){document.getElementById(\"messageArea\").innerText=\"このブラウザでは編集できません。\";for(var a=document.querySelectorAll(\"nav > *\"),b=0;b<a.length;b++)a[b].setAttribute(\"disabled\",\"disabled\")}function on(a,b,c){var d;d=\"string\"==typeof a?document.querySelector(a):a,d.addEventListener(b,c),eventListeners.push({element:d,eventName:b,callback:c})}function removeAllEvents(){for(var a=0;a<eventListeners.length;a++){var b=eventListeners[a].element,c=eventListeners[a].eventName,d=eventListeners[a].callback;b.removeEventListener(c,d)}eventListeners=[]}function updateKantanVersion(a){document.getElementById(\"kantanVersion\").value=a;for(var b=document.getElementById(\"kantanEdition\").value,c=document.getElementsByClassName(\"version\"),d=0;d<c.length;d++)c[d].innerText=a+\"_\"+b}function updateKantanEdition(a){document.getElementById(\"kantanEdition\").value=a}function kantanUpdate(a){a.doUpdate()}function doLayout(){var a=document.getElementById(\"editor\"),b=document.getElementById(\"previewer\"),c=document.getElementById(\"wrapper\"),d=window.innerHeight-c.offsetTop-10;c.style.height=d+\"px\",isVisible(a)?(b.style.width=\"50%\",b.style.height=\"100%\"):(b.style.width=\"980px\",b.style.height=\"\")}function toggleMode(){var a=document.getElementById(\"attach\"),b=document.getElementById(\"editor\"),c=document.getElementById(\"previewer\");if(isVisible(b)&&(editorScrollBarPos=b.scrollTop,caretStartPos=b.selectionStart,caretEndPos=b.selectionEnd),isVisible(b)){isPreviewerOpened=isVisible(c),0==isPreviewerOpened&&openPreview(),hide(a),hide(b),doPreview();for(var d=null,e=null,f=c.querySelectorAll(\"*\"),g=0;g<f.length;g++){var h=c.scrollTop-(f[g].offsetTop-c.offsetTop);(null==d||Math.abs(h)<Math.abs(d))&&(d=h,e=f[g])}doLayout(),c.focus(),e&&(wrapper.scrollTop=e.offsetTop-c.offsetTop+d)}else{showBlock(a),showBlock(b),doPreview();for(var d=null,e=null,f=c.querySelectorAll(\"*\"),g=0;g<f.length;g++){var h=wrapper.scrollTop-(f[g].offsetTop-c.offsetTop);(null==d||Math.abs(h)<Math.abs(d))&&(d=h,e=f[g])}0==isPreviewerOpened&&closePreview(),doLayout(),e&&(c.scrollTop=e.offsetTop-c.offsetTop+d)}isVisible(b)&&(b.scrollTop=editorScrollBarPos,b.selectionStart=caretStartPos,b.selectionEnd=caretEndPos,b.focus())}function queuePreview(){var a=document.getElementById(\"autoSyncButton\");a.checked&&(clearTimeout(previewQueue),previewQueue=setTimeout(doPreview,queuePreviewWait))}function doPreview(){var a=document.getElementById(\"previewer\"),b=document.createEvent(\"Event\");b.initEvent(\"prepreview\",!0,!0),a.dispatchEvent(b);var c=isMaxScroll(\"previewer\");a.innerHTML=marked(editor.value);var d=document.querySelector(\"h1\");d?document.title=d.textContent:document.title=\"無題\",0==saved&&(document.title=\"* \"+document.title);var e=document.getElementsByTagName(\"img\");for(i in e){var f=e[i],g=document.getElementById(\"attach-\"+f.name);null!=g&&(f.src=g.innerHTML)}if(\"undefined\"!=typeof Diagram)for(var h=document.getElementsByClassName(\"sequence\"),i=0;i<h.length;i++){var j=h[i],k=Diagram.parse(j.textContent);j.innerHTML=\"\",k.drawSVG(j,{theme:\"simple\"})}if(\"undefined\"!=typeof flowchart)for(var l=document.getElementsByClassName(\"flow\"),i=0;i<l.length;i++){var m=l[i],k=flowchart.parse(m.textContent);m.innerHTML=\"\",k.drawSVG(m)}a.style.border=\"1px solid gray\",1==c&&(a.scrollTop=a.scrollHeight);var b=document.createEvent(\"Event\");b.initEvent(\"previewed\",!0,!0),a.dispatchEvent(b)}function isMaxScroll(a){var b=document.getElementById(a),c=b.scrollHeight,d=b.clientHeight,e=b.scrollTop,f=c-(d+e);return f>=-1&&1>=f}function attachFiles(a){for(var b=0;b<a.length;b++){var c=a[b],d=a[b].type;\"text/html\"==d?attachHtmlFile(c):attachFile(c)}}function attachFile(a){var b=new FileReader;b.fileName=a.name,b.onload=function(a){var b=a.target;addAttachFileElements(b.fileName,b.result)},b.readAsDataURL(a)}function attachHtmlFile(a){var b=new FileReader;b.fileName=a.name,b.onload=function(a){return function(b){var c=b.target.result,d=c.substring(23,c.length-8),e=document.createElement(\"html\");e.innerHTML=d;var f=e.querySelector(\"ul#fileList\"),g=e.querySelector(\"textarea#editor\");f&&g?showImportDialog(\"かんたんMarkdownのファイルを検出しました。どの項目をインポートしますか？\\nインポートする場合、項目は末尾に挿入されます\",function(b){1==b.result?importKantanMarkdown(b,e,a):attachFile(a)}):attachFile(a)}}(a),b.readAsText(a)}function importKantanMarkdown(a,b,c){if(1==a.attach){for(var d=b.querySelector(\"ul#fileList\"),e=(document.getElementById(\"fileList\"),d.querySelectorAll(\"script\")),f=0;f<e.length;f++){var g=e[f],h=g.title,i=g.innerHTML;addAttachFileElements(h,i)}saved=!1}if(1==a.markdown){var j=b.querySelector(\"textarea#editor\"),k=document.getElementById(\"editor\");k.value=k.textContent+j.textContent,saved=!1}doPreview()}function showImportDialog(a,b){document.getElementById(\"saveButton\").disabled=!0,document.getElementById(\"importDialogMessage\").innerText=a;var c=document.getElementById(\"importDialog\");c.querySelector(\"form\").reset(),document.getElementById(\"importDialogOkButton\").onclick=function(a){a.preventDefault(),hide(c=document.getElementById(\"importDialog\"));var d={result:!0,attach:document.getElementById(\"importDialogAttach\").checked,markdown:document.getElementById(\"importDialogMarkdown\").checked,css:!1};return b(d),document.getElementById(\"importDialogOkButton\")&&(document.getElementById(\"importDialogOkButton\").onclick=null),document.getElementById(\"importDialogCancelButton\")&&document.getElementById(\"importDialogCancelButton\").onclick,document.getElementById(\"saveButton\")&&(document.getElementById(\"saveButton\").disabled=!1),!1},document.getElementById(\"importDialogCancelButton\").onclick=function(a){return a.preventDefault(),hide(c=document.getElementById(\"importDialog\")),b({result:!1}),delete document.getElementById(\"importDialogOkButton\").onclick,delete document.getElementById(\"importDialogCancelButton\").onclick,document.getElementById(\"saveButton\").disabled=!1,!1},showBlock(c);var d=document.querySelector(\"body\");c.style.top=\"10px\",c.style.left=d.offsetWidth/2-c.offsetWidth/2+\"px\"}function addAttachFileElements(a,b){var c=document.createElement(\"li\"),d=document.createElement(\"script\");d.type=\"text/template\",d.id=\"attach-\"+a,d.title=a,d.innerHTML=b,c.appendChild(d);var e=document.createElement(\"input\");e.type=\"text\",e.classList.add(\"fileName\"),e.value=a,on(e,\"change\",onFileNameChanged),c.appendChild(e);var f=document.createElement(\"button\");f.classList.add(\"detachButton\"),f.innerHTML=\"×\",on(f,\"click\",onDetachButtonClicked),c.appendChild(f),document.getElementById(\"fileList\").appendChild(c);var g=document.getElementById(\"editor\"),h=document.getElementById(\"toggleButton\"),i=document.getElementById(\"filer\");isVisible(g)||h.click(),isVisible(i)||openFiler(),queuePreview()}function openFiler(){document.getElementById(\"attachToggleButton\").innerText=\"添付ファイルを隠す(Alt+↑)\",showBlock(document.getElementById(\"attachForm\")),showBlock(document.getElementById(\"filer\")),doLayout()}function closeFiler(){document.getElementById(\"attachToggleButton\").innerText=\"添付ファイルを表示(Alt+↓)\",hide(document.getElementById(\"attachForm\")),hide(document.getElementById(\"filer\")),doLayout()}function openPreview(){var a=document.getElementById(\"editor\"),b=document.getElementById(\"previewer\");isVisible(a)&&!isVisible(b)&&(document.getElementById(\"previewToggleButton\").innerText=\"プレビューを隠す(Alt+→)\",a.style.width=\"50%\",showBlock(b),doLayout())}function closePreview(){var a=document.getElementById(\"editor\"),b=document.getElementById(\"previewer\");isVisible(a)&&isVisible(b)&&(document.getElementById(\"previewToggleButton\").innerText=\"プレビューを表示(Alt+←)\",a.style.width=\"100%\",hide(b),doLayout())}function save(){var a=document.getElementById(\"wrapper\").scrollTop,b=document.getElementById(\"previewer\").scrollTop;document.querySelector(\"#updateScriptArea\").innerHTML=\"\";var c=document.getElementById(\"editor\");c.innerHTML=c.value.replace(/</g,\"&lt;\");var d=isVisible(c);1==d&&toggleMode(),document.getElementById(\"previewer\").innerHTML=\"\",document.getElementById(\"messageArea\").innerHTML=\"\";var e=\"<!doctype html>\\n<html>\\n\";e+=document.getElementsByTagName(\"html\")[0].innerHTML;var f=e.lastIndexOf(\"/script>\");e=e.substring(0,f),e+=\"/script>\\n</body>\\n</html>\";var g=new Blob([e]);if(window.navigator.msSaveBlob)window.navigator.msSaveBlob(g,document.title+\".html\");else{var h=window.URL||window.webkitURL,i=h.createObjectURL(g),j=document.createElement(\"a\");j.download=document.title.replace(/^\\* /,\"\")+\".html\",j.href=i;var k=document.createEvent(\"MouseEvents\");k.initMouseEvent(\"click\",!0,!1,self,0,0,0,0,0,!1,!1,!1,!1,0,null),j.dispatchEvent(k),delete j}contentAtSave=c.value,saved=!0,doPreview(),1==d&&toggleMode(),document.getElementById(\"previewer\").scrollTop=b,document.getElementById(\"wrapper\").scrollTop=a}function updateSavedFlag(){saved=contentAtSave==document.getElementById(\"editor\").value}function headingSyncToPreviewer(){var a=document.getElementById(\"editor\"),b=document.getElementById(\"previewer\"),c=getCurrentNumberOfHeading(a);scrollPreviewerToHeading(b,c)}function headingSyncToEditor(a){var b=document.getElementById(\"editor\"),c=document.getElementById(\"previewer\"),d=getNumberOfHeading(c,a.target);scrollEditorToHeading(b,d)}function getNumberOfHeading(a,b){var c,d=a.querySelectorAll(\"h1, h2, h3, h4, h5, h6\");for(c=0;c<d.length&&d[c]!=b;c++);return c+1}function scrollEditorToHeading(a,b){for(var c,d=a.value,e=processForHeadingSync(d,d.length),f=0,c=0;c<e.length;c++){var g=e[c];if(g.match(/^# .+$/)&&(f++,f==b))break}var h=0;if(0!=c){var i=0;for(h=0;h<d.length;h++){var j=d.charAt(h);if(\"\\n\"==j&&(i++,i==c)){h++;break}}}var k=a.value.indexOf(\"\\n\",h);k=-1==k?a.value.length:k,a.selectionStart=h,a.selectionEnd=k,updateScrollPos(a),updateSavedFlag(),a.focus()}function getCurrentNumberOfHeading(a){for(var b=a.value,c=a.selectionStart,d=0;c<b.length&&2>d;)\"\\n\"==b.charAt(c)&&d++,c++;c--;var e=processForHeadingSync(b,c);return 2==d&&e[e.length-1].match(/^#{1,6}\\s(.+)$/)&&e.pop(),e.join().split(\"# \").length-1}function scrollPreviewerToHeading(a,b){if(0==b)a.scrollTop=0;else{var c=a.querySelectorAll(\"h1, h2, h3, h4, h5, h6\"),d=c[b-1];a.scrollTop=d.offsetTop-a.offsetTop}}function processForHeadingSync(a,b){var c=a.substring(0,b),d=c.split(\"\\n\"),e=[],f=editor.currentStyle||document.defaultView.getComputedStyle(editor,\"\"),g=f.tabSize||f.MozTabSize||8;g=Number(g);var h,i=!1,j=!1;for(h=0;h<d.length;h++){var k=d[h];k=k.replace(new RegExp(\"^ {\"+g+\",}.*\"),\"\"),k=k.replace(/^\\t+.*/,\"\"),k=k.replace(/^\\s+|\\s+$/g,\"\"),1!=i?1!=j?\"~~~\"!=k.substring(0,3)?\"```\"!=k.substring(0,3)?!k.match(/^={2,}$|^-{2,}$/)||e[h-1].match(/^#{1,6}\\s(.+)$/)||\"\"==e[h-1]?k.match(/^#{1,6}\\s(.+)$/)?e.push(\"# \"+RegExp.$1):e.push(k.replace(/#/g,\"\")):(e[h-1]=\"# \"+e[h-1],e.push(\"\")):(j=!0,e.push(\"\")):(i=!0,e.push(\"\")):(\"```\"==k&&(j=!1),e.push(\"\")):(\"~~~\"==k&&(i=!1),e.push(\"\"))}return e}function updateScrollPos(a){var b,c=a.value,d=a.selectionStart,e=a.selectionEnd;try{b=document.execCommand(\"insertText\",!1,\"X\")}catch(f){b=!1}if(b)a.value=c,a.selectionStart=d,a.selectionEnd=d,a.blur(),a.focus(),a.selectionStart=d,a.selectionEnd=e;else{var g=c.substring(0,d),h=c.substr(e);a.value=g+\"X\"+h,a.selectionStart=g.length,a.selectionEnd=g.length+1;document.execCommand(\"delete\",!1,null);a.value=c,a.selectionStart=d,a.selectionEnd=e}}function isEnable(a){return a&&(\"undefined\"==typeof a.disabled||0==a.disabled)}function isVisible(a){var b=a.currentStyle||document.defaultView.getComputedStyle(a,\"\");if(\"none\"==b.display)return!1;var c=\"body\"==a.tagName.toLowerCase()?null:a.parentNode;return c?isVisible(c):!0}function showBlock(a){a.style.display=\"block\"}function hide(a){a.style.display=\"none\"}!function(){var a=document.createElement(\"div\");void 0==a.innerText&&Object.defineProperty(HTMLElement.prototype,\"innerText\",{get:function(){return this.textContent},set:function(a){this.textContent=a}})}();try{new Blob([\"temp\"])}catch(e){setViewMode()}var ua=window.navigator.userAgent.toLowerCase();-1==ua.indexOf(\"chrome\")&&-1!=ua.indexOf(\"safari\")&&setViewMode(),updateKantanVersion(document.getElementById(\"kantanVersion\").value);var eventListeners=[];on(\"#updateButton\",\"click\",function(a){if(a.preventDefault(),!window.confirm(\"最新版にアップデートします。\\n不測の事態に備えて、現在編集中のドキュメントは保存しておくことをお勧めします。\\n\\n【OK】：アップデート実行(あと何回かダイアログが表示されます)\\n【キャンセル】：キャンセル\"))return!1;var b=document.createElement(\"script\");return b.src=\"http://tatesuke.github.io/KanTanMarkdown/kantanUpdate.js\",b[\"class\"]=\"kantanUpdateScript\",b.onerror=function(){alert(\"アップデートに失敗しました。\\nアップデート用のファイルにアクセスできませんでした。\\nインターネットに接続されていないか、サーバーダウンです\")},document.querySelector(\"#updateScriptArea\").appendChild(b),!1}),toKantanEditor(document.getElementById(\"editor\")),\"undefined\"!=typeof hljs&&marked.setOptions({highlight:function(a,b){return hljs.highlightAuto(a,[b]).value}}),isEnable(document.getElementById(\"toggleButton\"))&&\"\"==document.getElementById(\"editor\").innerHTML?toggleMode():doPreview(),doLayout(),on(window,\"resize\",doLayout);var editorScrollBarPos=0,caretStartPos=0,caretEndPos=0,isPreviewerOpened=!0;on(\"#toggleButton\",\"click\",toggleMode),on(\"#autoSyncButton\",\"change\",function(){1==this.checked?this.setAttribute(\"checked\",\"checked\"):this.removeAttribute(\"checked\")}),on(\"#syncButton\",\"click\",doPreview),on(\"#editor\",\"change\",queuePreview),on(\"#editor\",\"keyup\",queuePreview);var previewQueue=null,queuePreviewWait=300;on(\"#attachButton\",\"change\",function(a){var b=a.target,c=b.files;attachFiles(c)}),on(\"body\",\"dragover\",function(a){a.stopPropagation(),a.preventDefault(),a.dataTransfer.dropEffect=\"copy\",this.classList.add(\"onDragover\")}),on(\"body\",\"drop\",function(a){a.stopPropagation(),a.preventDefault(),attachFiles(a.dataTransfer.files),this.classList.remove(\"onDragover\")}),on(\"body\",\"dragleave\",function(a){this.classList.remove(\"onDragover\")});for(var onDetachButtonClicked=function(a){if(window.confirm(\"削除していいですか?\")){var b=a.target.parentNode;b.parentNode.removeChild(b),saved=!1}},fileNameElems=document.getElementsByClassName(\"fileName\"),i=0;i<fileNameElems.length;i++){var fileNameElem=fileNameElems[i],fileName=fileNameElem.previousElementSibling.getAttribute(\"title\");fileNameElem.value=fileName}var onFileNameChanged=function(a){var b=a.target;if(\"\"==b.value.trim())alert(\"名前は必ず入力してください\"),b.focus();else{var c=b.previousElementSibling;c.id=\"attach-\"+b.value,c.title=b.value,saved=!1,queuePreview()}};on(\"#attachToggleButton\",\"click\",function(){isVisible(document.getElementById(\"filer\"))?closeFiler():openFiler()}),on(\"#previewToggleButton\",\"click\",function(){isVisible(document.getElementById(\"previewer\"))?closePreview():openPreview()});var contentAtSave=editor.value;on(\"#saveButton\",\"click\",save);var saved=!0;window.onbeforeunload=function(){return saved?void 0:\"ドキュメントが保存されていません。\"},on(\"#editor\",\"input\",updateSavedFlag),on(\"#onlineMenuButton\",\"click\",function(){var a=document.getElementById(\"onlineMenu\");a.style.top=this.offsetTop+this.scrollHeight+\"px\",showBlock(a)}),on(\"body\",\"click\",function(a){var b=document.getElementById(\"onlineMenuButton\");a.target!=b&&hide(document.getElementById(\"onlineMenu\"))}),on(\"#headingSyncButton\",\"click\",headingSyncToPreviewer),on(\"#previewer\",\"previewed\",function(a){if(isVisible(document.getElementById(\"editor\")))for(var b=a.target.querySelectorAll(\"h1, h2, h3, h4, h5, h6\"),c=0;c<b.length;c++)b[c].onmouseover=function(){this.style.cursor=\"pointer\"},b[c].onclick=headingSyncToEditor}),on(\"#previewer\",\"prepreview\",function(a){for(var b=document.getElementById(\"previewer\").querySelectorAll(\"h1, h2, h3, h4, h5, h6\"),c=0;c<b.length;c++)b[c].onmouseover=null,b[c].onclick=null}),on(\"body\",\"keydown\",function(a){var b=a.keyCode?a.keyCode:a.which;if(27==b){a.preventDefault();var c=document.getElementById(\"onlineMenu\");if(isVisible(c))hide(c);else{var d=document.getElementById(\"toggleButton\");isEnable(d)&&d.click()}return!1}if(83==b&&(a.ctrlKey||a.metaKey)){a.preventDefault();var e=document.getElementById(\"saveButton\");return isEnable(e)&&e.click(),!1}if(116==b||82==b&&(a.ctrlKey||a.metaKey)){a.preventDefault();var f=document.getElementById(\"syncButton\");return isEnable(f)&&doPreview(),!1}if(112==b){a.preventDefault();var g=document.getElementById(\"helpButton\");return g.click(),!1}if(37==b&&a.altKey)return a.preventDefault(),openPreview(),!1;if(38==b&&a.altKey)return a.preventDefault(),closeFiler(),!1;if(39==b&&a.altKey)return a.preventDefault(),closePreview(),!1;if(40==b&&a.altKey)return a.preventDefault(),openFiler(),!1;if(113==b){a.preventDefault();var h=document.getElementById(\"headingSyncButton\");return h.click(),!1}return!0});\n" + 
+"function setViewOnly(){document.getElementById(\"messageArea\").innerText=\"このブラウザでは編集できません。\";for(var a=document.querySelectorAll(\"nav > *\"),b=0;b<a.length;b++)a[b].setAttribute(\"disabled\",\"disabled\")}function on(a,b,c){var d;d=\"string\"==typeof a?document.querySelector(a):a,d.addEventListener(b,c),eventListeners.push({element:d,eventName:b,callback:c})}function removeAllEvents(){for(var a=0;a<eventListeners.length;a++){var b=eventListeners[a].element,c=eventListeners[a].eventName,d=eventListeners[a].callback;b.removeEventListener(c,d)}eventListeners=[]}function updateKantanVersion(a){document.getElementById(\"kantanVersion\").value=a;for(var b=document.getElementById(\"kantanEdition\").value,c=document.getElementsByClassName(\"version\"),d=0;d<c.length;d++)c[d].innerText=a+\"_\"+b}function updateKantanEdition(a){document.getElementById(\"kantanEdition\").value=a}function kantanUpdate(a){a.doUpdate()}function doLayout(){var a=document.getElementById(\"wrapper\"),b=window.innerHeight-a.offsetTop-10;a.style.height=b+\"px\"}function toggleMode(){var a=document.getElementById(\"attach\"),b=document.getElementById(\"editorTabWrapper\"),c=document.getElementById(\"editor\"),d=document.getElementById(\"previewer\");if(isEditMode()&&(editorScrollBarPos=c.scrollTop,caretStartPos=c.selectionStart,caretEndPos=c.selectionEnd),isEditMode()){isPreviewerOpened=isVisible(d),0==isPreviewerOpened&&openPreview(),document.querySelector(\"body\").classList.add(\"previewMode\"),document.querySelector(\"body\").classList.remove(\"editMode\"),hide(a),hide(b),doPreview();for(var e=null,f=null,g=d.querySelectorAll(\"*\"),h=0;h<g.length;h++){var i=d.scrollTop-(g[h].offsetTop-d.offsetTop);(null==e||Math.abs(i)<Math.abs(e))&&(e=i,f=g[h])}doLayout(),d.focus(),f&&(wrapper.scrollTop=f.offsetTop-d.offsetTop+e)}else{document.querySelector(\"body\").classList.remove(\"previewMode\"),document.querySelector(\"body\").classList.add(\"editMode\"),showBlock(a),showBlock(b),doPreview();for(var e=null,f=null,g=d.querySelectorAll(\"*\"),h=0;h<g.length;h++){var i=wrapper.scrollTop-(g[h].offsetTop-d.offsetTop);(null==e||Math.abs(i)<Math.abs(e))&&(e=i,f=g[h])}0==isPreviewerOpened&&closePreview(),doLayout(),f&&(d.scrollTop=f.offsetTop-d.offsetTop+e)}isEditMode()&&(c.scrollTop=editorScrollBarPos,c.selectionStart=caretStartPos,c.selectionEnd=caretEndPos,c.focus())}function queuePreview(){var a=document.getElementById(\"autoSyncButton\");a.checked&&(clearTimeout(previewQueue),previewQueue=setTimeout(doPreview,queuePreviewWait))}function doPreview(){var a=document.getElementById(\"previewer\"),b=document.createEvent(\"Event\");b.initEvent(\"prepreview\",!0,!0),a.dispatchEvent(b);var c=isMaxScroll(\"previewer\");a.innerHTML=marked(editor.value);var d=document.querySelector(\"#previewerStyle\"),e=document.querySelector(\"#cssEditor\");d.innerHTML=e.value;var f=document.querySelector(\"h1\");f?document.title=f.textContent:document.title=\"無題\",0==saved&&(document.title=\"* \"+document.title);var g=document.getElementsByTagName(\"img\");for(k in g){var h=g[k],i=document.getElementById(\"attach-\"+h.name);null!=i&&(h.src=i.innerHTML)}if(\"undefined\"!=typeof Diagram)for(var j=document.getElementsByClassName(\"sequence\"),k=0;k<j.length;k++){var l=j[k],m=Diagram.parse(l.textContent);l.innerHTML=\"\",m.drawSVG(l,{theme:\"simple\"})}if(\"undefined\"!=typeof flowchart)for(var n=document.getElementsByClassName(\"flow\"),k=0;k<n.length;k++){var o=n[k],m=flowchart.parse(o.textContent);o.innerHTML=\"\",m.drawSVG(o)}a.style.border=\"1px solid gray\",1==c&&(a.scrollTop=a.scrollHeight);var b=document.createEvent(\"Event\");b.initEvent(\"previewed\",!0,!0),a.dispatchEvent(b)}function isMaxScroll(a){var b=document.getElementById(a),c=b.scrollHeight,d=b.clientHeight,e=b.scrollTop,f=c-(d+e);return f>=-1&&1>=f}function cssChanged(){saved=!1;var a=document.title;a.match(/^\\*/)||(document.title=\"* \"+a)}function attachFiles(a){for(var b=0;b<a.length;b++){var c=a[b],d=a[b].type;\"text/html\"==d?attachHtmlFile(c):attachFile(c)}}function attachFile(a){var b=new FileReader;b.fileName=a.name,b.onload=function(a){var b=a.target;addAttachFileElements(b.fileName,b.result)},b.readAsDataURL(a)}function attachHtmlFile(a){var b=new FileReader;b.fileName=a.name,b.onload=function(a){return function(b){var c=b.target.result,d=c.substring(23,c.length-8),e=document.createElement(\"html\");e.innerHTML=d;var f=e.querySelector(\"ul#fileList\"),g=e.querySelector(\"textarea#editor\");f&&g?showImportDialog(\"かんたんMarkdownのファイルを検出しました。どの項目をインポートしますか？\",function(b){1==b.result?importKantanMarkdown(b,e,a):attachFile(a)}):attachFile(a)}}(a),b.readAsText(a)}function importKantanMarkdown(a,b,c){if(1==a.attach){for(var d=b.querySelector(\"ul#fileList\"),e=(document.getElementById(\"fileList\"),d.querySelectorAll(\"script\")),f=0;f<e.length;f++){var g=e[f],h=g.title,i=g.innerHTML;addAttachFileElements(h,i)}saved=!1}if(1==a.markdown){var j=b.querySelector(\"textarea#editor\"),k=document.getElementById(\"editor\");k.value=k.value+j.value,saved=!1}if(1==a.css){var l=b.querySelector(\"#previewerStyle\");if(l){var m=document.getElementById(\"cssEditor\");m.value=m.textContent+l.innerHTML,saved=!1}}doPreview()}function showImportDialog(a,b){document.getElementById(\"saveButton\").disabled=!0,document.getElementById(\"importDialogMessage\").innerText=a;var c=document.getElementById(\"importDialog\");c.querySelector(\"form\").reset(),document.getElementById(\"importDialogOkButton\").onclick=function(a){a.preventDefault(),hide(c);var d={result:!0,attach:document.getElementById(\"importDialogAttach\").checked,markdown:document.getElementById(\"importDialogMarkdown\").checked,css:document.getElementById(\"importDialogCss\").checked};return b(d),document.getElementById(\"importDialogOkButton\")&&(document.getElementById(\"importDialogOkButton\").onclick=null),document.getElementById(\"importDialogCancelButton\")&&document.getElementById(\"importDialogCancelButton\").onclick,document.getElementById(\"saveButton\")&&(document.getElementById(\"saveButton\").disabled=!1),!1},document.getElementById(\"importDialogCancelButton\").onclick=function(a){return a.preventDefault(),hide(c),b({result:!1}),delete document.getElementById(\"importDialogOkButton\").onclick,delete document.getElementById(\"importDialogCancelButton\").onclick,document.getElementById(\"saveButton\").disabled=!1,!1},showBlock(c);var d=document.querySelector(\"body\");c.style.top=\"10px\",c.style.left=d.offsetWidth/2-c.offsetWidth/2+\"px\"}function addAttachFileElements(a,b){var c=document.createElement(\"li\"),d=document.createElement(\"script\");d.type=\"text/template\",d.id=\"attach-\"+a,d.title=a,d.innerHTML=b,c.appendChild(d);var e=document.createElement(\"input\");e.type=\"text\",e.classList.add(\"fileName\"),e.value=a,on(e,\"change\",onFileNameChanged),c.appendChild(e);var f=document.createElement(\"button\");f.classList.add(\"detachButton\"),f.innerHTML=\"×\",on(f,\"click\",onDetachButtonClicked),c.appendChild(f),document.getElementById(\"fileList\").appendChild(c);var g=(document.getElementById(\"editor\"),document.getElementById(\"toggleButton\")),h=document.getElementById(\"filer\");isEditMode()||g.click(),isVisible(h)||openFiler(),queuePreview()}function openFiler(){document.getElementById(\"attachToggleButton\").innerText=\"添付ファイルを隠す(Alt+↑)\",showBlock(document.getElementById(\"attachForm\")),showBlock(document.getElementById(\"filer\")),doLayout()}function closeFiler(){document.getElementById(\"attachToggleButton\").innerText=\"添付ファイルを表示(Alt+↓)\",hide(document.getElementById(\"attachForm\")),hide(document.getElementById(\"filer\")),doLayout()}function openPreview(){var a=document.getElementById(\"editorTabWrapper\"),b=document.getElementById(\"previewer\");isEditMode()&&!isVisible(b)&&(document.getElementById(\"previewToggleButton\").innerText=\"プレビューを隠す(Alt+→)\",a.classList.remove(\"fullWidth\"),showBlock(b),doLayout())}function closePreview(){var a=document.getElementById(\"editorTabWrapper\"),b=document.getElementById(\"previewer\");isEditMode()&&isVisible(b)&&(document.getElementById(\"previewToggleButton\").innerText=\"プレビューを表示(Alt+←)\",a.classList.add(\"fullWidth\"),hide(b),doLayout())}function save(){var a=document.getElementById(\"wrapper\").scrollTop,b=document.getElementById(\"previewer\").scrollTop;document.querySelector(\"#updateScriptArea\").innerHTML=\"\";var c=document.getElementById(\"editor\");c.innerHTML=c.value.replace(/</g,\"&lt;\");var d=isEditMode();1==d&&toggleMode(),document.getElementById(\"previewer\").innerHTML=\"\",document.getElementById(\"messageArea\").innerHTML=\"\";var e=\"<!doctype html>\\n<html>\\n\";e+=document.getElementsByTagName(\"html\")[0].innerHTML;var f=e.lastIndexOf(\"/script>\");e=e.substring(0,f),e+=\"/script>\\n</body>\\n</html>\";var g=new Blob([e]);if(window.navigator.msSaveBlob)window.navigator.msSaveBlob(g,document.title+\".html\");else{var h=window.URL||window.webkitURL,i=h.createObjectURL(g),j=document.createElement(\"a\");j.download=document.title.replace(/^\\* /,\"\")+\".html\",j.href=i;var k=document.createEvent(\"MouseEvents\");k.initMouseEvent(\"click\",!0,!1,self,0,0,0,0,0,!1,!1,!1,!1,0,null),j.dispatchEvent(k),delete j}contentAtSave=c.value,saved=!0,doPreview(),1==d&&toggleMode(),document.getElementById(\"previewer\").scrollTop=b,document.getElementById(\"wrapper\").scrollTop=a}function updateSavedFlag(){saved=contentAtSave==document.getElementById(\"editor\").value}function headingSyncToPreviewer(){var a=document.getElementById(\"editor\"),b=document.getElementById(\"previewer\"),c=getCurrentNumberOfHeading(a);scrollPreviewerToHeading(b,c)}function headingSyncToEditor(a){var b=document.getElementById(\"editor\"),c=document.getElementById(\"previewer\"),d=getNumberOfHeading(c,a.target);scrollEditorToHeading(b,d)}function getNumberOfHeading(a,b){var c,d=a.querySelectorAll(\"h1, h2, h3, h4, h5, h6\");for(c=0;c<d.length&&d[c]!=b;c++);return c+1}function scrollEditorToHeading(a,b){for(var c,d=a.value,e=processForHeadingSync(d,d.length),f=0,c=0;c<e.length;c++){var g=e[c];if(g.match(/^# .+$/)&&(f++,f==b))break}var h=0;if(0!=c){var i=0;for(h=0;h<d.length;h++){var j=d.charAt(h);if(\"\\n\"==j&&(i++,i==c)){h++;break}}}var k=a.value.indexOf(\"\\n\",h);k=-1==k?a.value.length:k,a.selectionStart=h,a.selectionEnd=k,updateScrollPos(a),updateSavedFlag(),a.focus()}function getCurrentNumberOfHeading(a){for(var b=a.value,c=a.selectionStart,d=0;c<b.length&&2>d;)\"\\n\"==b.charAt(c)&&d++,c++;c--;var e=processForHeadingSync(b,c);return 2==d&&e[e.length-1].match(/^#{1,6}\\s(.+)$/)&&e.pop(),e.join().split(\"# \").length-1}function scrollPreviewerToHeading(a,b){if(0==b)a.scrollTop=0;else{var c=a.querySelectorAll(\"h1, h2, h3, h4, h5, h6\"),d=c[b-1];a.scrollTop=d.offsetTop-a.offsetTop}}function processForHeadingSync(a,b){var c=a.substring(0,b),d=c.split(\"\\n\"),e=[],f=editor.currentStyle||document.defaultView.getComputedStyle(editor,\"\"),g=f.tabSize||f.MozTabSize||8;g=Number(g);var h,i=!1,j=!1;for(h=0;h<d.length;h++){var k=d[h];k=k.replace(new RegExp(\"^ {\"+g+\",}.*\"),\"\"),k=k.replace(/^\\t+.*/,\"\"),k=k.replace(/^\\s+|\\s+$/g,\"\"),1!=i?1!=j?\"~~~\"!=k.substring(0,3)?\"```\"!=k.substring(0,3)?!k.match(/^={2,}$|^-{2,}$/)||e[h-1].match(/^#{1,6}\\s(.+)$/)||\"\"==e[h-1]?k.match(/^#{1,6}\\s(.+)$/)?e.push(\"# \"+RegExp.$1):e.push(k.replace(/#/g,\"\")):(e[h-1]=\"# \"+e[h-1],e.push(\"\")):(j=!0,e.push(\"\")):(i=!0,e.push(\"\")):(\"```\"==k&&(j=!1),e.push(\"\")):(\"~~~\"==k&&(i=!1),e.push(\"\"))}return e}function updateScrollPos(a){var b,c=a.value,d=a.selectionStart,e=a.selectionEnd;try{b=document.execCommand(\"insertText\",!1,\"X\")}catch(f){b=!1}if(b)a.value=c,a.selectionStart=d,a.selectionEnd=d,a.blur(),a.focus(),a.selectionStart=d,a.selectionEnd=e;else{var g=c.substring(0,d),h=c.substr(e);a.value=g+\"X\"+h,a.selectionStart=g.length,a.selectionEnd=g.length+1;document.execCommand(\"delete\",!1,null);a.value=c,a.selectionStart=d,a.selectionEnd=e}}function showMarkdown(){var a=document.querySelector(\"#markdownTab\").parentNode;a.classList.add(\"selected\");var b=document.querySelector(\"#editor\");showBlock(b),b.focus();var c=document.querySelector(\"#cssTab\").parentNode;c.classList.remove(\"selected\");var d=document.querySelector(\"#cssEditor\");hide(d)}function showCss(){var a=document.querySelector(\"#markdownTab\").parentNode;a.classList.remove(\"selected\");document.querySelector(\"#editor\");hide(document.querySelector(\"#editor\"));var b=document.querySelector(\"#cssTab\").parentNode;b.classList.add(\"selected\");var c=document.querySelector(\"#cssEditor\");showBlock(c),c.focus()}function isEditMode(){return document.querySelector(\"body\").classList.contains(\"editMode\")}function isEnable(a){return a&&(\"undefined\"==typeof a.disabled||0==a.disabled)}function isVisible(a){var b=a.currentStyle||document.defaultView.getComputedStyle(a,\"\");if(\"none\"==b.display)return!1;var c=\"body\"==a.tagName.toLowerCase()?null:a.parentNode;return c?isVisible(c):!0}function showBlock(a){a.classList.add(\"showBlock\"),a.classList.remove(\"hide\")}function hide(a){a.classList.remove(\"showBlock\"),a.classList.add(\"hide\")}!function(){var a=document.createElement(\"div\");void 0==a.innerText&&Object.defineProperty(HTMLElement.prototype,\"innerText\",{get:function(){return this.textContent},set:function(a){this.textContent=a}})}();try{new Blob([\"temp\"])}catch(e){setViewOnly()}var ua=window.navigator.userAgent.toLowerCase();-1==ua.indexOf(\"chrome\")&&-1!=ua.indexOf(\"safari\")&&setViewOnly(),updateKantanVersion(document.getElementById(\"kantanVersion\").value);var eventListeners=[];on(\"#updateButton\",\"click\",function(a){if(a.preventDefault(),!window.confirm(\"最新版にアップデートします。\\n不測の事態に備えて、現在編集中のドキュメントは保存しておくことをお勧めします。\\n\\n【OK】：アップデート実行(あと何回かダイアログが表示されます)\\n【キャンセル】：キャンセル\"))return!1;var b=document.createElement(\"script\");return b.src=\"http://tatesuke.github.io/KanTanMarkdown/kantanUpdate.js\",b[\"class\"]=\"kantanUpdateScript\",b.onerror=function(){alert(\"アップデートに失敗しました。\\nアップデート用のファイルにアクセスできませんでした。\\nインターネットに接続されていないか、サーバーダウンです\")},document.querySelector(\"#updateScriptArea\").appendChild(b),!1}),toKantanEditor(document.getElementById(\"editor\")),toKantanEditor(document.getElementById(\"cssEditor\")),\"undefined\"!=typeof hljs&&marked.setOptions({highlight:function(a,b){return hljs.highlightAuto(a,[b]).value}}),document.querySelector(\"body\").classList.add(\"previewMode\"),document.querySelector(\"body\").classList.remove(\"editMode\"),document.querySelector(\"#cssEditor\").value=document.querySelector(\"#previewerStyle\").innerHTML.trim(),document.querySelector(\"#cssEditor\").selectionStart=0,document.querySelector(\"#cssEditor\").selectionEnd=0,isEnable(document.getElementById(\"toggleButton\"))&&\"\"==document.getElementById(\"editor\").innerHTML?toggleMode():doPreview(),doLayout(),on(window,\"resize\",doLayout);var editorScrollBarPos=0,caretStartPos=0,caretEndPos=0,isPreviewerOpened=!0;on(\"#toggleButton\",\"click\",toggleMode),on(\"#autoSyncButton\",\"change\",function(){1==this.checked?this.setAttribute(\"checked\",\"checked\"):this.removeAttribute(\"checked\")}),on(\"#syncButton\",\"click\",doPreview),on(\"#editor\",\"change\",queuePreview),on(\"#editor\",\"keyup\",queuePreview);var previewQueue=null,queuePreviewWait=300;on(\"#cssEditor\",\"change\",cssChanged),on(\"#cssEditor\",\"keyup\",cssChanged),on(\"#attachButton\",\"change\",function(a){var b=a.target,c=b.files;attachFiles(c)}),on(\"body\",\"dragover\",function(a){a.stopPropagation(),a.preventDefault(),a.dataTransfer.dropEffect=\"copy\",this.classList.add(\"onDragover\")}),on(\"body\",\"drop\",function(a){a.stopPropagation(),a.preventDefault(),attachFiles(a.dataTransfer.files),this.classList.remove(\"onDragover\")}),on(\"body\",\"dragleave\",function(a){this.classList.remove(\"onDragover\")});for(var onDetachButtonClicked=function(a){if(window.confirm(\"削除していいですか?\")){var b=a.target.parentNode;b.parentNode.removeChild(b),saved=!1}},fileNameElems=document.getElementsByClassName(\"fileName\"),i=0;i<fileNameElems.length;i++){var fileNameElem=fileNameElems[i],fileName=fileNameElem.previousElementSibling.getAttribute(\"title\");fileNameElem.value=fileName}var onFileNameChanged=function(a){var b=a.target;if(\"\"==b.value.trim())alert(\"名前は必ず入力してください\"),b.focus();else{var c=b.previousElementSibling;c.id=\"attach-\"+b.value,c.title=b.value,saved=!1,queuePreview()}};on(\"#attachToggleButton\",\"click\",function(){isVisible(document.getElementById(\"filer\"))?closeFiler():openFiler()}),on(\"#previewToggleButton\",\"click\",function(){isVisible(document.getElementById(\"previewer\"))?closePreview():openPreview()});var contentAtSave=editor.value;on(\"#saveButton\",\"click\",save);var saved=!0;window.onbeforeunload=function(){return saved?void 0:\"ドキュメントが保存されていません。\"},on(\"#editor\",\"input\",updateSavedFlag),on(\"#onlineMenuButton\",\"click\",function(){var a=document.getElementById(\"onlineMenu\");a.style.top=this.offsetTop+this.scrollHeight+\"px\",showBlock(a)}),on(\"body\",\"click\",function(a){var b=document.getElementById(\"onlineMenuButton\");a.target!=b&&hide(document.getElementById(\"onlineMenu\"))}),on(\"#headingSyncButton\",\"click\",headingSyncToPreviewer),on(\"#previewer\",\"previewed\",function(a){if(isEditMode())for(var b=a.target.querySelectorAll(\"h1, h2, h3, h4, h5, h6\"),c=0;c<b.length;c++)b[c].onmouseover=function(){this.style.cursor=\"pointer\"},b[c].onclick=headingSyncToEditor}),on(\"#previewer\",\"prepreview\",function(a){for(var b=document.getElementById(\"previewer\").querySelectorAll(\"h1, h2, h3, h4, h5, h6\"),c=0;c<b.length;c++)b[c].onmouseover=null,b[c].onclick=null}),on(\"#markdownTab\",\"click\",function(a){return a.preventDefault(),showMarkdown(),!1}),on(\"#cssTab\",\"click\",function(a){return a.preventDefault(),showCss(a),!1}),on(\"body\",\"keydown\",function(a){var b=a.keyCode?a.keyCode:a.which;if(27==b){a.preventDefault();var c=document.getElementById(\"onlineMenu\");if(isVisible(c))hide(c);else{var d=document.getElementById(\"toggleButton\");isEnable(d)&&d.click()}return!1}if(83==b&&(a.ctrlKey||a.metaKey)){a.preventDefault();var e=document.getElementById(\"saveButton\");return isEnable(e)&&e.click(),!1}if(116==b||82==b&&(a.ctrlKey||a.metaKey)){a.preventDefault();var f=document.getElementById(\"syncButton\");return isEnable(f)&&f.click(),!1}if(112==b){a.preventDefault();var g=document.getElementById(\"helpButton\");return g.click(),!1}if(37==b&&a.altKey)return a.preventDefault(),openPreview(),!1;if(38==b&&a.altKey)return a.preventDefault(),closeFiler(),!1;if(39==b&&a.altKey)return a.preventDefault(),closePreview(),!1;if(40==b&&a.altKey)return a.preventDefault(),openFiler(),!1;if(113==b){a.preventDefault();var h=document.getElementById(\"headingSyncButton\");return h.click(),!1}return!0});\n" + 
 "</script>\n" + 
 "</body>\n" + 
 "",
 	"doUpdate": function() {
 		var kantanVersion = document.getElementById("kantanVersion").value;
 		if (kantanVersion == this.newVersion) {
-			alert("お使いのKantanMarkdownは最新です。アップデートの必要はありません。");
-			return;
+			var confirm = window.confirm("お使いのKantanMarkdownは最新です。それでも強制的にアップデートを実行しますか？");		
+			if (confirm == false) {
+				return;
+			}
 		}
 		
 		showImportDialog(
 				"アップデートを適用できます。\n" +
 				"\n" +
-				"現在ご利用のバージョン: " + kantanVersion + "\n" +
-				"新しいバージョン　　　: " + this.newVersion + "\n" +
+				"現在ご利用のバージョン：\t" + kantanVersion + "\n" +
+				"新しいバージョン　　　：\t" + this.newVersion + "\n" +
 				"\n" + 
 				"新バージョンに引き継ぐ項目を選んでください。", (function (parent) {
 
@@ -523,8 +664,9 @@ kantanUpdate({
 	},
 	"rewirteHtml":function(dialogResult) {
 		// アップデート前の値を記憶しておく
-		var fileListElement = document.querySelector("ul#fileList");
-		var originalMarkdown = document.querySelector("textarea#editor").value;
+		var fileListElement  = document.querySelector("#fileList");
+		var originalMarkdown = document.querySelector("#editor");
+		var originalCss      = document.querySelector("#cssEditor");
 		
 		// エディションを読み込み
 		var kantanEdition = document.querySelector("#kantanEdition").value;
@@ -591,8 +733,15 @@ kantanUpdate({
 		
 		// Markdown引継ぎ
 		if (dialogResult.markdown == true) {
-			var editor = document.getElementById("editor");
-			editor.value = originalMarkdown;
+			var editor = document.querySelector("#editor");
+			editor.value = originalMarkdown.value;
+			saved = false;
+		}
+		
+		// CSS引継ぎ
+		if ((dialogResult.css == true) && originalCss) {
+			var cssEditor = document.querySelector("#cssEditor");
+			cssEditor.value = originalCss.value;
 			saved = false;
 		}
 		

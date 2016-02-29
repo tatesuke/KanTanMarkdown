@@ -7,10 +7,8 @@
  * http://opensource.org/licenses/mit-license.php
  --><head>
 <meta charset="utf-8">
-<style>
-<inline src="css/kantan.css" />
-</style>
-<style id="previewerCss">
+<style><inline src="css/kantan.css" /></style>
+<style id="previewerStyle">
 <inline src="css/previewer.css" />
 <inline src="css/hljs.css" />
 </style>
@@ -37,7 +35,16 @@
 </div>
 <div id="wrapper">
 	<noscript>このファイルはJavaScriptを有効にしないと閲覧できません。</noscript>
-	<textarea id="editor"></textarea>
+	<div id="editorTabWrapper">
+		<div id="editorTabContents">
+			<textarea id="editor"></textarea>
+			<textarea id="cssEditor"></textarea>
+		</div>
+		<ol id="editorTabs">
+			<li class="selected"><a href="#" id="markdownTab">Markdown</a></li>
+			<li><a href="#" id="cssTab">CSS</a></li>
+		</ol>
+	</div>
 	<div id="previewer" tabIndex="-1"></div>
 </div>
 <div id="onlineMenu">
@@ -52,9 +59,9 @@
 	<p id="importDialogMessage"></p>
 	<form>
 	<ul>
-		<li><input type="checkBox" checked="checked" id="importDialogAttach"><label for="importDialogAttach">添付ファイル</label></li>
-		<li><input type="checkBox" checked="checked" id="importDialogMarkdown"><label for="importDialogMarkdown">Markdown</label></li>
-		<!--<li><input type="checkBox" checked="checked" id="importDialogCss"><label for="importDialogCss">CSS</label></li>-->
+		<li><input type="checkBox" checked="checked" id="importDialogAttach"><label for="importDialogAttach">添付ファイル(末尾に挿入)</label></li>
+		<li><input type="checkBox" checked="checked" id="importDialogMarkdown"><label for="importDialogMarkdown">Markdown(末尾に挿入)</label></li>
+		<li><input type="checkBox" id="importDialogCss"><label for="importDialogCss">CSS(上書き)</label></li>
 	</ul>
 	<ul class="buttonArea">
 		<li><button id="importDialogOkButton">OK</button></li>

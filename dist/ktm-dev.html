@@ -7,14 +7,13 @@
  * http://opensource.org/licenses/mit-license.php
  --><head>
 <meta charset="utf-8">
-<style>
-body {
+<style>body {
 	margin: 0;
 	padding: 0;
 	position:relative;
 }
 
-.onDragover {
+body .onDragover {
 	border : 5px dashed #99cde1;
 }
 
@@ -22,11 +21,11 @@ nav {
 	margint:0;
 }
 
-#leftNav{
+nav #leftNav{
 	float:left;
 }
 
-#rightNav {
+nav #rightNav {
 	float:right;
 }
 
@@ -45,18 +44,18 @@ nav:after {
 	border-bottom:1px solid gray;
 	display:none;
 }
-#attachForm {
+#attach #attachForm {
 	box-sizing:border-box;
 	width:100%;
 	height:100%;
 	display:none;
 }
 
-input[type="file"] {
+#attach #attachForm input[type="file"] {
 	width:100%;
 }
 
-#filer{
+#attach #filer{
 	box-sizing:border-box;
 	width:100%;
 	height:150px;
@@ -64,8 +63,8 @@ input[type="file"] {
 	display:none;
 }
 
-#attachToggleButton,
-#previewToggleButton{
+#attach #attachToggleButton,
+#attach #previewToggleButton{
 	width: 50%;
 }
 
@@ -73,28 +72,96 @@ input[type="file"] {
 	overflow: auto;
 }
 
-#editor {
+#wrapper #editorTabWrapper {
 	box-sizing:border-box;
-	resize:none; 
 	width:50%;
 	height:100%;
 	float:left;
 	border-top:none;
 	display:none;
+	margin: 0;
+	padding: 0;
+}
+
+#wrapper #editorTabWrapper #editorTabContents {
+	box-sizing:border-box;
+	width: 100%;
+	height: calc(100% - 20px); /* #editorTabの高さと合わせる */
+	marign: 0;
+	padding: 0;
+}
+
+#wrapper #editorTabWrapper #editorTabContents #editor,
+#wrapper #editorTabWrapper #editorTabContents #cssEditor{
+	box-sizing:border-box;
+	resize:none; 
+	width: 100%;
+	height:100%;
 	-moz-tab-size: 4;
 	-o-tab-size: 4;
 	tab-size: 4;
-	border:1px solid gray;
 	margin: 0;
+}
+
+#wrapper #editorTabWrapper #editorTabContents #cssEditor {
+	display:none;
+}
+
+#wrapper #editorTabWrapper #editorTabs {
+	box-sizing:border-box;
+	border:0;
+	width: 100%;
+	height:20px; /* #editorTabContentsの高さと合わせる */
+	margin: 0;
+	padding: 0;
+}
+
+#wrapper #editorTabWrapper #editorTabs li {
+	box-sizing:border-box;
+	list-style: none;
+	float:left;
+	width:50%;
+	height:100%;
+	text-align:center;
+	margin-left:0;
+	border-top:0;
+	border-right:1px solid gray;
+	border-bottom:1px solid gray;
+	border-left:1px solid gray;
+	border-radius: 0 0 10px 10px/0 0 10px 10px;
+}
+
+#wrapper #editorTabWrapper #editorTabs li a {
+	display:block;
+	width:100%;
+	height:100%;
+	text-decoration:none;
+	color:black;
+}
+
+#wrapper #editorTabWrapper #editorTabs li.selected {
+	background-color:#7a9cd3;
+}
+
+#wrapper #editorTabWrapper.fullWidth {
+	width:100%;
 }
 
 #previewer {
 	box-sizing:border-box;
-	width:100%;
 	margin: 0 auto;
+	height:auto;
 	overflow:auto;
-	word-wrap: break-word;
-	border:1px solid gray;
+}
+
+.previewMode #previewer {
+	height: auto;
+	overflow:auto;
+}
+
+.editMode #previewer {
+	width:50%;
+	height:100%;
 }
 
 #previewer:empty {
@@ -180,300 +247,437 @@ input[type="file"] {
 	padding-right:  20px;
 }
 
-@media print{
-	nav {
-		display:none;
-	}
+.showBlock {
+	display:block !important;
+}
 
-	#wrapper {
-		overflow: visible;
-	}
-	
-	#previewer {
-		border: 0;
-	}
+.hide {
+	display: none  !important;
+}
+
+@media print {
+  nav {
+  	display:none;
+  }
+  #previewer {
+  	border:0 !important;
+  	margin:0 !important;
+  	padding:0 !important;
+  }
 }
 </style>
-<style id="previewerCss">
+<style id="previewerStyle">
+/*
+ * CSSの設定を間違えると、最悪の場合
+ * 内容を編集できなくなるので注意してください。
+ * 標準のCSSに戻したいときはCSSを引き継がずに強制アップデートしてください
+ * また、CSSの変更はプレビューしないと反映しません。
+ */
+ 
+.previewMode #previewer {
+    width: 980px;
+}
 #previewer {
-  font-family: Helvetica, arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.6;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  background-color: white;
-  padding: 45px; }
+    word-wrap: break-word;
+    border: 1px solid gray;
+    font-family: Helvetica, arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    background-color: white;
+    padding: 45px;
+}
 #previewer > *:first-child {
-  margin-top: 0 !important; }
+    margin-top: 0 !important;
+}
 #previewer > *:last-child {
-  margin-bottom: 0 !important; }
+    margin-bottom: 0 !important;
+}
 a {
-  color: #4183C4; }
+    color: #4183C4;
+}
 a.absent {
-  color: #cc0000; }
+    color: #cc0000;
+}
 a.anchor {
-  display: block;
-  padding-left: 30px;
-  margin-left: -30px;
-  cursor: pointer;
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0; }
-h1, h2, h3, h4, h5, h6 {
-  margin: 20px 0 10px;
-  padding: 0;
-  font-weight: bold;
-  -webkit-font-smoothing: antialiased;
-  cursor: text;
-  position: relative; }
-h1:hover a.anchor, h2:hover a.anchor, h3:hover a.anchor, h4:hover a.anchor, h5:hover a.anchor, h6:hover a.anchor {
-  background: url("para.png") no-repeat 10px center;
-  text-decoration: none; }
-h1 tt, h1 code {
-  font-size: inherit; }
-h2 tt, h2 code {
-  font-size: inherit; }
-h3 tt, h3 code {
-  font-size: inherit; }
-h4 tt, h4 code {
-  font-size: inherit; }
-h5 tt, h5 code {
-  font-size: inherit; }
-h6 tt, h6 code {
-  font-size: inherit; }
-h1 {
-  font-size: 28px;
-  color: black; }
-h2 {
-  font-size: 24px;
-  border-bottom: 1px solid #cccccc;
-  color: black; }
-h3 {
-  font-size: 18px; }
-h4 {
-  font-size: 16px; }
-h5 {
-  font-size: 14px; }
+    display: block;
+    padding-left: 30px;
+    margin-left: -30px;
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
 h6 {
-  color: #777777;
-  font-size: 14px; }
-p, blockquote, ul, ol, dl, li:first, table, pre {
-  margin: 15px 0; }
+    margin: 20px 0 10px;
+    padding: 0;
+    font-weight: bold;
+    -webkit-font-smoothing: antialiased;
+    cursor: text;
+    position: relative;
+}
+h1:hover a.anchor,
+h2:hover a.anchor,
+h3:hover a.anchor,
+h4:hover a.anchor,
+h5:hover a.anchor,
+h6:hover a.anchor {
+    background: url("para.png") no-repeat 10px center;
+    text-decoration: none;
+}
+h1 tt,
+h1 code {
+    font-size: inherit;
+}
+h2 tt,
+h2 code {
+    font-size: inherit;
+}
+h3 tt,
+h3 code {
+    font-size: inherit;
+}
+h4 tt,
+h4 code {
+    font-size: inherit;
+}
+h5 tt,
+h5 code {
+    font-size: inherit;
+}
+h6 tt,
+h6 code {
+    font-size: inherit;
+}
+h1 {
+    font-size: 28px;
+    color: black;
+}
+h2 {
+    font-size: 24px;
+    border-bottom: 1px solid #cccccc;
+    color: black;
+}
+h3 {
+    font-size: 18px;
+}
+h4 {
+    font-size: 16px;
+}
+h5 {
+    font-size: 14px;
+}
+h6 {
+    color: #777777;
+    font-size: 14px;
+}
+p,
+blockquote,
+ul,
+ol,
+dl,
+li:first,
+table,
+pre {
+    margin: 15px 0;
+}
 hr {
-  background-color: #e7e7e7;
-  border: 0 none;
-  height: 4px;
-  padding: 0; }
+    background-color: #e7e7e7;
+    border: 0 none;
+    height: 4px;
+    padding: 0;
+}
 #previewer > h2:first-child {
-  margin-top: 0;
-  padding-top: 0; }
-#previewer > h1:first-child {
-  margin-top: 0;
-  padding-top: 0; }
-  #previewer > h1:first-child + h2 {
     margin-top: 0;
-    padding-top: 0; }
-#previewer > h3:first-child, #previewer > h4:first-child, #previewer > h5:first-child, #previewer > h6:first-child {
-  margin-top: 0;
-  padding-top: 0; }
-a:first-child h1, a:first-child h2, a:first-child h3, a:first-child h4, a:first-child h5, a:first-child h6 {
-  margin-top: 0;
-  padding-top: 0; }
-h1 p, h2 p, h3 p, h4 p, h5 p, h6 p {
-  margin-top: 0; }
+    padding-top: 0;
+}
+#previewer > h1:first-child {
+    margin-top: 0;
+    padding-top: 0;
+}
+#previewer > h1:first-child + h2 {
+    margin-top: 0;
+    padding-top: 0;
+}
+#previewer > h3:first-child,
+#previewer > h4:first-child,
+#previewer > h5:first-child,
+#previewer > h6:first-child {
+    margin-top: 0;
+    padding-top: 0;
+}
+a:first-child h1,
+a:first-child h2,
+a:first-child h3,
+a:first-child h4,
+a:first-child h5,
+a:first-child h6 {
+    margin-top: 0;
+    padding-top: 0;
+}
+h1 p,
+h2 p,
+h3 p,
+h4 p,
+h5 p,
+h6 p {
+    margin-top: 0;
+}
 li p.first {
-  display: inline-block; }
-ul, ol {
-  padding-left: 30px; }
-ul :first-child, ol :first-child {
-  margin-top: 0; }
-ul :last-child, ol :last-child {
-  margin-bottom: 0; }
+    display: inline-block;
+}
+ul,
+ol {
+    padding-left: 30px;
+}
+ul:first-child,
+ol:first-child {
+    margin-top: 0;
+}
+ul:last-child,
+ol:last-child {
+    margin-bottom: 0;
+}
 dl {
-  padding: 0; }
-  dl dt {
+    padding: 0;
+}
+dl dt {
     font-size: 14px;
     font-weight: bold;
     font-style: italic;
     padding: 0;
-    margin: 15px 0 5px; }
-    dl dt:first-child {
-      padding: 0; }
-    dl dt > :first-child {
-      margin-top: 0; }
-    dl dt > :last-child {
-      margin-bottom: 0; }
-  dl dd {
+    margin: 15px 0 5px;
+}
+dl dt:first-child {
+    padding: 0;
+}
+dl dt >:first-child {
+    margin-top: 0;
+}
+dl dt >:last-child {
+    margin-bottom: 0;
+}
+dl dd {
     margin: 0 0 15px;
-    padding: 0 15px; }
-    dl dd > :first-child {
-      margin-top: 0; }
-    dl dd > :last-child {
-      margin-bottom: 0; }
+    padding: 0 15px;
+}
+dl dd >:first-child {
+    margin-top: 0;
+}
+dl dd >:last-child {
+    margin-bottom: 0;
+}
 blockquote {
-  border-left: 4px solid #dddddd;
-  padding: 0 15px;
-  color: #777777; }
-  blockquote > :first-child {
-    margin-top: 0; }
-  blockquote > :last-child {
-    margin-bottom: 0; }
+    border-left: 4px solid #dddddd;
+    padding: 0 15px;
+    color: #777777;
+}
+blockquote >:first-child {
+    margin-top: 0;
+}
+blockquote >:last-child {
+    margin-bottom: 0;
+}
 table {
-  border-collapse : collapse; 
-  padding: 0; }
-  table tr {
+    border-collapse: collapse;
+    padding: 0;
+}
+table tr {
     border-top: 1px solid #cccccc;
     background-color: white;
     margin: 0;
-    padding: 0; }
-    table tr:nth-child(2n) {
-      background-color: #f8f8f8; }
-    table tr th {
-      font-weight: bold;
-      border: 1px solid #cccccc;
-      text-align: left;
-      margin: 0;
-      padding: 6px 13px; }
-    table tr td {
-      border: 1px solid #cccccc;
-      text-align: left;
-      margin: 0;
-      padding: 6px 13px; }
-    table tr th :first-child, table tr td :first-child {
-      margin-top: 0; }
-    table tr th :last-child, table tr td :last-child {
-      margin-bottom: 0; }
+    padding: 0;
+}
+table tr:nth-child(2n) {
+    background-color: #f8f8f8;
+}
+table tr th {
+    font-weight: bold;
+    border: 1px solid #cccccc;
+    text-align: left;
+    margin: 0;
+    padding: 6px 13px;
+}
+table tr td {
+    border: 1px solid #cccccc;
+    text-align: left;
+    margin: 0;
+    padding: 6px 13px;
+}
+table tr th:first-child,
+table tr td:first-child {
+    margin-top: 0;
+}
+table tr th:last-child,
+table tr td:last-child {
+    margin-bottom: 0;
+}
 img {
-  max-width: 100%; }
+    max-width: 100%;
+}
 span.frame {
-  display: block;
-  overflow: hidden; }
-  span.frame > span {
+    display: block;
+    overflow: hidden;
+}
+span.frame > span {
     border: 1px solid #dddddd;
     display: block;
     float: left;
     overflow: hidden;
     margin: 13px 0 0;
     padding: 7px;
-    width: auto; }
-  span.frame span img {
+    width: auto;
+}
+span.frame span img {
     display: block;
-    float: left; }
-  span.frame span span {
+    float: left;
+}
+span.frame span span {
     clear: both;
     color: #333333;
     display: block;
-    padding: 5px 0 0; }
+    padding: 5px 0 0;
+}
 span.align-center {
-  display: block;
-  overflow: hidden;
-  clear: both; }
-  span.align-center > span {
+    display: block;
+    overflow: hidden;
+    clear: both;
+}
+span.align-center > span {
     display: block;
     overflow: hidden;
     margin: 13px auto 0;
-    text-align: center; }
-  span.align-center span img {
+    text-align: center;
+}
+span.align-center span img {
     margin: 0 auto;
-    text-align: center; }
+    text-align: center;
+}
 span.align-right {
-  display: block;
-  overflow: hidden;
-  clear: both; }
-  span.align-right > span {
+    display: block;
+    overflow: hidden;
+    clear: both;
+}
+span.align-right > span {
     display: block;
     overflow: hidden;
     margin: 13px 0 0;
-    text-align: right; }
-  span.align-right span img {
+    text-align: right;
+}
+span.align-right span img {
     margin: 0;
-    text-align: right; }
+    text-align: right;
+}
 span.float-left {
-  display: block;
-  margin-right: 13px;
-  overflow: hidden;
-  float: left; }
-  span.float-left span {
-    margin: 13px 0 0; }
+    display: block;
+    margin-right: 13px;
+    overflow: hidden;
+    float: left;
+}
+span.float-left span {
+    margin: 13px 0 0;
+}
 span.float-right {
-  display: block;
-  margin-left: 13px;
-  overflow: hidden;
-  float: right; }
-  span.float-right > span {
+    display: block;
+    margin-left: 13px;
+    overflow: hidden;
+    float: right;
+}
+span.float-right > span {
     display: block;
     overflow: hidden;
     margin: 13px auto 0;
-    text-align: right; }
-code, tt {
-  margin: 0 2px;
-  padding: 0 5px;
-  white-space: nowrap;
-  border: 1px solid #eaeaea;
-  background-color: #f8f8f8;
-  border-radius: 3px; }
+    text-align: right;
+}
+code,
+tt {
+    margin: 0 2px;
+    padding: 0 5px;
+    white-space: nowrap;
+    border: 1px solid #eaeaea;
+    background-color: #f8f8f8;
+    border-radius: 3px;
+}
 pre code {
-  margin: 0;
-  padding: 0;
-  white-space: pre-wrap;
-  border: none;
-  background: transparent; }
+    margin: 0;
+    padding: 0;
+    white-space: pre-wrap;
+    border: none;
+    background: transparent;
+}
 .highlight pre {
-  background-color: #f8f8f8;
-  border: 1px solid #cccccc;
-  font-size: 13px;
-  line-height: 19px;
-  overflow: auto;
-  padding: 6px 10px;
-  border-radius: 3px; }
+    background-color: #f8f8f8;
+    border: 1px solid #cccccc;
+    font-size: 13px;
+    line-height: 19px;
+    overflow: auto;
+    padding: 6px 10px;
+    border-radius: 3px;
+}
 pre {
-  background-color: #f8f8f8;
-  border: 1px solid #cccccc;
-  font-size: 13px;
-  line-height: 19px;
-  overflow: auto;
-  padding: 6px 10px;
-  border-radius: 3px; }
-  pre code, pre tt {
+    background-color: #f8f8f8;
+    border: 1px solid #cccccc;
+    font-size: 13px;
+    line-height: 19px;
+    overflow: auto;
+    padding: 6px 10px;
+    border-radius: 3px;
+}
+pre code,
+pre tt {
     background-color: transparent;
-    border: none; }
-.sequence, .flow {
-  overflow:auto;
+    border: none;
 }
-.info{
-	color : #3a87ad;
-	background-color: #d9edf7;
-	border: 1px solid #bce8f1;
-	font-size: 13px;
-	line-height: 19px;
-	padding: 6px 10px;
-	border-radius: 0px;
-	margin: 1em 0px 1em;
+.sequence,
+.flow {
+    overflow: auto;
 }
-
-.warn{
-	color : #c09853;
-	background-color: #fcf8e3;
-	border: 1px solid #fbeed5;
-	font-size: 13px;
-	line-height: 19px;
-	padding: 6px 10px;
-	border-radius: 0px;
-	margin: 1em 0px 1em;
+.info {
+    color: #3a87ad;
+    background-color: #d9edf7;
+    border: 1px solid #bce8f1;
+    font-size: 13px;
+    line-height: 19px;
+    padding: 6px 10px;
+    border-radius: 0px;
+    margin: 1em 0px 1em;
 }
-
-.alert{
-	color : #b94a48;
-	background-color: #f2dede;
-	border: 1px solid #eed3d7;
-	font-size: 13px;
-	line-height: 19px;
-	padding: 6px 10px;
-	border-radius: 0px;
-	margin: 1em 0px 1em;
+.warn {
+    color: #c09853;
+    background-color: #fcf8e3;
+    border: 1px solid #fbeed5;
+    font-size: 13px;
+    line-height: 19px;
+    padding: 6px 10px;
+    border-radius: 0px;
+    margin: 1em 0px 1em;
 }
-
+.alert {
+    color: #b94a48;
+    background-color: #f2dede;
+    border: 1px solid #eed3d7;
+    font-size: 13px;
+    line-height: 19px;
+    padding: 6px 10px;
+    border-radius: 0px;
+    margin: 1em 0px 1em;
+}
+@media print {
+    nav {
+        display: none;
+    }
+    #wrapper {
+        overflow: visible;
+    }
+    #previewer {
+        border: 0;
+    }
+}
 /* START_HLJS_CSS */
 /*
 
@@ -599,7 +803,16 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 </div>
 <div id="wrapper">
 	<noscript>このファイルはJavaScriptを有効にしないと閲覧できません。</noscript>
-	<textarea id="editor"></textarea>
+	<div id="editorTabWrapper">
+		<div id="editorTabContents">
+			<textarea id="editor"></textarea>
+			<textarea id="cssEditor"></textarea>
+		</div>
+		<ol id="editorTabs">
+			<li class="selected"><a href="#" id="markdownTab">Markdown</a></li>
+			<li><a href="#" id="cssTab">CSS</a></li>
+		</ol>
+	</div>
 	<div id="previewer" tabIndex="-1"></div>
 </div>
 <div id="onlineMenu">
@@ -614,9 +827,9 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 	<p id="importDialogMessage"></p>
 	<form>
 	<ul>
-		<li><input type="checkBox" checked="checked" id="importDialogAttach"><label for="importDialogAttach">添付ファイル</label></li>
-		<li><input type="checkBox" checked="checked" id="importDialogMarkdown"><label for="importDialogMarkdown">Markdown</label></li>
-		<!--<li><input type="checkBox" checked="checked" id="importDialogCss"><label for="importDialogCss">CSS</label></li>-->
+		<li><input type="checkBox" checked="checked" id="importDialogAttach"><label for="importDialogAttach">添付ファイル(末尾に挿入)</label></li>
+		<li><input type="checkBox" checked="checked" id="importDialogMarkdown"><label for="importDialogMarkdown">Markdown(末尾に挿入)</label></li>
+		<li><input type="checkBox" id="importDialogCss"><label for="importDialogCss">CSS(上書き)</label></li>
 	</ul>
 	<ul class="buttonArea">
 		<li><button id="importDialogOkButton">OK</button></li>
@@ -624,7 +837,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 	</ul>
 	</form>
 </div>
-<input type="hidden" id="kantanVersion" value="v1.20160221.03">
+<input type="hidden" id="kantanVersion" value="v1.20160229.01">
 <input type="hidden" id="kantanEdition" value="dev">
 <div id="updateScriptArea"></div>
 <script id="markedJs">
@@ -1042,16 +1255,16 @@ function toKantanEditor(editor) {
 	try {
 		new Blob(["temp"]);
 	} catch(e) {
-		setViewMode(); 
+		setViewOnly(); 
 	}
 
 	// Safariはdownload属性に対応していないので閲覧のみ
 	var ua = window.navigator.userAgent.toLowerCase();
 	if ((ua.indexOf("chrome") == -1) && (ua.indexOf('safari') != -1)) {
-		setViewMode();
+		setViewOnly();
 	}
 
-	function setViewMode() {
+	function setViewOnly() {
 		document.getElementById("messageArea").innerText
 				 = "このブラウザでは編集できません。";
 		var navElems = document.querySelectorAll("nav > *");
@@ -1136,6 +1349,7 @@ function toKantanEditor(editor) {
 
 	/* エディタに機能追加 */
 	toKantanEditor(document.getElementById("editor"));
+	toKantanEditor(document.getElementById("cssEditor"));
 
 	/* シンタックスハイライト設定 */
 	if (typeof hljs !== "undefined") {
@@ -1145,8 +1359,14 @@ function toKantanEditor(editor) {
 			}
 		});
 	}
-
+	
 	/* 起動時にコンテンツ読み込み */
+	document.querySelector("body").classList.add("previewMode");
+	document.querySelector("body").classList.remove("editMode");
+	document.querySelector("#cssEditor").value = 
+			document.querySelector("#previewerStyle").innerHTML.trim();
+	document.querySelector("#cssEditor").selectionStart = 0;
+	document.querySelector("#cssEditor").selectionEnd = 0;
 	if (isEnable(document.getElementById("toggleButton")) 
 			&& (document.getElementById("editor").innerHTML == "")) {
 		// 編集モードでなく、内容が空であれば初期状態を編集モードにする
@@ -1159,20 +1379,10 @@ function toKantanEditor(editor) {
 	doLayout();
 	on(window, "resize", doLayout);
 	function doLayout() {
-		var editor = document.getElementById("editor");
-		var previewer = document.getElementById("previewer");
 		var wrapper = document.getElementById("wrapper");
 		
-		var height = window.innerHeight - wrapper.offsetTop - 10;
-		wrapper.style.height = height + "px";
-		
-		if (isVisible(editor)) {
-			previewer.style.width = "50%";
-			previewer.style.height = "100%";
-		} else {
-			previewer.style.width = "980px";
-			previewer.style.height = "";
-		}
+		var wrapperHeight = window.innerHeight - wrapper.offsetTop - 10;
+		wrapper.style.height = wrapperHeight + "px";
 	}
 
 	/* 編集・閲覧切り替え */
@@ -1184,23 +1394,27 @@ function toKantanEditor(editor) {
 
 	function toggleMode() {
 		var attach = document.getElementById("attach");
+		var editorTabWrapper = document.getElementById("editorTabWrapper");
 		var editor = document.getElementById("editor");
 		var previewer = document.getElementById("previewer");
-		if (isVisible(editor)) {
+		if (isEditMode()) {
 			editorScrollBarPos    = editor.scrollTop;
 			caretStartPos = editor.selectionStart;
 			caretEndPos = editor.selectionEnd;
 		}
 
-		if (isVisible(editor)) {
+		if (isEditMode()) {
 			// プレビューモードへ
 			isPreviewerOpened = isVisible(previewer);
 			if (isPreviewerOpened == false) {
 				openPreview();
 			}
 			
+			document.querySelector("body").classList.add("previewMode");
+			document.querySelector("body").classList.remove("editMode");
+			
 			hide(attach);
-			hide(editor);
+			hide(editorTabWrapper);
 			doPreview();
 			
 			// スクロールバー位置記憶
@@ -1225,8 +1439,11 @@ function toKantanEditor(editor) {
 			}
 		} else {
 			// 編集モードへ
+			document.querySelector("body").classList.remove("previewMode");
+			document.querySelector("body").classList.add("editMode");
+			
 			showBlock(attach);
-			showBlock(editor);
+			showBlock(editorTabWrapper);
 			doPreview();
 			
 			// スクロールバー位置記憶
@@ -1254,7 +1471,7 @@ function toKantanEditor(editor) {
 		}
 		
 
-		if (isVisible(editor)) {
+		if (isEditMode()) {
 			editor.scrollTop    = editorScrollBarPos;
 			editor.selectionStart = caretStartPos;
 			editor.selectionEnd = caretEndPos;
@@ -1262,7 +1479,7 @@ function toKantanEditor(editor) {
 		}
 	}
 
-	/* エディタとプレビューの同期 */
+	/* Markdownエディタとプレビューの同期 */
 
 	// 自動同期チェックボックスをクリックしたらchecked属性を更新する
 	// これを行わないと自動同期チェックボックスの状態が保存されない
@@ -1313,6 +1530,12 @@ function toKantanEditor(editor) {
 		
 		// マークダウンレンダリング
 		previewer.innerHTML = marked(editor.value);
+		
+		// CSS修正
+		var previewerStyle = document.querySelector("#previewerStyle");
+		var cssEditor = document.querySelector("#cssEditor");
+		previewerStyle.innerHTML = cssEditor.value;
+		
 		
 		// タイトル変更
 		var h1 = document.querySelector("h1");
@@ -1384,6 +1607,19 @@ function toKantanEditor(editor) {
 		// 小数点付きの計算なので数ピクセルの誤差を許容する
 		return (-1.0 <= diff) && (diff <= 1.0);
 	}
+	
+	/* CSSエディタ変更周り */
+	// エディタに変化があったらプレビュー予約
+	on("#cssEditor", "change", cssChanged);
+	on("#cssEditor", "keyup", cssChanged);
+
+	function cssChanged() {
+		saved = false;
+		var title = document.title;
+		if (!title.match(/^\*/)) {
+			document.title = "* " + title;
+		}
+	}
 
 	/* ファイル添付 */
 	on("#attachButton", "change", function(e) {
@@ -1446,8 +1682,8 @@ function toKantanEditor(editor) {
 				var editorElement = dummyHtml.querySelector("textarea#editor");
 				if (fileListElement && editorElement) {
 					showImportDialog(
-							"かんたんMarkdownのファイルを検出しました。どの項目をインポートしますか？\n" + 
-							"インポートする場合、項目は末尾に挿入されます", function(result){
+							"かんたんMarkdownのファイルを検出しました。どの項目をインポートしますか？"
+							, function(result){
 						if (result.result == true) {
 							importKantanMarkdown(result, dummyHtml, file);
 						} else {
@@ -1480,8 +1716,17 @@ function toKantanEditor(editor) {
 		if (result.markdown == true) {
 			var editorElement = dummyHtml.querySelector("textarea#editor")
 			var editor = document.getElementById("editor");
-			editor.value = editor.textContent + editorElement.textContent;
+			editor.value = editor.value + editorElement.value;
 			saved = false;
+		}
+		
+		if (result.css == true) {
+			var styleElement = dummyHtml.querySelector("#previewerStyle");
+			if (styleElement) {
+				var cssEditor = document.getElementById("cssEditor");
+				cssEditor.value = cssEditor.textContent + styleElement.innerHTML;
+				saved = false;
+			}
 		}
 		
 		doPreview();
@@ -1495,13 +1740,13 @@ function toKantanEditor(editor) {
 		
 		document.getElementById("importDialogOkButton").onclick = function(e){
 			e.preventDefault();
-			hide(dialogElement = document.getElementById("importDialog"));
+			hide(dialogElement);
 			
 			var result = {
 				result: true,
 				attach: document.getElementById("importDialogAttach").checked,
 				markdown:document.getElementById("importDialogMarkdown").checked,
-				css:false
+				css:document.getElementById("importDialogCss").checked,
 			}
 			callback(result);
 			
@@ -1521,7 +1766,7 @@ function toKantanEditor(editor) {
 		
 		document.getElementById("importDialogCancelButton").onclick = function(e) {
 			e.preventDefault();
-			hide(dialogElement = document.getElementById("importDialog"));
+			hide(dialogElement);
 			
 			callback({result:false});
 			
@@ -1568,7 +1813,7 @@ function toKantanEditor(editor) {
 		var editor = document.getElementById("editor");
 		var toggleButton = document.getElementById("toggleButton");
 		var filer = document.getElementById("filer");
-		if (!isVisible(editor)) {
+		if (!isEditMode()) {
 			toggleButton.click();
 		}
 		if (!isVisible(filer)) {
@@ -1646,11 +1891,11 @@ function toKantanEditor(editor) {
 	function openPreview() {
 		// エディタサイズに相対値を利用しているためプレビュー表示されていない場合のみ実行
 		// 閲覧モード時は実行しない
-		var editor = document.getElementById("editor");
+		var editorTabWrapper = document.getElementById("editorTabWrapper");
 		var previewer = document.getElementById("previewer");
-		if (isVisible(editor) && !isVisible(previewer)) {
+		if (isEditMode() && !isVisible(previewer)) {
 			document.getElementById("previewToggleButton").innerText = "プレビューを隠す(Alt+→)";
-			editor.style.width = "50%";
+			editorTabWrapper.classList.remove("fullWidth");
 			showBlock(previewer);
 			doLayout();
 		}
@@ -1659,11 +1904,11 @@ function toKantanEditor(editor) {
 	function closePreview() {
 		// エディタサイズに相対値を利用しているためプレビュー表示されている場合のみ実行
 		// 閲覧モード時は実行しない
-		var editor = document.getElementById("editor");
+		var editorTabWrapper = document.getElementById("editorTabWrapper");
 		var previewer = document.getElementById("previewer");
-		if (isVisible(editor) && isVisible(previewer)) {
+		if (isEditMode() && isVisible(previewer)) {
 			document.getElementById("previewToggleButton").innerText = "プレビューを表示(Alt+←)";
-			editor.style.width = "100%";
+			editorTabWrapper.classList.add("fullWidth");
 			hide(previewer);
 			doLayout();
 		}
@@ -1683,7 +1928,7 @@ function toKantanEditor(editor) {
 		var editor = document.getElementById("editor");
 		editor.innerHTML = editor.value.replace(/</g, "&lt;");
 		
-		var toggleFlag = isVisible(editor);
+		var toggleFlag = isEditMode();
 		if (toggleFlag == true) {
 			toggleMode();
 		}
@@ -1691,6 +1936,8 @@ function toKantanEditor(editor) {
 		/* ファイルの肥大化を防ぐため中身を消去 */
 		document.getElementById("previewer").innerHTML = "";
 		document.getElementById("messageArea").innerHTML = "";
+		// cssエディタはテキストエリアなので保存されない
+		// document.getElementById("cssEditor").value = "";
 		
 		var html = "<!doctype html>\n<html>\n";
 		html += document.getElementsByTagName("html")[0].innerHTML;
@@ -1764,7 +2011,7 @@ function toKantanEditor(editor) {
 	on("#headingSyncButton", "click", headingSyncToPreviewer);
 
 	on("#previewer", "previewed", function(e) {
-		if (isVisible(document.getElementById("editor"))) {
+		if (isEditMode()) {
 			var headings = e.target.querySelectorAll("h1, h2, h3, h4, h5, h6");
 			for (var i = 0; i < headings.length; i++) {
 				// 見出しにイベントを設定する。メモリリーク対策でプレビュー時に
@@ -2007,6 +2254,45 @@ function toKantanEditor(editor) {
 		}
 	}
 	
+	/* Markdown, CSS切り替え */
+	on("#markdownTab", "click", function(e) {
+		e.preventDefault();
+		showMarkdown();
+		return false;
+	});
+	
+	on("#cssTab", "click", function(e) {
+		e.preventDefault();
+		showCss(e);
+		return false;
+	});
+	
+	function showMarkdown() {
+		var markdownTab = document.querySelector("#markdownTab").parentNode;
+		markdownTab.classList.add("selected");
+		var editor = document.querySelector("#editor");
+		showBlock(editor);
+		editor.focus();
+		
+		var cssTab = document.querySelector("#cssTab").parentNode;
+		cssTab.classList.remove("selected");
+		var cssEditor = document.querySelector("#cssEditor");
+		hide(cssEditor);
+	}
+	
+	function showCss() {
+		var markdownTab = document.querySelector("#markdownTab").parentNode;
+		markdownTab.classList.remove("selected");
+		var editor = document.querySelector("#editor");
+		hide(document.querySelector("#editor"));
+		
+		var cssTab = document.querySelector("#cssTab").parentNode;
+		cssTab.classList.add("selected");
+		var cssEditor = document.querySelector("#cssEditor");
+		showBlock(cssEditor);
+		cssEditor.focus();
+	}
+	
 	/* ショートカットキー */
 	on("body", "keydown", function(event) {
 		var code = (event.keyCode ? event.keyCode : event.which);
@@ -2048,7 +2334,7 @@ function toKantanEditor(editor) {
 			
 			var syncButton = document.getElementById("syncButton");
 			if (isEnable(syncButton)) {
-				doPreview();
+				syncButton.click();
 			}
 			return false;
 		}
@@ -2103,7 +2389,11 @@ function toKantanEditor(editor) {
 		
 		return true;
 	});
-
+	
+	function isEditMode() {
+		return document.querySelector("body").classList.contains("editMode");
+	}
+	
 	function isEnable(elem) {
 		return elem &&
 				((typeof elem.disabled === "undefined")
@@ -2124,11 +2414,13 @@ function toKantanEditor(editor) {
 	}
 
 	function showBlock(elem) {
-		elem.style.display = "block";
+		elem.classList.add("showBlock");
+		elem.classList.remove("hide");
 	}
 
 	function hide(elem) {
-		elem.style.display = "none";
+		elem.classList.remove("showBlock")
+		elem.classList.add("hide");
 	}
 
 </script>
