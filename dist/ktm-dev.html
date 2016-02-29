@@ -624,7 +624,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 	</ul>
 	</form>
 </div>
-<input type="hidden" id="kantanVersion" value="v1.20160221.02">
+<input type="hidden" id="kantanVersion" value="v1.20160221.03">
 <input type="hidden" id="kantanEdition" value="dev">
 <div id="updateScriptArea"></div>
 <script id="markedJs">
@@ -1093,9 +1093,10 @@ function toKantanEditor(editor) {
 
 	function updateKantanVersion (version) {
 		document.getElementById("kantanVersion").value = version;
+		var edition = document.getElementById("kantanEdition").value;
 		var versionElements = document.getElementsByClassName("version");
 		for (var i = 0 ; i < versionElements.length; i++) {
-			versionElements[i].innerText = version;
+			versionElements[i].innerText = version + "_" + edition;
 		}
 	}
 	
