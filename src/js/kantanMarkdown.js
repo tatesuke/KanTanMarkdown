@@ -922,6 +922,8 @@
 			line = line.replace(/^\t+.*/, "");
 			// trim
 			line = line.replace(/^\s+|\s+$/g, "");
+			// 行頭のblockquoteは削除
+			line = line.replace(/^\s*(>\s*)+/, "");
 			
 			if (tildeCodeBlockFlag == true) {
 				if (line == "~~~") {
@@ -956,7 +958,8 @@
 				newLines.push("");
 				continue;
 			}
-			if (line.match(/^#{1,6}\s(.+)$/)) {
+			if (line.match(/^#{1,6}\s(.+)$/)
+				|| line.match(/^<h[1-6]>(.*)$/)) {
 				newLines.push("# " + RegExp.$1);
 				continue;
 			}
