@@ -1410,9 +1410,6 @@ function toKantanEditor(editor) {
 				openPreview();
 			}
 			
-			document.querySelector("body").classList.add("previewMode");
-			document.querySelector("body").classList.remove("editMode");
-			
 			hide(attach);
 			hide(editorTabWrapper);
 			doPreview();
@@ -1430,6 +1427,8 @@ function toKantanEditor(editor) {
 			}	
 			
 			// レイアウト修正
+			document.querySelector("body").classList.add("previewMode");
+			document.querySelector("body").classList.remove("editMode");
 			doLayout();
 			
 			previewer.focus();
@@ -1439,9 +1438,6 @@ function toKantanEditor(editor) {
 			}
 		} else {
 			// 編集モードへ
-			document.querySelector("body").classList.remove("previewMode");
-			document.querySelector("body").classList.add("editMode");
-			
 			showBlock(attach);
 			showBlock(editorTabWrapper);
 			doPreview();
@@ -1463,6 +1459,8 @@ function toKantanEditor(editor) {
 			}
 			
 			// レイアウト修正
+			document.querySelector("body").classList.remove("previewMode");
+			document.querySelector("body").classList.add("editMode");
 			doLayout();
 			
 			if (minElem) {
@@ -2162,6 +2160,8 @@ function toKantanEditor(editor) {
 			line = line.replace(/^\t+.*/, "");
 			// trim
 			line = line.replace(/^\s+|\s+$/g, "");
+			// 行頭のblockquoteは削除
+			line = line.replace(/^\s*(>\s*)+/, "");
 			
 			if (tildeCodeBlockFlag == true) {
 				if (line == "~~~") {
@@ -2196,7 +2196,8 @@ function toKantanEditor(editor) {
 				newLines.push("");
 				continue;
 			}
-			if (line.match(/^#{1,6}\s(.+)$/)) {
+			if (line.match(/^#{1,6}\s(.+)$/)
+				|| line.match(/^<h[1-6]>(.*)$/)) {
 				newLines.push("# " + RegExp.$1);
 				continue;
 			}

@@ -170,9 +170,6 @@
 				openPreview();
 			}
 			
-			document.querySelector("body").classList.add("previewMode");
-			document.querySelector("body").classList.remove("editMode");
-			
 			hide(attach);
 			hide(editorTabWrapper);
 			doPreview();
@@ -190,6 +187,8 @@
 			}	
 			
 			// レイアウト修正
+			document.querySelector("body").classList.add("previewMode");
+			document.querySelector("body").classList.remove("editMode");
 			doLayout();
 			
 			previewer.focus();
@@ -199,9 +198,6 @@
 			}
 		} else {
 			// 編集モードへ
-			document.querySelector("body").classList.remove("previewMode");
-			document.querySelector("body").classList.add("editMode");
-			
 			showBlock(attach);
 			showBlock(editorTabWrapper);
 			doPreview();
@@ -223,6 +219,8 @@
 			}
 			
 			// レイアウト修正
+			document.querySelector("body").classList.remove("previewMode");
+			document.querySelector("body").classList.add("editMode");
 			doLayout();
 			
 			if (minElem) {
