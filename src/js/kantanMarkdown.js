@@ -109,6 +109,11 @@
 
 	/* エディタに機能追加 */
 	toKantanEditor(document.getElementById("editor"));
+	
+	document.querySelector("#cssEditor").value = 
+			document.querySelector("#previewerStyle").innerHTML.trim();
+	document.querySelector("#cssEditor").selectionStart = 0;
+	document.querySelector("#cssEditor").selectionEnd = 0;
 	toKantanEditor(document.getElementById("cssEditor"));
 
 	/* シンタックスハイライト設定 */
@@ -123,10 +128,6 @@
 	/* 起動時にコンテンツ読み込み */
 	document.querySelector("body").classList.add("previewMode");
 	document.querySelector("body").classList.remove("editMode");
-	document.querySelector("#cssEditor").value = 
-			document.querySelector("#previewerStyle").innerHTML.trim();
-	document.querySelector("#cssEditor").selectionStart = 0;
-	document.querySelector("#cssEditor").selectionEnd = 0;
 	if (isEnable(document.getElementById("toggleButton")) 
 			&& (document.getElementById("editor").innerHTML == "")) {
 		// 編集モードでなく、内容が空であれば初期状態を編集モードにする
@@ -558,7 +559,19 @@
 		input.value = fileName;
 		on(input, "change", onFileNameChanged);
 		li.appendChild(input);
-
+		
+		var insertButton = document.createElement("button");
+		insertButton.classList.add('insertButton');
+		insertButton.innerHTML = "to Editor";
+		on(insertButton, "click", onInsertButtonClicked);
+		li.appendChild(insertButton);
+		
+		var downloadButton = document.createElement("button");
+		downloadButton.classList.add('downloadButton');
+		downloadButton.innerHTML = "Download";
+		on(downloadButton, "click", onDownloadButtonClicked);
+		li.appendChild(downloadButton);
+		
 		var detachButton = document.createElement("button");
 		detachButton.classList.add('detachButton');
 		detachButton.innerHTML = "×";
@@ -612,6 +625,38 @@
 			saved = false;
 			queuePreview();
 		}
+	}
+
+	/* 添付ファイルをエディタに挿入 */
+	function onInsertButtonClicked (e) {
+		var target = e.target;
+		var script = target.parentNode.querySelector("script");
+		var fileName = script.title;
+				
+		var insertText = "attach:" + fileName;
+		
+		var textArea = document.getElementById("editor");
+		if (!isVisible(textArea)) {
+			textArea = document.getElementById("cssEditor");
+		}
+		
+		var text = textArea.value;
+		var newPos = textArea.selectionStart + insertText.length + 1;
+		var part1 = text.substring(0, textArea.selectionStart);
+		var part2 = text.substr(textArea.selectionEnd);
+		textArea.value = part1 + insertText + part2;
+		textArea.selectionStart = newPos;
+		textArea.selectionEnd = newPos;
+		updateScrollPos(textArea);
+		
+		var event= document.createEvent("Event");
+		event.initEvent("changeByJs",false,false);
+		textArea.dispatchEvent(event);
+	}
+	
+	/* 添付ファイルをダウンロード */
+	function onDownloadButtonClicked (e) {
+		alert("download");
 	}
 
 	/* 添付ファイル領域開け閉め */
