@@ -572,20 +572,32 @@
 	}
 	
 	function addAttachFileElements(fileName, content) {
+		var name = fileName;
+		var script = document.querySelector("#fileList script[title='" + name + "']");
+		var i = 1;
+		while (script) {
+			var pos = fileName.lastIndexOf(".");
+			var name = fileName.substring(0, pos);
+			var ext = fileName.substr(pos);
+			name = name + "(" + i + ")" + ext;
+			script = document.querySelector("#fileList script[title='" + name + "']");
+			i++;
+		}
+		
 		var li = document.createElement("li");
-
+		
 		var script = document.createElement("script");
 		script.type  = "text/template";
-		script.id    = "attach-" + fileName;
-		script.title = fileName;
+		script.id    = "attach-" + name;
+		script.title = name;
 		script.innerHTML = content;
 		li.appendChild(script);
 
 		var input  = document.createElement("input");
 		input.type = "text";
-		input.classList.add('fileName');
-		input.value = fileName;
-		on(input, "change", onFileNameChanged);
+		input.classList.add('name');
+		input.value = name;
+		on(input, "blur", onFileNameChanged);
 		li.appendChild(input);
 		
 		var insertButton = document.createElement("button");
@@ -619,6 +631,7 @@
 			openFiler();
 		}
 		
+		saved = false;
 		queuePreview();
 	}
 
@@ -678,16 +691,31 @@
 
 	var onFileNameChanged = function(e) {
 		var target = e.target;
-		if (target.value.trim() == "") {
-			alert("名前は必ず入力してください");
-			target.focus();
-		} else {
-			var scriptTag = target.previousElementSibling;
-			scriptTag.id =  "attach-" + target.value;
-			scriptTag.title = target.value;
-			saved = false;
-			queuePreview();
+		var name = target.value.trim();
+		var selfName = target.parentNode.querySelector("script").title;
+		
+		if (name == selfName) {
+			return true;
 		}
+		if (name == "") {
+			alert("名前は必ず入力してください。");
+			e.target.focus();
+			return false;
+		}
+		var script = document.querySelector("#fileList script[title='" + name + "']");
+		if (script) {
+			alert("名前が重複しています。");
+			target.focus();
+			target.selectionStart = 0;
+			target.selectionEnd = name.length;
+			return false;
+		} 
+		var scriptTag = target.previousElementSibling;
+		scriptTag.id =  "attach-" + name;
+		scriptTag.title = name;
+		saved = false;
+		queuePreview();
+		return true;
 	}
 
 	/* 添付ファイルをエディタに挿入 */
@@ -697,22 +725,21 @@
 		var fileName = script.title;
 		var insertText = "attach:" + fileName;
 		
-		var textArea = document.getElementById("editor");
-		if (!isVisible(textArea)) {
-			textArea = document.getElementById("cssEditor");
+		var editor = document.getElementById("editor");
+		if (isVisible(editor)) {
+			var text = editor.value;
+			var newPos = editor.selectionStart + insertText.length + 1;
+			var part1 = text.substring(0, editor.selectionStart);
+			var part2 = text.substr(editor.selectionEnd);
+			editor.value = part1 + insertText + part2;
+			editor.selectionStart = newPos;
+			editor.selectionEnd = newPos;
+			updateScrollPos(editor);
+			
+			var event= document.createEvent("Event");
+			event.initEvent("changeByJs",false,false);
+			editor.dispatchEvent(event);
 		}
-		var text = textArea.value;
-		var newPos = textArea.selectionStart + insertText.length + 1;
-		var part1 = text.substring(0, textArea.selectionStart);
-		var part2 = text.substr(textArea.selectionEnd);
-		textArea.value = part1 + insertText + part2;
-		textArea.selectionStart = newPos;
-		textArea.selectionEnd = newPos;
-		updateScrollPos(textArea);
-		
-		var event= document.createEvent("Event");
-		event.initEvent("changeByJs",false,false);
-		textArea.dispatchEvent(event);
 	}
 	
 	/* 添付ファイルをダウンロード */
