@@ -278,6 +278,7 @@
 	
 	// 同期実行
 	var blobUrls = {};
+	var blobs = {};
 	function doPreview() {
 		// prepreviewedイベントをディスパッチ
 		var previewer = document.getElementById("previewer");
@@ -644,6 +645,7 @@
 		var url = window.URL || window.webkitURL;
 		var blobURL = url.createObjectURL(blob);
 		blobUrls[name] = blobURL;
+		blobs[name] = blob;
 		
 		return blobURL;
 	}
@@ -657,6 +659,7 @@
 			
 			parent.parentNode.removeChild(parent);
 			delete blobUrls[name];
+			delete blobs[name];
 			
 			saved = false;
 		}
@@ -670,6 +673,7 @@
 		var fileName = fileNameElem.previousElementSibling.getAttribute("title");
 		fileNameElem.value = fileName;
 		delete blobUrls[fileName];
+		delete blobs[fileName];
 	}
 
 	var onFileNameChanged = function(e) {
@@ -713,7 +717,25 @@
 	
 	/* 添付ファイルをダウンロード */
 	function onDownloadButtonClicked (e) {
-		alert("download");
+		var target = e.target;
+		var script = target.parentNode.querySelector("script");
+		var fileName = script.title;
+		var blobURL = getBlobUrl(fileName);
+		if (window.navigator.msSaveBlob) {
+			var blob = blobs[name];
+			window.navigator.msSaveBlob(blob, fileName);
+		} else {
+			var a = document.createElement('a');
+			a.download = fileName;
+			a.href = blobURL;
+			
+			// firefoxでa.click()が効かないため無理やりclickイベントをディスパッチする
+			var ev = document.createEvent("MouseEvents");
+		    ev.initMouseEvent("click", true, false, self, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+			a.dispatchEvent(ev);
+			delete a;
+		}
+		
 	}
 
 	/* 添付ファイル領域開け閉め */
