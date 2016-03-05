@@ -309,7 +309,7 @@
 		}
 		
 		// 画像埋め込み
-		var images = document.getElementsByTagName("img");
+		var images = document.querySelectorAll("#previewer img");
 		for (i in images) {
 			var elem = images[i];
 			var blobUrl = null;
@@ -326,6 +326,23 @@
 				elem.src = blobUrl;
 			}
 		}
+		
+		// リンク
+		var anchors = document.querySelectorAll("#previewer a");
+		for(i in anchors) {
+			var anchor = anchors[i];
+			var href = anchor.href;
+			if (href) {
+				var matchs = href.trim().match(/^attach:(.+)/);
+				if (matchs) {
+					var name = matchs[1];
+					var blobUrl = getBlobUrl(name);
+					anchor.href = blobUrl;
+					anchor.download = name;
+				}
+			}
+		}
+		
 		
 		// シーケンス図
 		if (typeof Diagram !== "undefined") {
