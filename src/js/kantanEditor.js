@@ -215,6 +215,10 @@ function toKantanEditor(editor) {
 			isCtrlVDowning = false;
 		}
 	});
+	on(editor, "changeByJs", function(e){
+		saveUndo(e.target);
+	});
+	
 	on(editor, "mouseup", function(e) {
 		valueAtArrowOrClick = {
 			val: editor.value,

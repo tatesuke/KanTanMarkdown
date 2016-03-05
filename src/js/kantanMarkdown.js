@@ -40,18 +40,20 @@
 	function on(elementOrQuery, eventName, callback) {
 		var element;
 		if (typeof elementOrQuery === "string") {
-			element = document.querySelector(elementOrQuery);
+			element = document.querySelectorAll(elementOrQuery);
 		} else {
-			element = elementOrQuery;
+			element = [elementOrQuery];
 		}
 		
-		element.addEventListener(eventName, callback);
-		
-		eventListeners.push({
-			element: element,
-			eventName: eventName,
-			callback: callback,
-		});	
+		for (var i = 0; i < element.length; i++) {
+			element[i].addEventListener(eventName, callback);
+			
+			eventListeners.push({
+				element: element[i],
+				eventName: eventName,
+				callback: callback,
+			});	
+		}
 	}
 
 	function removeAllEvents() {
@@ -109,6 +111,11 @@
 
 	/* エディタに機能追加 */
 	toKantanEditor(document.getElementById("editor"));
+	
+	document.querySelector("#cssEditor").value = 
+			document.querySelector("#previewerStyle").innerHTML.trim();
+	document.querySelector("#cssEditor").selectionStart = 0;
+	document.querySelector("#cssEditor").selectionEnd = 0;
 	toKantanEditor(document.getElementById("cssEditor"));
 
 	/* シンタックスハイライト設定 */
@@ -123,10 +130,6 @@
 	/* 起動時にコンテンツ読み込み */
 	document.querySelector("body").classList.add("previewMode");
 	document.querySelector("body").classList.remove("editMode");
-	document.querySelector("#cssEditor").value = 
-			document.querySelector("#previewerStyle").innerHTML.trim();
-	document.querySelector("#cssEditor").selectionStart = 0;
-	document.querySelector("#cssEditor").selectionEnd = 0;
 	if (isEnable(document.getElementById("toggleButton")) 
 			&& (document.getElementById("editor").innerHTML == "")) {
 		// 編集モードでなく、内容が空であれば初期状態を編集モードにする
@@ -170,9 +173,6 @@
 				openPreview();
 			}
 			
-			document.querySelector("body").classList.add("previewMode");
-			document.querySelector("body").classList.remove("editMode");
-			
 			hide(attach);
 			hide(editorTabWrapper);
 			doPreview();
@@ -190,6 +190,8 @@
 			}	
 			
 			// レイアウト修正
+			document.querySelector("body").classList.add("previewMode");
+			document.querySelector("body").classList.remove("editMode");
 			doLayout();
 			
 			previewer.focus();
@@ -199,9 +201,6 @@
 			}
 		} else {
 			// 編集モードへ
-			document.querySelector("body").classList.remove("previewMode");
-			document.querySelector("body").classList.add("editMode");
-			
 			showBlock(attach);
 			showBlock(editorTabWrapper);
 			doPreview();
@@ -223,6 +222,8 @@
 			}
 			
 			// レイアウト修正
+			document.querySelector("body").classList.remove("previewMode");
+			document.querySelector("body").classList.add("editMode");
 			doLayout();
 			
 			if (minElem) {
@@ -309,14 +310,49 @@
 		}
 		
 		// 画像埋め込み
-		var images = document.getElementsByTagName("img");
+		var images = document.querySelectorAll("#previewer img");
 		for (i in images) {
 			var elem = images[i];
-			var img = document.getElementById("attach-" + elem.name);
-			if (img != null) {
-				elem.src = img.innerHTML;
+			var base64 = null;
+			if (elem.name) {
+				var script = document.getElementById("attach-" + elem.name);
+				if (script) {
+					base64 = script.innerHTML;
+				}
+			}
+			if (!base64 && elem.src) {
+				var matchs = elem.src.trim().match(/^attach:(.+)/);
+				if (matchs) {
+					var script = document.getElementById("attach-" + 
+							decodeURIComponent(matchs[1]));
+					if (script) {
+						base64 = script.innerHTML;
+					}
+				}
+			}
+			if (base64 != null) {
+				elem.src = base64;
 			}
 		}
+		
+		// リンク
+		var anchors = document.querySelectorAll("#previewer a");
+		for(i in anchors) {
+			var anchor = anchors[i];
+			var href = anchor.href;
+			if (href) {
+				var matchs = href.trim().match(/^attach:(.+)/);
+				if (matchs) {
+					var name = decodeURIComponent(matchs[1]);
+					var blob = getBlob(name);
+					var url = window.URL || window.webkitURL;
+					var blobUrl = url.createObjectURL(blob);
+					anchor.href = blobUrl;
+					anchor.download = name;
+				}
+			}
+		}
+		
 		
 		// シーケンス図
 		if (typeof Diagram !== "undefined") {
@@ -355,7 +391,7 @@
 		event.initEvent("previewed", true, true);
 		previewer.dispatchEvent(event);
 	}
-
+	
 	function isMaxScroll (id) {
 		var elem = document.getElementById(id);
 		
@@ -545,22 +581,46 @@
 	}
 	
 	function addAttachFileElements(fileName, content) {
+		var name = fileName;
+		var script = document.querySelector("#fileList script[title='" + name + "']");
+		var i = 1;
+		while (script) {
+			var pos = fileName.lastIndexOf(".");
+			var name = fileName.substring(0, pos);
+			var ext = fileName.substr(pos);
+			name = name + "(" + i + ")" + ext;
+			script = document.querySelector("#fileList script[title='" + name + "']");
+			i++;
+		}
+		
 		var li = document.createElement("li");
-
+		
 		var script = document.createElement("script");
 		script.type  = "text/template";
-		script.id    = "attach-" + fileName;
-		script.title = fileName;
+		script.id    = "attach-" + name;
+		script.title = name;
 		script.innerHTML = content;
 		li.appendChild(script);
 
 		var input  = document.createElement("input");
 		input.type = "text";
 		input.classList.add('fileName');
-		input.value = fileName;
-		on(input, "change", onFileNameChanged);
+		input.value = name;
+		on(input, "blur", onFileNameChanged);
 		li.appendChild(input);
-
+		
+		var insertButton = document.createElement("button");
+		insertButton.classList.add('insertButton');
+		insertButton.innerHTML = "insert URI";
+		on(insertButton, "click", onInsertButtonClicked);
+		li.appendChild(insertButton);
+		
+		var downloadButton = document.createElement("button");
+		downloadButton.classList.add('downloadButton');
+		downloadButton.innerHTML = "Download";
+		on(downloadButton, "click", onDownloadButtonClicked);
+		li.appendChild(downloadButton);
+		
 		var detachButton = document.createElement("button");
 		detachButton.classList.add('detachButton');
 		detachButton.innerHTML = "×";
@@ -580,14 +640,37 @@
 			openFiler();
 		}
 		
+		saved = false;
 		queuePreview();
 	}
 
+	function getBlob(name) {
+		var script = document.getElementById("attach-" + name);
+		if (!script) {
+			return null;
+		}
+		
+		var base64 = script.innerHTML;
+		var mimeType = base64.match(/^\s*data:(.+);base64/)[1];
+		var bin = atob(base64.replace(/^.*,/, ''));
+		var buffer = new Uint8Array(bin.length);
+		for (var i = 0; i < bin.length; i++) {
+			buffer[i] = bin.charCodeAt(i);
+		}
+		var blob = new Blob([buffer.buffer], {
+			type: mimeType
+		});
+		
+		return blob;
+	}
+
 	/* ファイル削除 */
-	var onDetachButtonClicked = function(e) {
+	on(".detachButton", "click", onDetachButtonClicked);
+	function onDetachButtonClicked(e) {
 		// 削除ボタンが押されたら親要素(li)ごと削除
 		if(window.confirm('削除していいですか?')){
 			var parent = e.target.parentNode;
+			var name = parent.querySelector("script").name;
 			parent.parentNode.removeChild(parent);
 			saved = false;
 		}
@@ -598,22 +681,88 @@
 	for (var i = 0; i < fileNameElems.length; i++) {
 		// なぜかvale属性の変更が保存されないので起動時に引っ張ってきてやる
 		var fileNameElem = fileNameElems[i];
-		var fileName = fileNameElem.previousElementSibling.getAttribute("title");
+		var script = fileNameElem.parentNode.querySelector("script");
+		var fileName = script.title;
 		fileNameElem.value = fileName;
 	}
-
-	var onFileNameChanged = function(e) {
+	on("#fileList input", "blur", onFileNameChanged);
+	function onFileNameChanged (e) {
 		var target = e.target;
-		if (target.value.trim() == "") {
-			alert("名前は必ず入力してください");
-			target.focus();
-		} else {
-			var scriptTag = target.previousElementSibling;
-			scriptTag.id =  "attach-" + target.value;
-			scriptTag.title = target.value;
-			saved = false;
-			queuePreview();
+		var name = target.value.trim();
+		var selfName = target.parentNode.querySelector("script").title;
+		
+		if (name == selfName) {
+			return true;
 		}
+		if (name == "") {
+			alert("名前は必ず入力してください。");
+			e.target.focus();
+			return false;
+		}
+		var script = document.querySelector("#fileList script[title='" + name + "']");
+		if (script) {
+			alert("名前が重複しています。");
+			target.focus();
+			target.selectionStart = 0;
+			target.selectionEnd = name.length;
+			return false;
+		} 
+		var scriptTag = target.previousElementSibling;
+		scriptTag.id =  "attach-" + name;
+		scriptTag.title = name;
+		saved = false;
+		queuePreview();
+		return true;
+	}
+
+	/* 添付ファイルをエディタに挿入 */
+	on(".insertButton", "click", onInsertButtonClicked);
+	function onInsertButtonClicked (e) {
+		var target = e.target;
+		var script = target.parentNode.querySelector("script");
+		var fileName = script.title;
+		var insertText = "attach:" + fileName;
+		
+		var editor = document.getElementById("editor");
+		if (isVisible(editor)) {
+			var text = editor.value;
+			var newPos = editor.selectionStart + insertText.length + 1;
+			var part1 = text.substring(0, editor.selectionStart);
+			var part2 = text.substr(editor.selectionEnd);
+			editor.value = part1 + insertText + part2;
+			editor.selectionStart = newPos;
+			editor.selectionEnd = newPos;
+			updateScrollPos(editor);
+			
+			var event= document.createEvent("Event");
+			event.initEvent("changeByJs",false,false);
+			editor.dispatchEvent(event);
+		}
+	}
+	
+	/* 添付ファイルをダウンロード */
+	on(".downloadButton", "click", onDownloadButtonClicked);
+	function onDownloadButtonClicked (e) {
+		var target = e.target;
+		var script = target.parentNode.querySelector("script");
+		var fileName = script.title;
+		var blob = getBlob(fileName);
+		if (window.navigator.msSaveBlob) {
+			window.navigator.msSaveBlob(blob, fileName);
+		} else {
+			var url = window.URL || window.webkitURL;
+			var blobURL = url.createObjectURL(blob);
+			var a = document.createElement('a');
+			a.download = fileName;
+			a.href = blobURL;
+			
+			// firefoxでa.click()が効かないため無理やりclickイベントをディスパッチする
+			var ev = document.createEvent("MouseEvents");
+		    ev.initMouseEvent("click", true, false, self, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+			a.dispatchEvent(ev);
+			delete a;
+		}
+		
 	}
 
 	/* 添付ファイル領域開け閉め */
@@ -922,6 +1071,8 @@
 			line = line.replace(/^\t+.*/, "");
 			// trim
 			line = line.replace(/^\s+|\s+$/g, "");
+			// 行頭のblockquoteは削除
+			line = line.replace(/^\s*(>\s*)+/, "");
 			
 			if (tildeCodeBlockFlag == true) {
 				if (line == "~~~") {
@@ -956,7 +1107,8 @@
 				newLines.push("");
 				continue;
 			}
-			if (line.match(/^#{1,6}\s(.+)$/)) {
+			if (line.match(/^#{1,6}\s(.+)$/)
+				|| line.match(/^<h[1-6]>(.*)$/)) {
 				newLines.push("# " + RegExp.$1);
 				continue;
 			}

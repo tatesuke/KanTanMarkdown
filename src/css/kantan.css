@@ -4,7 +4,7 @@ body {
 	position:relative;
 }
 
-body .onDragover {
+body.onDragover {
 	border : 5px dashed #99cde1;
 }
 
@@ -52,6 +52,10 @@ nav:after {
 	height:150px;
 	overflow: auto;
 	display:none;
+}
+
+#attach #filer input{
+	width: 300px;
 }
 
 #attach #attachToggleButton,
