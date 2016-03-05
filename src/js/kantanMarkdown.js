@@ -323,7 +323,8 @@
 			if (!base64 && elem.src) {
 				var matchs = elem.src.trim().match(/^attach:(.+)/);
 				if (matchs) {
-					var script = document.getElementById("attach-" + matchs[1]);
+					var script = document.getElementById("attach-" + 
+							decodeURIComponent(matchs[1]));
 					if (script) {
 						base64 = script.innerHTML;
 					}
@@ -342,7 +343,7 @@
 			if (href) {
 				var matchs = href.trim().match(/^attach:(.+)/);
 				if (matchs) {
-					var name = matchs[1];
+					var name = decodeURIComponent(matchs[1]);
 					var blob = getBlob(name);
 					var url = window.URL || window.webkitURL;
 					var blobUrl = url.createObjectURL(blob);
