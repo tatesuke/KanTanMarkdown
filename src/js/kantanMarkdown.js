@@ -602,7 +602,7 @@
 		
 		var insertButton = document.createElement("button");
 		insertButton.classList.add('insertButton');
-		insertButton.innerHTML = "to Editor";
+		insertButton.innerHTML = "insert URI";
 		on(insertButton, "click", onInsertButtonClicked);
 		li.appendChild(insertButton);
 		

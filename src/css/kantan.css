@@ -54,6 +54,10 @@ nav:after {
 	display:none;
 }
 
+#attach #filer input{
+	width: 300px;
+}
+
 #attach #attachToggleButton,
 #attach #previewToggleButton{
 	width: 50%;
