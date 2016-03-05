@@ -277,6 +277,7 @@
 	}
 	
 	// 同期実行
+	var blobUrls = {};
 	function doPreview() {
 		// prepreviewedイベントをディスパッチ
 		var previewer = document.getElementById("previewer");
@@ -311,9 +312,18 @@
 		var images = document.getElementsByTagName("img");
 		for (i in images) {
 			var elem = images[i];
-			var img = document.getElementById("attach-" + elem.name);
-			if (img != null) {
-				elem.src = img.innerHTML;
+			var blobUrl = null;
+			if (elem.name) {
+				blobUrl = getBlobUrl(elem.name);
+			}
+			if (!blobUrl && elem.src) {
+				var matchs = elem.src.trim().match(/^attach:(.+)/);
+				if (matchs) {
+					blobUrl = getBlobUrl(matchs[1]); 
+				}
+			}
+			if (blobUrl != null) {
+				elem.src = blobUrl;
 			}
 		}
 		
@@ -354,7 +364,7 @@
 		event.initEvent("previewed", true, true);
 		previewer.dispatchEvent(event);
 	}
-
+	
 	function isMaxScroll (id) {
 		var elem = document.getElementById(id);
 		
@@ -594,12 +604,43 @@
 		queuePreview();
 	}
 
+	function getBlobUrl(name) {
+		var script = document.getElementById("attach-" + name);
+		if (!script) {
+			return null;
+		}
+		if (blobUrls[name]) {
+			return blobUrls[name];
+		}
+		
+		var base64 = script.innerHTML;
+		var mimeType = base64.match(/^\s*data:(.+);base64/)[1];
+		var bin = atob(base64.replace(/^.*,/, ''));
+		var buffer = new Uint8Array(bin.length);
+		for (var i = 0; i < bin.length; i++) {
+			buffer[i] = bin.charCodeAt(i);
+		}
+		var blob = new Blob([buffer.buffer], {
+			type: mimeType
+		});
+		
+		var url = window.URL || window.webkitURL;
+		var blobURL = url.createObjectURL(blob);
+		blobUrls[name] = blobURL;
+		
+		return blobURL;
+	}
+
 	/* ファイル削除 */
 	var onDetachButtonClicked = function(e) {
 		// 削除ボタンが押されたら親要素(li)ごと削除
 		if(window.confirm('削除していいですか?')){
 			var parent = e.target.parentNode;
+			var name = parent.querySelector("script").name;
+			
 			parent.parentNode.removeChild(parent);
+			delete blobUrls[name];
+			
 			saved = false;
 		}
 	}
@@ -611,6 +652,7 @@
 		var fileNameElem = fileNameElems[i];
 		var fileName = fileNameElem.previousElementSibling.getAttribute("title");
 		fileNameElem.value = fileName;
+		delete blobUrls[fileName];
 	}
 
 	var onFileNameChanged = function(e) {
@@ -632,14 +674,12 @@
 		var target = e.target;
 		var script = target.parentNode.querySelector("script");
 		var fileName = script.title;
-				
 		var insertText = "attach:" + fileName;
 		
 		var textArea = document.getElementById("editor");
 		if (!isVisible(textArea)) {
 			textArea = document.getElementById("cssEditor");
 		}
-		
 		var text = textArea.value;
 		var newPos = textArea.selectionStart + insertText.length + 1;
 		var part1 = text.substring(0, textArea.selectionStart);
