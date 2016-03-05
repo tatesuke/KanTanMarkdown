@@ -40,18 +40,20 @@
 	function on(elementOrQuery, eventName, callback) {
 		var element;
 		if (typeof elementOrQuery === "string") {
-			element = document.querySelector(elementOrQuery);
+			element = document.querySelectorAll(elementOrQuery);
 		} else {
-			element = elementOrQuery;
+			element = [elementOrQuery];
 		}
 		
-		element.addEventListener(eventName, callback);
-		
-		eventListeners.push({
-			element: element,
-			eventName: eventName,
-			callback: callback,
-		});	
+		for (var i = 0; i < element.length; i++) {
+			element[i].addEventListener(eventName, callback);
+			
+			eventListeners.push({
+				element: element[i],
+				eventName: eventName,
+				callback: callback,
+			});	
+		}
 	}
 
 	function removeAllEvents() {
@@ -277,8 +279,6 @@
 	}
 	
 	// 同期実行
-	var blobUrls = {};
-	var blobs = {};
 	function doPreview() {
 		// prepreviewedイベントをディスパッチ
 		var previewer = document.getElementById("previewer");
@@ -313,18 +313,24 @@
 		var images = document.querySelectorAll("#previewer img");
 		for (i in images) {
 			var elem = images[i];
-			var blobUrl = null;
+			var base64 = null;
 			if (elem.name) {
-				blobUrl = getBlobUrl(elem.name);
-			}
-			if (!blobUrl && elem.src) {
-				var matchs = elem.src.trim().match(/^attach:(.+)/);
-				if (matchs) {
-					blobUrl = getBlobUrl(matchs[1]); 
+				var script = document.getElementById("attach-" + elem.name);
+				if (script) {
+					base64 = script.innerHTML;
 				}
 			}
-			if (blobUrl != null) {
-				elem.src = blobUrl;
+			if (!base64 && elem.src) {
+				var matchs = elem.src.trim().match(/^attach:(.+)/);
+				if (matchs) {
+					var script = document.getElementById("attach-" + matchs[1]);
+					if (script) {
+						base64 = script.innerHTML;
+					}
+				}
+			}
+			if (base64 != null) {
+				elem.src = base64;
 			}
 		}
 		
@@ -337,7 +343,9 @@
 				var matchs = href.trim().match(/^attach:(.+)/);
 				if (matchs) {
 					var name = matchs[1];
-					var blobUrl = getBlobUrl(name);
+					var blob = getBlob(name);
+					var url = window.URL || window.webkitURL;
+					var blobURL = url.createObjectURL(blob);
 					anchor.href = blobUrl;
 					anchor.download = name;
 				}
@@ -595,7 +603,7 @@
 
 		var input  = document.createElement("input");
 		input.type = "text";
-		input.classList.add('name');
+		input.classList.add('fileName');
 		input.value = name;
 		on(input, "blur", onFileNameChanged);
 		li.appendChild(input);
@@ -635,13 +643,10 @@
 		queuePreview();
 	}
 
-	function getBlobUrl(name) {
+	function getBlob(name) {
 		var script = document.getElementById("attach-" + name);
 		if (!script) {
 			return null;
-		}
-		if (blobUrls[name]) {
-			return blobUrls[name];
 		}
 		
 		var base64 = script.innerHTML;
@@ -655,24 +660,18 @@
 			type: mimeType
 		});
 		
-		var url = window.URL || window.webkitURL;
-		var blobURL = url.createObjectURL(blob);
-		blobUrls[name] = blobURL;
-		blobs[name] = blob;
-		
-		return blobURL;
+		return blob;
 	}
 
 	/* ファイル削除 */
-	var onDetachButtonClicked = function(e) {
+	on(".detachButton", "click", onDetachButtonClicked);
+	function onDetachButtonClicked(e) {
 		// 削除ボタンが押されたら親要素(li)ごと削除
 		if(window.confirm('削除していいですか?')){
 			var parent = e.target.parentNode;
 			var name = parent.querySelector("script").name;
 			
 			parent.parentNode.removeChild(parent);
-			delete blobUrls[name];
-			delete blobs[name];
 			
 			saved = false;
 		}
@@ -683,13 +682,12 @@
 	for (var i = 0; i < fileNameElems.length; i++) {
 		// なぜかvale属性の変更が保存されないので起動時に引っ張ってきてやる
 		var fileNameElem = fileNameElems[i];
-		var fileName = fileNameElem.previousElementSibling.getAttribute("title");
+		var script = fileNameElem.parentNode.querySelector("script");
+		var fileName = script.title;
 		fileNameElem.value = fileName;
-		delete blobUrls[fileName];
-		delete blobs[fileName];
 	}
-
-	var onFileNameChanged = function(e) {
+	on("#fileList input", "blur", onFileNameChanged);
+	function onFileNameChanged (e) {
 		var target = e.target;
 		var name = target.value.trim();
 		var selfName = target.parentNode.querySelector("script").title;
@@ -719,6 +717,7 @@
 	}
 
 	/* 添付ファイルをエディタに挿入 */
+	on(".insertButton", "click", onInsertButtonClicked);
 	function onInsertButtonClicked (e) {
 		var target = e.target;
 		var script = target.parentNode.querySelector("script");
@@ -743,15 +742,17 @@
 	}
 	
 	/* 添付ファイルをダウンロード */
+	on(".downloadButton", "click", onDownloadButtonClicked);
 	function onDownloadButtonClicked (e) {
 		var target = e.target;
 		var script = target.parentNode.querySelector("script");
 		var fileName = script.title;
-		var blobURL = getBlobUrl(fileName);
+		var blob = getBlob(fileName);
 		if (window.navigator.msSaveBlob) {
-			var blob = blobs[name];
 			window.navigator.msSaveBlob(blob, fileName);
 		} else {
+			var url = window.URL || window.webkitURL;
+			var blobURL = url.createObjectURL(blob);
 			var a = document.createElement('a');
 			a.download = fileName;
 			a.href = blobURL;
