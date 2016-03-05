@@ -4,7 +4,7 @@ body {
 	position:relative;
 }
 
-body .onDragover {
+body.onDragover {
 	border : 5px dashed #99cde1;
 }
 
