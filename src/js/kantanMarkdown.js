@@ -345,7 +345,7 @@
 					var name = matchs[1];
 					var blob = getBlob(name);
 					var url = window.URL || window.webkitURL;
-					var blobURL = url.createObjectURL(blob);
+					var blobUrl = url.createObjectURL(blob);
 					anchor.href = blobUrl;
 					anchor.download = name;
 				}
@@ -670,9 +670,7 @@
 		if(window.confirm('削除していいですか?')){
 			var parent = e.target.parentNode;
 			var name = parent.querySelector("script").name;
-			
 			parent.parentNode.removeChild(parent);
-			
 			saved = false;
 		}
 	}
