@@ -27,9 +27,15 @@ kantanUpdate({
 	},
 	"rewirteHtml":function(dialogResult) {
 		// アップデート前の値を記憶しておく
-		var fileListElement  = document.querySelector("#fileList");
-		var originalMarkdown = document.querySelector("#editor");
-		var originalCss      = document.querySelector("#cssEditor");
+		var originalFileList = {};
+		var attachFile  = document.querySelectorAll("#fileList script");
+		for (var i = 0; i < attachFile.length; i++) {
+			var title =  attachFile[i].name;
+			var base64 = attachFile[i].innerHTML;
+			fileList[title] = base64;
+		}
+		var originalMarkdown = document.querySelector("#editor").value;
+		var originalCss      = document.querySelector("#cssEditor").value;
 		
 		// エディションを読み込み
 		var kantanEdition = document.querySelector("#kantanEdition").value;
@@ -42,11 +48,11 @@ kantanUpdate({
 		if (kantanEdition == "lite") {
 			newHtml = newHtml.replace(/\/\* START_HLJS_CSS \*\/[\s|\S]+\/\* END_HLJS_CSS \*\//, "");
 		}
-		
+
 		// 本体をアップデート
 		var html = document.querySelector("html");
 		html.innerHTML = newHtml;
-		
+
 		// バージョン・エディション更新
 		updateKantanVersion(this.newVersion);
 		updateKantanEdition(kantanEdition);
@@ -83,12 +89,8 @@ kantanUpdate({
 		
 		// 添付ファイル引継ぎ
 		if (dialogResult.attach == true) {
-			var fileList = document.getElementById("fileList");
-			var importScripts = fileListElement.querySelectorAll("script");
-			for (var i = 0; i < importScripts.length; i++) {
-				var scriptElement = importScripts[i];
-				var fileName = scriptElement.title;
-				var content = scriptElement.innerHTML;
+			for (var fileName in originalFileList) {
+				var content = originalFileList[fileName];
 				addAttachFileElements(fileName, content);
 			}
 			saved = false;
@@ -97,14 +99,14 @@ kantanUpdate({
 		// Markdown引継ぎ
 		if (dialogResult.markdown == true) {
 			var editor = document.querySelector("#editor");
-			editor.value = originalMarkdown.value;
+			editor.value = originalMarkdown;
 			saved = false;
 		}
 		
 		// CSS引継ぎ
 		if ((dialogResult.css == true) && originalCss) {
 			var cssEditor = document.querySelector("#cssEditor");
-			cssEditor.value = originalCss.value;
+			cssEditor.value = originalCss;
 			saved = false;
 		}
 		
