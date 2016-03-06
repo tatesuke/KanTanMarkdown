@@ -667,9 +667,9 @@ kantanUpdate({
 		var originalFileList = {};
 		var attachFile  = document.querySelectorAll("#fileList script");
 		for (var i = 0; i < attachFile.length; i++) {
-			var title =  attachFile[i].name;
+			var fileName =  attachFile[i].title;
 			var base64 = attachFile[i].innerHTML;
-			fileList[title] = base64;
+			originalFileList[fileName] = base64;
 		}
 		var originalMarkdown = document.querySelector("#editor").value;
 		var originalCss      = document.querySelector("#cssEditor").value;
