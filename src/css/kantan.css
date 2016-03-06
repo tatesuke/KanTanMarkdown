@@ -250,6 +250,23 @@ nav:after {
 	display: none  !important;
 }
 
+/* JavaScriptOff時の配慮 */
+.initialState #editorTabWrapper {
+	display:block !important;
+	width: 100% !important;
+}
+.initialState #editor {
+	margin-top: 5px !important;
+	font-size: large !important;
+	height: 90vh !important;
+}
+.initialState nav,
+.initialState #attach,
+.initialState #editorTabs,
+.initialState #previewer {
+	display:none !important;
+}
+
 @media print {
   nav {
   	display:none;
