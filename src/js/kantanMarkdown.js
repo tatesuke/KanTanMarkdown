@@ -130,6 +130,7 @@
 	/* 起動時にコンテンツ読み込み */
 	document.querySelector("body").classList.add("previewMode");
 	document.querySelector("body").classList.remove("editMode");
+	document.querySelector("body").classList.remove("initialState");
 	if (isEnable(document.getElementById("toggleButton")) 
 			&& (document.getElementById("editor").innerHTML == "")) {
 		// 編集モードでなく、内容が空であれば初期状態を編集モードにする
@@ -841,6 +842,7 @@
 		if (toggleFlag == true) {
 			toggleMode();
 		}
+		document.querySelector("body").classList.add("initialState");
 		
 		/* ファイルの肥大化を防ぐため中身を消去 */
 		document.getElementById("previewer").innerHTML = "";
@@ -875,6 +877,8 @@
 		contentAtSave = editor.value;
 		saved = true;
 		doPreview();
+		
+		document.querySelector("body").classList.remove("initialState");
 		if (toggleFlag == true) {
 			toggleMode();
 		}
