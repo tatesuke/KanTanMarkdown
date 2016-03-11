@@ -1,0 +1,69 @@
+#drawArea {
+	position:absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: gray;
+	display: none;
+}
+
+#drawArea h2 {
+	font-size: 14px;
+}
+
+#drawArea #canvasWrapper {
+	box-sizing: border-box;
+	float:left;
+	width: calc(100% - 200px);
+	height: 100%;
+	overflow: auto;
+	position: relative;
+	padding: 5px 15px 15px 5px;
+}
+
+#drawArea #canvasWrapper #baseCanvas,
+#drawArea #canvasWrapper #mainCanvas,
+#drawArea #canvasWrapper #workCanvas {
+	position: absolute;
+	border:1px solid red;
+}
+
+#drawArea #drawControllWrapper {
+	position: relative;
+	background-color: white;
+	float:left;
+	width:200px;
+	height:100%;
+}
+
+
+#drawArea #drawControllWrapper div {
+	width:100%;
+}
+
+#drawArea #drawControllWrapper button {
+	display:block;
+	width: 100%;
+}
+
+
+#drawArea #drawControllWrapper .float50 {
+	box-sizing:border-box;
+	float:left;
+	width:50%;
+}
+
+#drawArea #drawControllWrapper .clearfix:after {
+	content: "."; 
+	display: block; 
+	height: 0; 
+	font-size:0;	
+	clear: both; 
+	visibility:hidden;
+}
+
+#drawArea #drawControllWrapper .buttons {
+	position: absolute;
+	bottom : 0;
+}

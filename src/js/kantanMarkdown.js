@@ -108,7 +108,7 @@
 		
 		return false;
 	})
-
+	
 	/* エディタに機能追加 */
 	toKantanEditor(document.getElementById("editor"));
 	
@@ -314,25 +314,44 @@
 		var images = document.querySelectorAll("#previewer img");
 		for (i in images) {
 			var elem = images[i];
-			var base64 = null;
+			var base64Script = null;
 			if (elem.name) {
 				var script = document.getElementById("attach-" + elem.name);
 				if (script) {
-					base64 = script.innerHTML;
+					base64Script = script;
 				}
 			}
-			if (!base64 && elem.src) {
+			if (!base64Script && elem.src) {
 				var matchs = elem.src.trim().match(/^attach:(.+)/);
 				if (matchs) {
 					var script = document.getElementById("attach-" + 
 							decodeURIComponent(matchs[1]));
 					if (script) {
-						base64 = script.innerHTML;
+						base64Script = script;
 					}
 				}
 			}
-			if (base64 != null) {
-				elem.src = base64;
+			if (base64Script != null) {
+				var base64 = base64Script.innerHTML;
+				if (base64Script.nextElementSibling.tagName == "SCRIPT") { //★ここの判定の仕方がダサい
+					var baseImage = new Image();
+					baseImage.src= base64;
+					
+					var layerImage = new Image();
+					layerImage.src = base64Script.nextElementSibling.innerHTML;
+					
+					var tempCanvas = document.createElement("canvas");
+					tempCanvas.width = baseImage.width;
+					tempCanvas.height = baseImage.height;
+					
+					var ctx = tempCanvas.getContext('2d');
+					
+					ctx.drawImage(baseImage,0, 0);
+					ctx.drawImage(layerImage,0, 0);
+					elem.src = tempCanvas.toDataURL();
+				} else {
+					elem.src = base64;
+				}
 			}
 		}
 		
@@ -457,7 +476,7 @@
 	    fr.fileName = file.name;
 	    fr.onload = function(e) {
 			var target = e.target;
-			addAttachFileElements(target.fileName, target.result);
+			addAttachFileElements(target.fileName, target.result, "", "");
 		};
 		fr.readAsDataURL(file);
 	}
@@ -498,14 +517,19 @@
 	
 	function importKantanMarkdown(result, dummyHtml, file) {
 		if (result.attach == true) {
-			var fileListElement = dummyHtml.querySelector("ul#fileList");
-			var fileList = document.getElementById("fileList");
-			var importScripts = fileListElement.querySelectorAll("script");
-			for (var i = 0; i < importScripts.length; i++) {
-				var scriptElement = importScripts[i];
+			var fileListElement = dummyHtml.querySelectorAll("ul#fileList li");
+			for (var i = 0; i < fileListElement.length; i++) {
+				var scriptElement = fileListElement[i].querySelector("script");
 				var fileName = scriptElement.title;
 				var content = scriptElement.innerHTML;
-				addAttachFileElements(fileName, content);
+				
+				var layerElement = fileListElement[i].querySelector("script.layerContent");
+				var layerContent = layerElement.innerHTML;
+				
+				var trimInfoElement = fileListElement[i].querySelector("script.trimInfo");
+				var trimInfo = trimInfoElement.innerHTML;
+				
+				addAttachFileElements(fileName, content, layerContent, trimInfo);
 			}
 			saved = false;
 		}
@@ -581,7 +605,7 @@
 		dialogElement.style.left = ((body.offsetWidth / 2.0) - (dialogElement.offsetWidth / 2.0)) + "px";
 	}
 	
-	function addAttachFileElements(fileName, content) {
+	function addAttachFileElements(fileName, content, layerContent, trimInfo) {
 		var name = fileName;
 		var script = document.querySelector("#fileList script[title='" + name + "']");
 		var i = 1;
@@ -602,7 +626,19 @@
 		script.title = name;
 		script.innerHTML = content;
 		li.appendChild(script);
-
+		
+		var layerScript = document.createElement("script");
+		layerScript.type  = "text/template";
+		layerScript.classList.add("layerContent");
+		layerScript.innerHTML = layerContent;
+		li.appendChild(layerScript);
+		
+		var trimScript = document.createElement("script");
+		trimScript.type  = "text/template";
+		trimScript.classList.add("trimInfo");
+		trimScript.innerHTML = trimInfo;
+		li.appendChild(trimScript);
+		
 		var input  = document.createElement("input");
 		input.type = "text";
 		input.classList.add('fileName');
@@ -616,6 +652,12 @@
 		on(insertButton, "click", onInsertButtonClicked);
 		li.appendChild(insertButton);
 		
+		var editoButton = document.createElement("button");
+		editoButton.classList.add('editoButton');
+		editoButton.innerHTML = "Edit";
+		on(editoButton, "click", onEditButtonClicked);
+		li.appendChild(editoButton);
+		
 		var downloadButton = document.createElement("button");
 		downloadButton.classList.add('downloadButton');
 		downloadButton.innerHTML = "Download";
@@ -627,7 +669,7 @@
 		detachButton.innerHTML = "×";
 		on(detachButton, "click", onDetachButtonClicked);
 		li.appendChild(detachButton);
-
+		
 		document.getElementById("fileList").appendChild(li);
 		
 		// ファイル添付領域を開く
@@ -765,7 +807,29 @@
 		}
 		
 	}
-
+	
+	/* お絵かき周り */
+	var drawer = new KantanDrawer(document.querySelector("#drawArea"));
+	on(".EditButton", "click", onEditButtonClicked);
+	function onEditButtonClicked(e) {
+		var rootElement = e.target.parentNode;
+		var contentElement = rootElement.querySelector("script");
+		var layerElement = rootElement.querySelector("script.layerContent");
+		var trimElement = rootElement.querySelector("script.trimInfo");
+		
+		drawer.show(contentElement.innerHTML,
+				layerElement.innerHTML,
+				trimElement.innerHTML,
+				function(layerContent, trimInfo) {
+					layerElement.innerHTML = layerContent;
+					trimElement.innerHTML = trimInfo;
+				},
+				function() {
+					alert("cancel");
+				}
+		);
+	}
+	
 	/* 添付ファイル領域開け閉め */
 	on("#attachToggleButton", "click", function() {
 		if (isVisible(document.getElementById("filer"))){
@@ -1209,6 +1273,17 @@
 		cssEditor.focus();
 	}
 	
+	function addAttachEditLayer(fileName, content) {
+		var script = document.createElement("script");
+		script.type  = "text/template";
+		script.className = "editLayer";
+		script.innerHTML = content;
+		
+		var attach = document.getElementById("attach-" + fileName);
+		var parent = attach.parentNode;
+		parent.insertBefore(script, attach.nextSibling);
+	}
+	
 	/* ショートカットキー */
 	on("body", "keydown", function(event) {
 		var code = (event.keyCode ? event.keyCode : event.which);
@@ -1338,3 +1413,4 @@
 		elem.classList.remove("showBlock")
 		elem.classList.add("hide");
 	}
+		
