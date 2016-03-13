@@ -12,7 +12,7 @@ function KantanDrawer (drawArea) {
 	this.trimInfo = null;
 	this.borderWidth = "1.0";
 	this.borderColor = "#ff0000";
-	this.fillColor = "none";
+	this.fillColor = "rgba(0, 0, 0, 0)";
 	this.scale = 1.0;
 	this.commands = [];
 	this.workCommands = [];
@@ -43,12 +43,12 @@ function KantanDrawer (drawArea) {
 	/* FillColor */
 	var fillColorInput = drawArea.querySelector("[name=fillColor]");
 	var fillColorPicker = drawArea.querySelector("[name=fillColorPicker]");
-	fillColorInput.value = this.fillColor;
-	fillColorPicker.value = "#000000";
+	fillColorInput.value = "";
+	fillColorPicker.value = "#FFFFFE";
 	on(fillColorInput, "blur", function() {
-		if (fillColor.value == "none") {
-			fillColorPicker.value = "#000000";
-			that.fillColor = "argb(0, 0, 0 ,0)";
+		if (fillColorInput.value == "") {
+			fillColorPicker.value = "#FFFFFE";
+			that.fillColor = "rgba(0, 0, 0 ,0)";
 		} else {
 			fillColorPicker.value = this.value;
 			that.fillColor = this.value;
@@ -113,6 +113,21 @@ function KantanDrawer (drawArea) {
 		that.modeStrategy.onBeforeModeStart(e, that.commands, that.workCommands);
 		that.repaint();
 	});
+	on(drawArea.querySelector("[name=rectangleModeButton]"), "click", function(e) {
+		that.modeStrategy = new RectangleModeStrategy(that);
+		that.modeStrategy.onBeforeModeStart(e, that.commands, that.workCommands);
+		that.repaint();
+	});
+	on(drawArea.querySelector("[name=eraserModeButton]"), "click", function(e) {
+		that.modeStrategy = new EraserModeStrategy(that);
+		that.modeStrategy.onBeforeModeStart(e, that.commands, that.workCommands);
+		that.repaint();
+	});
+	on(drawArea.querySelector("[name=letterModeButton]"), "click", function(e) {
+		that.modeStrategy = new LetterModeStrategy(that);
+		that.modeStrategy.onBeforeModeStart(e, that.commands, that.workCommands);
+		that.repaint();
+	});
 
 
 	/* モード制御 */
@@ -144,8 +159,6 @@ KantanDrawer.prototype = {
 		var that = this;
 		this.baseImg = new Image();
 		this.baseImg.onload = function() {
-			
-			
 			if (trimInfoStr.trim() != "") {
 				that.trimInfo = JSON.parse(trimInfoStr); 
 			} else {
@@ -340,6 +353,148 @@ PenModeStrategy.prototype = {
 			workCommands.length = 0;
 			this.drawer.repaint();
 		}
+	},
+	onBeforeModeEnd: function(e) {
+	}
+};
+
+function RectangleModeStrategy(drawer){
+	this.drawer = drawer;
+	this.mouseStart = null;
+	this.mouseEnd = null;
+};
+RectangleModeStrategy.prototype = {
+	onBeforeModeStart:function(commands, workCommands) {
+		this.mouseStart = null;
+		this.mouseEnd = null;
+	},
+	onMouseDown:function(e, x, y, commands, workCommands) {
+		if (e.button == 0) {
+			this.mouseStart = {x: x, y : y};
+			this.mouseEnd = {x: x, y : y};
+			
+			var mouseStart = this.mouseStart;
+			var mouseEnd = this.mouseEnd;
+			workCommands.length = 0;
+			workCommands.push(new DrawCommand(this.drawer, function(ctx) {
+				ctx.fillRect(
+					mouseStart.x,
+					mouseStart.y,
+					mouseEnd.x - mouseStart.x,
+					mouseEnd.y - mouseStart.y);
+				ctx.strokeRect(
+					mouseStart.x,
+					mouseStart.y,
+					mouseEnd.x - mouseStart.x,
+					mouseEnd.y - mouseStart.y);
+			}));
+			this.drawer.repaint();
+		}
+	},
+	onMouseMove:function(e, x, y, commands, workCommands) {
+		if (this.mouseStart != null) {
+			this.mouseEnd.x = x;
+			this.mouseEnd.y = y;
+			this.drawer.repaint();
+		}
+	},
+	onMouseUp: function(e, x, y, commands, workCommands) {
+		if ((this.mouseStart != null) && (e.button == 0)) {
+			this.mouseStart = null;
+			this.mouseEnd = null;
+			commands.push(workCommands[0]);
+			workCommands.length = 0;
+			this.drawer.repaint();
+		}
+	},
+	onBeforeModeEnd: function(e) {
+	}
+};
+
+function EraserModeStrategy(drawer){
+	this.drawer = drawer;
+	this.mouseStart = null;
+	this.mouseEnd = null;
+};
+EraserModeStrategy.prototype = {
+	onBeforeModeStart:function(commands, workCommands) {
+		this.mouseStart = null;
+		this.mouseEnd = null;
+	},
+	onMouseDown:function(e, x, y, commands, workCommands) {
+		if (e.button == 0) {
+			this.mouseStart = {x: x, y : y};
+			this.mouseEnd = {x: x, y : y};
+			
+			var mouseStart = this.mouseStart;
+			var mouseEnd = this.mouseEnd;
+			workCommands.length = 0;
+			workCommands.push(new DrawCommand(this.drawer, function(ctx) {
+				ctx.strokeStyle = "#808080";
+				ctx.strokeRect(
+					mouseStart.x,
+					mouseStart.y,
+					mouseEnd.x - mouseStart.x,
+					mouseEnd.y - mouseStart.y);
+			}));
+			this.drawer.repaint();
+		}
+	},
+	onMouseMove:function(e, x, y, commands, workCommands) {
+		if (this.mouseStart != null) {
+			this.mouseEnd.x = x;
+			this.mouseEnd.y = y;
+			this.drawer.repaint();
+		}
+	},
+	onMouseUp: function(e, x, y, commands, workCommands) {
+		if ((this.mouseStart != null) && (e.button == 0)) {
+			var mouseStart = this.mouseStart;
+			var mouseEnd = this.mouseEnd;
+			workCommands.length = 0;
+			commands.push(new DrawCommand(this.drawer, function(ctx) {
+				ctx.clearRect(
+					mouseStart.x,
+					mouseStart.y,
+					mouseEnd.x - mouseStart.x,
+					mouseEnd.y - mouseStart.y);
+			}));
+			this.mouseStart = null;
+			this.mouseEnd = null;
+			this.drawer.repaint();
+		}
+	},
+	onBeforeModeEnd: function(e) {
+	}
+};
+
+function LetterModeStrategy(drawer){
+	this.drawer = drawer;
+	this.mouseStart = null;
+	this.mouseEnd = null;
+};
+LetterModeStrategy.prototype = {
+	onBeforeModeStart:function(commands, workCommands) {
+		this.mouseStart = null;
+		this.mouseEnd = null;
+	},
+	onMouseDown:function(e, x, y, commands, workCommands) {
+		if (e.button == 0) {
+			var string = window.prompt("文字を入力してください");
+			if (string != null) {
+				commands.push(new DrawCommand(this.drawer, function(ctx) {
+					ctx.save();
+					ctx.fillStyle = this.drawer.borderColor;
+					ctx.fillText(string, x, y);
+					ctx.restore();
+				}));
+				this.drawer.repaint();
+			}
+		}
+	},
+	onMouseMove:function(e, x, y, commands, workCommands) {
+	},
+	onMouseUp: function(e, x, y, commands, workCommands) {
 	},
 	onBeforeModeEnd: function(e) {
 	}
