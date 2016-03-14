@@ -54,16 +54,17 @@ module.exports = function(grunt) {
 		},
 		cssmin: {
 			css: {
-				files: [{
-					src: ["dist/temp/src/css/kantan.css"],
-					dest: "dist/temp/src/css/kantan.css",
-				}]
+				files: [
+					{src: ["dist/temp/src/css/kantan.css"], dest: "dist/temp/src/css/kantan.css"},
+					{src: ["dist/temp/src/css/drawer.css"], dest: "dist/temp/src/css/drawer.css"},
+				]
 			}
 		},
 		uglify: {
 			js: {
 				files: {
 					"dist/temp/src/js/kantanEditor.js": ["dist/temp/src/js/kantanEditor.js"],
+					"dist/temp/src/js/kantanDrawer.js": ["dist/temp/src/js/kantanDrawer.js"],
 					"dist/temp/src/js/kantanMarkdown.js": ["dist/temp/src/js/kantanMarkdown.js"],
 				}
 			}
