@@ -8,10 +8,6 @@
 	display: none;
 }
 
-#drawArea h2 {
-	font-size: 14px;
-}
-
 #drawArea #canvasWrapper {
 	box-sizing: border-box;
 	float:left;
@@ -26,7 +22,6 @@
 #drawArea #canvasWrapper #mainCanvas,
 #drawArea #canvasWrapper #workCanvas {
 	position: absolute;
-	border:1px solid red;
 }
 
 #drawArea #drawControllWrapper {
@@ -38,35 +33,35 @@
 }
 
 
-#drawArea #drawControllWrapper div {
+#drawArea div {
 	width:100%;
 }
 
-#drawArea #drawControllWrapper button {
+#drawArea button {
 	display:block;
 	width: 100%;
 	border: 1px solid black;
 	background-color: #ffffff;
 }
 
-#drawArea #drawControllWrapper .mode button.selected {
+#drawArea  button.selected {
 	background-color: #7a9cd3;
 }
 
 
-#drawArea #drawControllWrapper .float50 {
+#drawArea .float50 {
 	box-sizing:border-box;
 	float:left;
 	width:50%;
 }
 
-#drawArea #drawControllWrapper .float25 {
+#drawArea .float25 {
 	box-sizing:border-box;
 	float:left;
 	width:25%;
 }
 
-#drawArea #drawControllWrapper .color9 {
+#drawArea .color9 {
 	box-sizing:border-box;
 	float:left;
 	width:11.1%;
@@ -75,7 +70,7 @@
 	padding:0;
 }
 
-#drawArea #drawControllWrapper .color3 {
+#drawArea .color3 {
 	box-sizing:border-box;
 	float:left;
 	width:33.3%;
@@ -84,20 +79,14 @@
 	padding:0;
 }
 
-#drawArea #drawControllWrapper .color[name=c_ff0000] { background-color:#ff0000; }
-#drawArea #drawControllWrapper .color[name=c_f09000] { background-color:#f09000; }
-#drawArea #drawControllWrapper .color[name=c_fbD01d] { background-color:#fbD01d; }
-#drawArea #drawControllWrapper .color[name=c_008000] { background-color:#008000; }
-#drawArea #drawControllWrapper .color[name=c_008e94] { background-color:#008e94; }
-#drawArea #drawControllWrapper .color[name=c_00519a] { background-color:#00519a; }
-#drawArea #drawControllWrapper .color[name=c_800080] { background-color:#800080; }
-#drawArea #drawControllWrapper .color[name=c_db3561] { background-color:#db3561; }
-#drawArea #drawControllWrapper .color[name=c_603000] { background-color:#603000; }
-#drawArea #drawControllWrapper .color[name=c_000000] { background-color:#000000; }
-#drawArea #drawControllWrapper .color[name=c_ffffff] { background-color:#ffffff; }
-#drawArea #drawControllWrapper .color[name=c_clear]  { background-color:#ffffff; }
+#drawArea .color[name=c_ff0000] { background-color:#ff0000; }
+#drawArea .color[name=c_f09000] { background-color:#f09000; }
+#drawArea .color[name=c_fbD01d] { background-color:#fbD01d; }
+#drawArea .color[name=c_000000] { background-color:#000000; }
+#drawArea .color[name=c_ffffff] { background-color:#ffffff; }
+#drawArea .color[name=c_clear]  { background-color:#ffffff; }
 
-#drawArea #drawControllWrapper .clearfix:after {
+#drawArea .clearfix:after {
 	content: "."; 
 	display: block; 
 	height: 0; 
@@ -106,7 +95,7 @@
 	visibility:hidden;
 }
 
-#drawArea #drawControllWrapper .buttons {
+#drawArea .buttons {
 	position: absolute;
 	bottom : 0;
 }

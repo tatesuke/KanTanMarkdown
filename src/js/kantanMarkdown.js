@@ -412,11 +412,6 @@
 			}
 		}
 		
-		// IEだとinnerHTML後にborderが消えてしまい
-		// スクロールバーの位置がおかしくなる。
-		// なのでここで特別にこの行を書いてやらないといけない
-		previewer.style.border = "1px solid gray";
-		
 		// スクロールバーが最下部にある場合、更新後も最下部にする。
 		if (scrollLockFlag == true) {
 			previewer.scrollTop = previewer.scrollHeight;

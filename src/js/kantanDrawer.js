@@ -7,18 +7,6 @@ function KantanDrawer (drawArea) {
 	this.mainCanvas = drawArea.querySelector("#mainCanvas");
 	this.workCanvas = drawArea.querySelector("#workCanvas");
 	
-	this.baseImg = null;
-	this.layerImg = null;
-	this.trimInfo = null;
-	this.borderWidth = null;
-	this.borderColor = null;
-	this.fillColor = null;
-	this.font = null;
-	this.scale = null;
-	this.commands = null;
-	this.redoCommands = null;
-	this.workCommands = null;
-	
 	/* モード切替 */
 	var modeButtons = drawArea.querySelectorAll(".mode button");
 	for (var i = 0; i < modeButtons.length; i++) {
@@ -246,9 +234,6 @@ KantanDrawer.prototype = {
 		if (modeName == "pen") {
 			this.modeStrategy = new PenModeStrategy(this);
 			this.modeStrategy.onBeforeModeStart(this.commands, this.workCommands);
-		} else if (modeName == "line") {
-			this.modeStrategy = new LineModeStrategy(this);
-			this.modeStrategy.onBeforeModeStart(this.commands, this.workCommands);
 		} else if (modeName == "rectangle") {
 			this.modeStrategy = new RectangleModeStrategy(this);
 			this.modeStrategy.onBeforeModeStart(this.commands, this.workCommands);
@@ -318,12 +303,13 @@ KantanDrawer.prototype = {
 		slaceElem.textContent = this.scale;
 	},
 	repaint: function() {
-		this.baseCanvas.width  = this.trimInfo.w * this.scale;
-		this.baseCanvas.height = this.trimInfo.h * this.scale;
-		this.mainCanvas.width  = this.trimInfo.w * this.scale;
-		this.mainCanvas.height = this.trimInfo.h * this.scale;
-		this.workCanvas.width  = this.trimInfo.w * this.scale;
-		this.workCanvas.height = this.trimInfo.h * this.scale;
+		this.baseCanvas.width = 
+				this.mainCanvas.width = 
+				this.workCanvas.width = this.trimInfo.w * this.scale;
+				
+		this.baseCanvas.height = 
+				this.mainCanvas.height =
+				this.workCanvas.height = this.trimInfo.h * this.scale;
 		
 		var trimModeButton = this.drawArea.querySelector("[name=trimModeButton]");
 		if (this.trimInfo.x == 0
@@ -458,8 +444,6 @@ TrimModeStrategy.prototype = {
 			this.drawer.repaint();
 		}
 	},
-	onBeforeModeEnd: function(e) {
-	}
 };
 
 function PenModeStrategy(drawer){
@@ -504,56 +488,6 @@ PenModeStrategy.prototype = {
 			this.drawer.repaint();
 		}
 	},
-	onBeforeModeEnd: function(e) {
-	}
-};
-
-function LineModeStrategy(drawer){
-	this.modeName = "line";
-	this.drawer = drawer;
-	this.mouseStart = null;
-	this.mouseEnd = null;
-};
-LineModeStrategy.prototype = {
-	onBeforeModeStart:function(commands, workCommands) {
-		this.mouseStart = null;
-		this.mouseEnd = null;
-	},
-	onMouseDown:function(e, x, y, commands, workCommands) {
-		if (e.button == 0) {
-			this.mouseStart = {x: x, y : y};
-			this.mouseEnd = {x: x, y : y};
-			
-			var mouseStart = this.mouseStart;
-			var mouseEnd = this.mouseEnd;
-			workCommands.length = 0;
-			workCommands.push(new DrawCommand(this.drawer, function(ctx) {
-				ctx.beginPath();
-				ctx.moveTo(mouseStart.x, mouseStart.y);
-				ctx.lineTo(mouseEnd.x, mouseEnd.y);
-				ctx.stroke();
-			}));
-			this.drawer.repaint();
-		}
-	},
-	onMouseMove:function(e, x, y, commands, workCommands) {
-		if (this.mouseStart != null) {
-			this.mouseEnd.x = x;
-			this.mouseEnd.y = y;
-			this.drawer.repaint();
-		}
-	},
-	onMouseUp: function(e, x, y, commands, workCommands) {
-		if ((this.mouseStart != null) && (e.button == 0)) {
-			this.mouseStart = null;
-			this.mouseEnd = null;
-			commands.push(workCommands[0]);
-			workCommands.length = 0;
-			this.drawer.repaint();
-		}
-	},
-	onBeforeModeEnd: function(e) {
-	}
 };
 
 function RectangleModeStrategy(drawer){
@@ -606,8 +540,6 @@ RectangleModeStrategy.prototype = {
 			this.drawer.repaint();
 		}
 	},
-	onBeforeModeEnd: function(e) {
-	}
 };
 
 function EraserModeStrategy(drawer){
@@ -664,8 +596,6 @@ EraserModeStrategy.prototype = {
 			this.drawer.repaint();
 		}
 	},
-	onBeforeModeEnd: function(e) {
-	}
 };
 
 function LetterModeStrategy(drawer){
@@ -698,7 +628,5 @@ LetterModeStrategy.prototype = {
 			}
 		}
 	},
-	onBeforeModeEnd: function(e) {
-	}
 };
 
