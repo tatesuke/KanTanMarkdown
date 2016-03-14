@@ -80,8 +80,7 @@
 }
 
 #drawArea .color[name=c_ff0000] { background-color:#ff0000; }
-#drawArea .color[name=c_f09000] { background-color:#f09000; }
-#drawArea .color[name=c_fbD01d] { background-color:#fbD01d; }
+#drawArea .color[name=c_34A853] { background-color:#34A853; }
 #drawArea .color[name=c_000000] { background-color:#000000; }
 #drawArea .color[name=c_ffffff] { background-color:#ffffff; }
 #drawArea .color[name=c_clear]  { background-color:#ffffff; }
@@ -95,7 +94,3 @@
 	visibility:hidden;
 }
 
-#drawArea .buttons {
-	position: absolute;
-	bottom : 0;
-}

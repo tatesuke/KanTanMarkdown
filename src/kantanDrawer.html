@@ -4,13 +4,11 @@
 	<canvas id="workCanvas"></canvas>
 </div>
 <div id="drawControllWrapper">
-	<div class="clearfix">
-		<dl>
+	<dl>
 		<dt>モード</dt>
-		<dd class="mode clearfix">
-			<button class="float50" name="penModeButton">Pen</button>
-			<button class="float50" name="rectangleModeButton">Rectangle</button>
-			<button class="float50" name="letterModeButton">Letter</button>
+		<dd class="mode">
+			<button name="rectangleModeButton">Rectangle</button>
+			<button name="letterModeButton">Letter</button>
 			<button name="eraserModeButton">Eraser</button>
 			<button name="trimModeButton">Trim</button>
 		</dd>
@@ -24,10 +22,9 @@
 		<dt>枠の色<dt>
 		<dd class="borderColor clearfix">
 			<button class="color color9" name="c_ff0000">　</button>
-			<button class="color color9" name="c_f09000">　</button>
-			<button class="color color9" name="c_fbD01d">　</button>
-			<button class="color color3" name="c_000000">　</button>
-			<button class="color color3" name="c_ffffff">　</button>
+			<button class="color color9" name="c_34A853">　</button>
+			<button class="color color9" name="c_000000">　</button>
+			<button class="color color9" name="c_ffffff">　</button>
 			<button class="color color3" name="c_clear">透明</button>
 			<input type="text" name="borderColor">
 		</dd>
@@ -35,10 +32,9 @@
 		<dt>塗りつぶしの色</dt>
 		<dd class="fillColor clearfix">
 			<button class="color color9" name="c_ff0000">　</button>
-			<button class="color color9" name="c_f09000">　</button>
-			<button class="color color9" name="c_fbD01d">　</button>
-			<button class="color color3" name="c_000000">　</button>
-			<button class="color color3" name="c_ffffff">　</button>
+			<button class="color color9" name="c_34A853">　</button>
+			<button class="color color9" name="c_000000">　</button>
+			<button class="color color9" name="c_ffffff">　</button>
 			<button class="color color3" name="c_clear">透明</button>
 			<input type="text" name="fillColor">
 		</dd>
@@ -54,16 +50,17 @@
 			<button name="minus" class="float25">-</button><button name="plus"class="float25">+</button>
 		</dd>
 		
-		</dl>
-	</div>
-	
-	<div>
-		<button name="undoButton" class="float50">←Undo</button>
-		<button name="redoButton" class="float50">Redo→</button>
-		<button name="resetButton">Reset</button>
-	</div>
-	<div class="buttons">
-		<button name="saveButton">Save</button>
-		<button name="cancelButton">Cancel</button>
-	<div>
+		<dt>編集</dt>
+		<dd>
+			<button name="undoButton" class="float50">←Undo</button>
+			<button name="redoButton" class="float50">Redo→</button>
+			<button name="resetButton">Reset</button>
+		</dd>
+		
+		<dt>ファイル</dt>
+		<dd>
+			<button name="saveButton">Save</button>
+			<button name="cancelButton">Cancel</button>
+		</dd>
+	</dl>
 </div>

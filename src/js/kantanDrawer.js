@@ -177,8 +177,6 @@ function KantanDrawer (drawArea) {
 };
 KantanDrawer.prototype = {
 	show: function(content, layerContent, trimInfoStr, saveCallback, cancelCallback) {
-		this.reset();
-		
 		this.saveCallback = saveCallback;
 		this.cancelCallback = cancelCallback;
 	
@@ -204,7 +202,7 @@ KantanDrawer.prototype = {
 			}
 		};
 		this.baseImg.src = content;
-		drawArea.addEventListener("keydown", this._eventCanceler);
+		this.reset();
 	},
 	hide: function() {
 		this.baseImg = null;
@@ -216,25 +214,20 @@ KantanDrawer.prototype = {
 		this.redoCommands = [];
 		this.workCommands = [];
 		this.layerImg = null;
-		this.setMode("pen");
+		this.trimInfo = {
+				x: 0,
+				y: 0,
+				w: this.baseImg.width,
+				h: this.baseImg.height,};
+		this.setMode("rectangle");
 		this.setBorderWidth(1.0);
 		this.setBorderColor("#ff0000");
 		this.setFillColor("rgba(0, 0, 0, 0)");
 		this.setFont("18px sans-serif");
 		this.setScale(1.0);
-		if (this.baseImg) {
-			this.trimInfo = {
-						x: 0,
-						y: 0,
-						w: this.baseImg.width,
-						h: this.baseImg.height,};
-		}
 	},
 	setMode: function(modeName) {
-		if (modeName == "pen") {
-			this.modeStrategy = new PenModeStrategy(this);
-			this.modeStrategy.onBeforeModeStart(this.commands, this.workCommands);
-		} else if (modeName == "rectangle") {
+		if (modeName == "rectangle") {
 			this.modeStrategy = new RectangleModeStrategy(this);
 			this.modeStrategy.onBeforeModeStart(this.commands, this.workCommands);
 		} else if (modeName == "letter") {
@@ -446,50 +439,6 @@ TrimModeStrategy.prototype = {
 	},
 };
 
-function PenModeStrategy(drawer){
-	this.modeName = "pen";
-	this.drawer = drawer;
-	this.isMouseDown = false;
-	this.posList = null;
-};
-PenModeStrategy.prototype = {
-	onBeforeModeStart:function(commands, workCommands) {
-		this.posList = [];
-	},
-	onMouseDown:function(e, x, y, commands, workCommands) {
-		if (e.button == 0) {
-			var posList = this.posList;
-			this.isMouseDown = true;
-			this.posList.push({x: x, y : y});
-			workCommands.length = 0;
-			workCommands.push(new DrawCommand(this.drawer, function(ctx) {
-				ctx.beginPath();
-				ctx.moveTo(posList[0].x, posList[0].y);
-				for (var i = 0; i < posList.length; i++) {
-					ctx.lineTo(posList[i].x, posList[i].y);
-				}
-				ctx.stroke();
-			}));
-			this.drawer.repaint();
-		}
-	},
-	onMouseMove:function(e, x, y, commands, workCommands) {
-		if (this.isMouseDown) {
-			this.posList.push({x: x, y : y});
-			this.drawer.repaint();
-		}
-	},
-	onMouseUp: function(e, x, y, commands, workCommands) {
-		if (e.button == 0) {
-			this.posList = [];
-			this.isMouseDown = false;
-			commands.push(workCommands[0]);
-			workCommands.length = 0;
-			this.drawer.repaint();
-		}
-	},
-};
-
 function RectangleModeStrategy(drawer){
 	this.modeName = "rectangle";
 	this.drawer = drawer;
@@ -500,6 +449,8 @@ RectangleModeStrategy.prototype = {
 	onBeforeModeStart:function(commands, workCommands) {
 		this.mouseStart = null;
 		this.mouseEnd = null;
+		workCommands.length = 0;
+		this.drawer.repaint();
 	},
 	onMouseDown:function(e, x, y, commands, workCommands) {
 		if (e.button == 0) {
@@ -552,6 +503,8 @@ EraserModeStrategy.prototype = {
 	onBeforeModeStart:function(commands, workCommands) {
 		this.mouseStart = null;
 		this.mouseEnd = null;
+		workCommands.length = 0;
+		this.drawer.repaint();
 	},
 	onMouseDown:function(e, x, y, commands, workCommands) {
 		if (e.button == 0) {
@@ -608,6 +561,8 @@ LetterModeStrategy.prototype = {
 	onBeforeModeStart:function(commands, workCommands) {
 		this.mouseStart = null;
 		this.mouseEnd = null;
+		workCommands.length = 0;
+		this.drawer.repaint();
 	},
 	onMouseDown:function(e, x, y, commands, workCommands) {
 	},
