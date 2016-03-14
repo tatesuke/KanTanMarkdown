@@ -332,23 +332,39 @@
 				}
 			}
 			if (base64Script != null) {
+				var rootElem = base64Script.parentNode;
+				
 				var base64 = base64Script.innerHTML;
-				if (base64Script.nextElementSibling.tagName == "SCRIPT") { //★ここの判定の仕方がダサい
+				var layer64 = rootElem.querySelector("script.layerContent").innerHTML;
+				var trimInfo = rootElem.querySelector("script.trimInfo").innerHTML;
+				trimInfo = (trimInfo != "") ? JSON.parse(trimInfo) : null;
+				
+				if (layer64 || trimInfo) {
 					var baseImage = new Image();
 					baseImage.src= base64;
-					
-					var layerImage = new Image();
-					layerImage.src = base64Script.nextElementSibling.innerHTML;
-					
 					var tempCanvas = document.createElement("canvas");
-					tempCanvas.width = baseImage.width;
-					tempCanvas.height = baseImage.height;
+					tempCanvas.width = (trimInfo) ? trimInfo.w : baseImage.width;
+					tempCanvas.height = (trimInfo) ? trimInfo.h : baseImage.height;
 					
 					var ctx = tempCanvas.getContext('2d');
-					
+					if (trimInfo) {
+						ctx.translate(-trimInfo.x, -trimInfo.y);
+					}
 					ctx.drawImage(baseImage,0, 0);
-					ctx.drawImage(layerImage,0, 0);
 					elem.src = tempCanvas.toDataURL();
+					
+					if (layer64 != "") {
+						var layerImage = new Image();
+						layerImage.onload = (function(elem) {
+							return function() {
+								ctx.drawImage(layerImage,0, 0);
+								elem.src = tempCanvas.toDataURL();
+							}
+						})(elem);
+						layerImage.src = layer64;
+						
+					}
+					
 				} else {
 					elem.src = base64;
 				}
@@ -817,15 +833,18 @@
 		var layerElement = rootElement.querySelector("script.layerContent");
 		var trimElement = rootElement.querySelector("script.trimInfo");
 		
+		document.querySelector("body").classList.add("drawMode");
 		drawer.show(contentElement.innerHTML,
 				layerElement.innerHTML,
 				trimElement.innerHTML,
 				function(layerContent, trimInfo) {
 					layerElement.innerHTML = layerContent;
 					trimElement.innerHTML = trimInfo;
+					document.querySelector("body").classList.remove("drawMode");
+					doPreview();
 				},
 				function() {
-					alert("cancel");
+					document.querySelector("body").classList.remove("drawMode");
 				}
 		);
 	}
@@ -1288,6 +1307,15 @@
 	on("body", "keydown", function(event) {
 		var code = (event.keyCode ? event.keyCode : event.which);
 		
+		if (isDrawMode()) {
+			if (code == 83 && (event.ctrlKey || event.metaKey)){
+				event.preventDefault();
+				return false;
+			} else {
+				return true;
+			}
+		}
+		
 		if (code == 27) {
 			// ESCキー
 			event.preventDefault();
@@ -1383,6 +1411,10 @@
 	
 	function isEditMode() {
 		return document.querySelector("body").classList.contains("editMode");
+	}
+	
+	function isDrawMode() {
+		return document.querySelector("body").classList.contains("drawMode");
 	}
 	
 	function isEnable(elem) {

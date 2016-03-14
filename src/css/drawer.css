@@ -45,6 +45,12 @@
 #drawArea #drawControllWrapper button {
 	display:block;
 	width: 100%;
+	border: 1px solid black;
+	background-color: #ffffff;
+}
+
+#drawArea #drawControllWrapper .mode button.selected {
+	background-color: #7a9cd3;
 }
 
 
@@ -53,6 +59,43 @@
 	float:left;
 	width:50%;
 }
+
+#drawArea #drawControllWrapper .float25 {
+	box-sizing:border-box;
+	float:left;
+	width:25%;
+}
+
+#drawArea #drawControllWrapper .color9 {
+	box-sizing:border-box;
+	float:left;
+	width:11.1%;
+	border:1px solid black;
+	margin:0;
+	padding:0;
+}
+
+#drawArea #drawControllWrapper .color3 {
+	box-sizing:border-box;
+	float:left;
+	width:33.3%;
+	border:1px solid black;
+	margin:0;
+	padding:0;
+}
+
+#drawArea #drawControllWrapper .color[name=c_ff0000] { background-color:#ff0000; }
+#drawArea #drawControllWrapper .color[name=c_f09000] { background-color:#f09000; }
+#drawArea #drawControllWrapper .color[name=c_fbD01d] { background-color:#fbD01d; }
+#drawArea #drawControllWrapper .color[name=c_008000] { background-color:#008000; }
+#drawArea #drawControllWrapper .color[name=c_008e94] { background-color:#008e94; }
+#drawArea #drawControllWrapper .color[name=c_00519a] { background-color:#00519a; }
+#drawArea #drawControllWrapper .color[name=c_800080] { background-color:#800080; }
+#drawArea #drawControllWrapper .color[name=c_db3561] { background-color:#db3561; }
+#drawArea #drawControllWrapper .color[name=c_603000] { background-color:#603000; }
+#drawArea #drawControllWrapper .color[name=c_000000] { background-color:#000000; }
+#drawArea #drawControllWrapper .color[name=c_ffffff] { background-color:#ffffff; }
+#drawArea #drawControllWrapper .color[name=c_clear]  { background-color:#ffffff; }
 
 #drawArea #drawControllWrapper .clearfix:after {
 	content: "."; 

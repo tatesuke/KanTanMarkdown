@@ -4,34 +4,76 @@
 	<canvas id="workCanvas"></canvas>
 </div>
 <div id="drawControllWrapper">
-	<div class="mode clearfix">
-		<h2>Mode</h2>
-		<button class="float50" name="penModeButton">Pen</button>
-		<button class="float50" name="lineModeButton">Line－</button>
-		<button class="float50" name="rectangleModeButton">Rectangle</button>
-		<button class="float50" name="letterModeButton">Letter</button>
-		<button class="float50" name="eraserModeButton">Eraser</button>
-		<button name="trimModeButton">Trim</button>
-	</div>
-	<div class="borderWidth">
-		<h2>Width</h2>
-		<input type="number" name="borderWidth" min="1">
-	</div>
 	<div class="clearfix">
-		<h2>Border</h2>
-		<input type="text" class="float50" name="borderColor">
-		<input type="color"  class="float50" name="borderColorPicker">
+		<dl>
+		<dt>モード</dt>
+		<dd class="mode clearfix">
+			<button class="float50" name="penModeButton">Pen</button>
+			<button class="float50" name="lineModeButton">Line</button>
+			<button class="float50" name="rectangleModeButton">Rectangle</button>
+			<button class="float50" name="letterModeButton">Letter</button>
+			<button name="eraserModeButton">Eraser</button>
+			<button name="trimModeButton">Trim</button>
+		</dd>
+		
+		<dt>枠の太さ</dt>
+		<dd class="borderWidth clearfix">
+			<div class="float50" name="borderWidth"></div>
+			<button name="minus" class="float25">-</button><button name="plus"class="float25">+</button>
+		</dd>
+		
+		<dt>枠の色<dt>
+		<dd class="borderColor clearfix">
+			<button class="color color9" name="c_ff0000">　</button>
+			<button class="color color9" name="c_f09000">　</button>
+			<button class="color color9" name="c_fbD01d">　</button>
+			<button class="color color9" name="c_008000">　</button>
+			<button class="color color9" name="c_008e94">　</button>
+			<button class="color color9" name="c_00519a">　</button>
+			<button class="color color9" name="c_800080">　</button>
+			<button class="color color9" name="c_db3561">　</button>
+			<button class="color color9" name="c_603000">　</button>
+			<button class="color color3" name="c_000000">　</button>
+			<button class="color color3" name="c_ffffff">　</button>
+			<button class="color color3" name="c_clear">透明</button>
+			<input type="text" name="borderColor">
+		</dd>
+		
+		<dt>塗りつぶしの色</dt>
+		<dd class="fillColor clearfix">
+			<button class="color color9" name="c_ff0000">　</button>
+			<button class="color color9" name="c_f09000">　</button>
+			<button class="color color9" name="c_fbD01d">　</button>
+			<button class="color color9" name="c_008000">　</button>
+			<button class="color color9" name="c_008e94">　</button>
+			<button class="color color9" name="c_00519a">　</button>
+			<button class="color color9" name="c_800080">　</button>
+			<button class="color color9" name="c_db3561">　</button>
+			<button class="color color9" name="c_603000">　</button>
+			<button class="color color3" name="c_000000">　</button>
+			<button class="color color3" name="c_ffffff">　</button>
+			<button class="color color3" name="c_clear">透明</button>
+			<input type="text" name="fillColor">
+		</dd>
+		
+		<dt>フォント</dt>
+		<dd class="clearfix">
+			<input type="text" name="font">
+		</dd>
+		
+		<dt>拡大率</dt>
+		<dd class="scale clearfix">
+			<div class="float50" name="scale"></div>
+			<button name="minus" class="float25">-</button><button name="plus"class="float25">+</button>
+		</dd>
+		
+		</dl>
 	</div>
-	<div class="clearfix">
-		<h2>Fill</h2>
-		<input type="text" class="float50" name="fillColor">
-		<input type="color" class="float50" name="fillColorPicker">
-	</div>
-	<div class="controll">
-		<h2>Edit</h2>
-		<input type="number" name="scale" min="0.1" step="0.1">
-		<button class="float50">←Undo</button>
-		<button name="clearButton">Clear</button>
+	
+	<div>
+		<button name="undoButton" class="float50">←Undo</button>
+		<button name="redoButton" class="float50">Redo→</button>
+		<button name="resetButton">Reset</button>
 	</div>
 	<div class="buttons">
 		<button name="saveButton">Save</button>
