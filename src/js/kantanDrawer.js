@@ -120,18 +120,29 @@ function KantanDrawer (drawArea) {
 			}
 		}
 		
-		if (!isEmpty) {
+		var trimInfoString;
+		if (isEmpty) {
+			if (that.trimInfo.x == 0
+					&& that.trimInfo.y == 0
+					&& that.trimInfo.w == that.baseImg.width
+					&& that.trimInfo.h == that.baseImg.height) {
+				trimInfoString = "";
+			} else {
+				trimInfoString = JSON.stringify(that.trimInfo);
+			}
+		} else {
 			var tempCanvas = document.createElement("canvas");
 			tempCanvas.width = that.baseImg.width;
 			tempCanvas.height = that.baseImg.height;
 			tempCtx = tempCanvas.getContext("2d");
 			tempCtx.putImageData(mainData, that.trimInfo.x, that.trimInfo.y);
 			layerData = tempCanvas.toDataURL();
+			trimInfoString = JSON.stringify(that.trimInfo);
 		}
 		
-		that.hide();
-		that.saveCallback(layerData, JSON.stringify(that.trimInfo));
+		that.saveCallback(layerData, trimInfoString);
 		that.reset();
+		that.hide();
 	});
 
 	/* cancel */
@@ -139,8 +150,8 @@ function KantanDrawer (drawArea) {
 	on(cancelButton, "click", function() {
 		var confirm = window.confirm("キャンセルしてもいいですか？編集内容は失われます。");
 		if (confirm == true) {
-			that.hide();
 			that.reset();
+			that.hide();
 			that.cancelCallback();
 		}
 	});
@@ -148,8 +159,8 @@ function KantanDrawer (drawArea) {
 	/* モード制御 */
 	on(this.workCanvas, "mousedown", function(e) {
 		var originalLength = that.commands.length;
-		var x = (e.layerX / that.scale) + that.trimInfo.x;
-		var y = (e.layerY / that.scale) + that.trimInfo.y;
+		var x = ((e.pageX + that.canvasWrapper.scrollLeft) / that.scale) + that.trimInfo.x;
+		var y = ((e.pageY + that.canvasWrapper.scrollTop) / that.scale) + that.trimInfo.y;
 		that.modeStrategy.onMouseDown(e, x, y, that.commands, that.workCommands);
 		if (originalLength != that.commands.length) {
 			that.redoCommands = [];
@@ -157,8 +168,8 @@ function KantanDrawer (drawArea) {
 	});
 	on(this.workCanvas, "mousemove", function(e) {
 		var originalLength = that.commands.length;
-		var x = (e.layerX / that.scale) + that.trimInfo.x;
-		var y = (e.layerY / that.scale) + that.trimInfo.y;
+		var x = ((e.pageX + that.canvasWrapper.scrollLeft) / that.scale) + that.trimInfo.x;
+		var y = ((e.pageY + that.canvasWrapper.scrollTop) / that.scale) + that.trimInfo.y;
 		that.modeStrategy.onMouseMove(e, x, y, that.commands, that.workCommands);
 		if (originalLength != that.commands.length) {
 			that.redoCommands = [];
@@ -166,8 +177,8 @@ function KantanDrawer (drawArea) {
 	});
 	on(this.workCanvas, "mouseup", function(e) {
 		var originalLength = that.commands.length;
-		var x = (e.layerX / that.scale) + that.trimInfo.x;
-		var y = (e.layerY / that.scale) + that.trimInfo.y;
+		var x = ((e.pageX + that.canvasWrapper.scrollLeft) / that.scale) + that.trimInfo.x;
+		var y = ((e.pageY + that.canvasWrapper.scrollTop) / that.scale) + that.trimInfo.y;
 		that.modeStrategy.onMouseUp(e, x, y, that.commands, that.workCommands);
 		if (originalLength != that.commands.length) {
 			that.redoCommands = [];
