@@ -8,10 +8,7 @@
  --><head>
 <meta charset="utf-8">
 <style><inline src="css/kantan.css" /><inline src="css/drawer.css" /></style>
-<style id="previewerStyle">
-<inline src="css/previewer.css" />
-<inline src="css/hljs.css" />
-</style>
+<style id="previewerStyle"></style>
 <title>無題</title>
 </head>
 <body class="initialState">
@@ -39,7 +36,8 @@
 		<noscript>このファイルはJavaScriptを有効にするとより正確に表示できます。</noscript>
 		<div id="editorTabContents">
 			<textarea id="editor"></textarea>
-			<textarea id="cssEditor"></textarea>
+			<textarea id="cssEditor"><inline src="css/previewer.css" />
+<inline src="css/hljs.css" /></textarea>
 		</div>
 		<ol id="editorTabs">
 			<li class="selected"><a href="#" id="markdownTab">Markdown</a></li>

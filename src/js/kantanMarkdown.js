@@ -111,11 +111,6 @@
 	
 	/* エディタに機能追加 */
 	toKantanEditor(document.getElementById("editor"));
-	
-	document.querySelector("#cssEditor").value = 
-			document.querySelector("#previewerStyle").innerHTML.trim();
-	document.querySelector("#cssEditor").selectionStart = 0;
-	document.querySelector("#cssEditor").selectionEnd = 0;
 	toKantanEditor(document.getElementById("cssEditor"));
 
 	/* シンタックスハイライト設定 */
@@ -597,10 +592,10 @@
 				var content = scriptElement.innerHTML;
 				
 				var layerElement = fileListElement[i].querySelector("script.layerContent");
-				var layerContent = layerElement.innerHTML;
+				var layerContent = (layerElement) ? layerElement.innerHTML : "";
 				
 				var trimInfoElement = fileListElement[i].querySelector("script.trimInfo");
-				var trimInfo = trimInfoElement.innerHTML;
+				var trimInfo = (trimInfoElement) ? trimInfoElement.innerHTML : "";
 				
 				addAttachFileElements(fileName, content, layerContent, trimInfo);
 			}
@@ -618,8 +613,14 @@
 			var styleElement = dummyHtml.querySelector("#previewerStyle");
 			if (styleElement) {
 				var cssEditor = document.getElementById("cssEditor");
-				cssEditor.value = cssEditor.textContent + styleElement.innerHTML;
-				saved = false;
+				var dummyCssEditor = dummyHtml.querySelector("#cssEditor");
+				if (styleElement.innerHTML.trim() != "") {
+					cssEditor.value = cssEditor.textContent + styleElement.innerHTML;
+					saved = false;
+				} else if (dummyCssEditor) {
+					cssEditor.value = cssEditor.textContent + dummyCssEditor.value;
+					saved = false;
+				}
 			}
 		}
 		
@@ -1015,6 +1016,9 @@
 		var editor = document.getElementById("editor");
 		editor.innerHTML = editor.value.replace(/</g, "&lt;");
 		
+		var cssEditor = document.getElementById("cssEditor");
+		cssEditor.innerHTML = cssEditor.value;
+		
 		var toggleFlag = isEditMode();
 		if (toggleFlag == true) {
 			toggleMode();
@@ -1024,8 +1028,7 @@
 		/* ファイルの肥大化を防ぐため中身を消去 */
 		document.getElementById("previewer").innerHTML = "";
 		document.getElementById("messageArea").innerHTML = "";
-		// cssエディタはテキストエリアなので保存されない
-		// document.getElementById("cssEditor").value = "";
+		document.getElementById("previewerStyle").innerHTML="";
 		
 		var html = "<!doctype html>\n<html>\n";
 		html += document.getElementsByTagName("html")[0].innerHTML;
