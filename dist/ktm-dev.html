@@ -67,6 +67,13 @@ nav:after {
 	width: 300px;
 }
 
+#attach #pasteArea {
+	box-sizing:border-box;
+	width:100%;
+	border: 1px solid gray;
+	text-align:center;
+}
+
 #attach #attachToggleButton,
 #attach #previewToggleButton{
 	width: 50%;
@@ -259,6 +266,23 @@ nav:after {
 	display: none  !important;
 }
 
+/* JavaScriptOff時の配慮 */
+.initialState #editorTabWrapper {
+	display:block !important;
+	width: 100% !important;
+}
+.initialState #editor {
+	margin-top: 5px !important;
+	font-size: large !important;
+	height: 90vh !important;
+}
+.initialState nav,
+.initialState #attach,
+.initialState #editorTabs,
+.initialState #previewer {
+	display:none !important;
+}
+
 @media print {
   nav {
   	display:none;
@@ -269,9 +293,132 @@ nav:after {
   	padding:0 !important;
   }
 }
+#drawArea {
+	position:absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: gray;
+	display: none;
+}
+
+#drawArea #canvasWrapper {
+	box-sizing: border-box;
+	float:left;
+	width: calc(100% - 200px);
+	height: 100%;
+	overflow: auto;
+	position: relative;
+	padding: 5px 15px 15px 5px;
+}
+
+#drawArea #canvasWrapper #baseCanvas,
+#drawArea #canvasWrapper #mainCanvas,
+#drawArea #canvasWrapper #workCanvas {
+	position: absolute;
+}
+
+#drawArea #drawControllWrapper {
+	position: relative;
+	background-color: white;
+	float:left;
+	width:200px;
+	height:100%;
+}
+
+
+#drawArea div {
+	width:100%;
+}
+
+#drawArea button {
+	display:block;
+	width: 100%;
+	border: 1px solid black;
+	background-color: #ffffff;
+}
+
+#drawArea  button.selected {
+	background-color: #7a9cd3;
+}
+
+
+#drawArea .float50 {
+	box-sizing:border-box;
+	float:left;
+	width:50%;
+}
+
+#drawArea .float25 {
+	box-sizing:border-box;
+	float:left;
+	width:25%;
+}
+
+#drawArea .color9 {
+	box-sizing:border-box;
+	float:left;
+	width:11.1%;
+	border:1px solid black;
+	margin:0;
+	padding:0;
+}
+
+#drawArea .color3 {
+	box-sizing:border-box;
+	float:left;
+	width:33.3%;
+	border:1px solid black;
+	margin:0;
+	padding:0;
+}
+
+#drawArea .color[name=c_ff0000] { background-color:#ff0000; }
+#drawArea .color[name=c_34A853] { background-color:#34A853; }
+#drawArea .color[name=c_000000] { background-color:#000000; }
+#drawArea .color[name=c_ffffff] { background-color:#ffffff; }
+#drawArea .color[name=c_clear]  { background-color:#ffffff; }
+
+#drawArea .clearfix:after {
+	content: "."; 
+	display: block; 
+	height: 0; 
+	font-size:0;	
+	clear: both; 
+	visibility:hidden;
+}
+
 </style>
-<style id="previewerStyle">
-/*
+<style id="previewerStyle"></style>
+<title>無題</title>
+</head>
+<body class="initialState">
+<nav>
+	<div id="leftNav">
+		<button id="onlineMenuButton">オンラインメニュー</button>
+	</div>
+	<div id="rightNav">
+		<span id="messageArea"></span>
+		<input type="checkbox" id="autoSyncButton" name="autoSyncButton" checked="checked"><label for="autoSyncButton">自動プレビュー</label>
+		<button id="syncButton">プレビュー(F5)</button><button id="headingSyncButton">見出し同期(F2)</button><button id="toggleButton">編集/閲覧(ESC)</button><button id="saveButton">保存(Ctrl+S)</button>
+	</div>
+</nav>
+<div id="attach">
+	<form id="attachForm"><input type="file" id="attachButton" multiple multiple></form>
+	<div id="filer">
+		<ul id="fileList">
+		</ul>
+		<div id="pasteArea" contenteditable="true">ここをクリックしてCtrl+V(Cmd+V)するとクリップボードの画像を添付できます。</div>
+	</div>
+	<button id="attachToggleButton">添付ファイルを表示(Alt+↓)</button><button id="previewToggleButton">プレビューを隠す(Alt+→)</button>
+</div>
+<div id="wrapper">
+	<div id="editorTabWrapper">
+		<noscript>このファイルはJavaScriptを有効にするとより正確に表示できます。</noscript>
+		<div id="editorTabContents">
+			<textarea id="editor"></textarea>
+			<textarea id="cssEditor">/*
  * CSSの設定を間違えると、最悪の場合
  * 内容を編集できなくなるので注意してください。
  * 標準のCSSに戻したいときはCSSを引き継がずに強制アップデートしてください
@@ -782,35 +929,7 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 .hljs-strong {
   font-weight: bold;
 }
-/* END_HLJS_CSS */
-</style>
-<title>無題</title>
-</head>
-<body>
-<nav>
-	<div id="leftNav">
-		<button id="onlineMenuButton">オンラインメニュー</button>
-	</div>
-	<div id="rightNav">
-		<span id="messageArea"></span>
-		<input type="checkbox" id="autoSyncButton" name="autoSyncButton" checked="checked"><label for="autoSyncButton">自動プレビュー</label>
-		<button id="syncButton">プレビュー(F5)</button><button id="headingSyncButton">見出し同期(F2)</button><button id="toggleButton">編集/閲覧(ESC)</button><button id="saveButton">保存(Ctrl+S)</button>
-	</div>
-</nav>
-<div id="attach">
-	<form id="attachForm"><input type="file" id="attachButton" multiple multiple></form>
-	<div id="filer">
-		<ul id="fileList">
-		</ul>
-	</div>
-	<button id="attachToggleButton">添付ファイルを表示(Alt+↓)</button><button id="previewToggleButton">プレビューを隠す(Alt+→)</button>
-</div>
-<div id="wrapper">
-	<noscript>このファイルはJavaScriptを有効にしないと閲覧できません。</noscript>
-	<div id="editorTabWrapper">
-		<div id="editorTabContents">
-			<textarea id="editor"></textarea>
-			<textarea id="cssEditor"></textarea>
+/* END_HLJS_CSS */</textarea>
 		</div>
 		<ol id="editorTabs">
 			<li class="selected"><a href="#" id="markdownTab">Markdown</a></li>
@@ -840,6 +959,75 @@ github.com style (c) Vasily Polovnyov <vast@whiteants.net>
 		<li><button id="importDialogCancelButton">キャンセル</button></li>
 	</ul>
 	</form>
+</div>
+<div id="drawArea">
+	<div id="canvasWrapper">
+	<canvas id="baseCanvas"></canvas>
+	<canvas id="mainCanvas"></canvas>
+	<canvas id="workCanvas"></canvas>
+</div>
+<div id="drawControllWrapper">
+	<dl>
+		<dt>モード</dt>
+		<dd class="mode">
+			<button name="rectangleModeButton">Rectangle</button>
+			<button name="letterModeButton">Letter</button>
+			<button name="eraserModeButton">Eraser</button>
+			<button name="trimModeButton">Trim</button>
+		</dd>
+		
+		<dt>枠の太さ</dt>
+		<dd class="borderWidth clearfix">
+			<div class="float50" name="borderWidth"></div>
+			<button name="minus" class="float25">-</button><button name="plus"class="float25">+</button>
+		</dd>
+		
+		<dt>枠の色<dt>
+		<dd class="borderColor clearfix">
+			<button class="color color9" name="c_ff0000">　</button>
+			<button class="color color9" name="c_34A853">　</button>
+			<button class="color color9" name="c_000000">　</button>
+			<button class="color color9" name="c_ffffff">　</button>
+			<button class="color color3" name="c_clear">透明</button>
+			<input type="text" name="borderColor">
+		</dd>
+		
+		<dt>塗りつぶしの色</dt>
+		<dd class="fillColor clearfix">
+			<button class="color color9" name="c_ff0000">　</button>
+			<button class="color color9" name="c_34A853">　</button>
+			<button class="color color9" name="c_000000">　</button>
+			<button class="color color9" name="c_ffffff">　</button>
+			<button class="color color3" name="c_clear">透明</button>
+			<input type="text" name="fillColor">
+		</dd>
+		
+		<dt>フォント</dt>
+		<dd class="clearfix">
+			<input type="text" name="font">
+		</dd>
+		
+		<dt>拡大率</dt>
+		<dd class="scale clearfix">
+			<div class="float50" name="scale"></div>
+			<button name="minus" class="float25">-</button><button name="plus"class="float25">+</button>
+		</dd>
+		
+		<dt>編集</dt>
+		<dd>
+			<button name="undoButton" class="float50">←Undo</button>
+			<button name="redoButton" class="float50">Redo→</button>
+			<button name="resetButton">Reset</button>
+		</dd>
+		
+		<dt>ファイル</dt>
+		<dd>
+			<button name="saveButton">Save</button>
+			<button name="cancelButton">Cancel</button>
+		</dd>
+	</dl>
+</div>
+
 </div>
 <input type="hidden" id="kantanVersion" value="v1.20160305.01">
 <input type="hidden" id="kantanEdition" value="dev">
@@ -1245,6 +1433,607 @@ function toKantanEditor(editor) {
 	}
 }
 </script>
+<script id="kantanDrawerJS">
+function KantanDrawer (drawArea) {
+	var that = this;
+	
+	this.drawArea = drawArea;
+	this.canvasWrapper = drawArea.querySelector("#canvasWrapper");
+	this.baseCanvas = drawArea.querySelector("#baseCanvas");
+	this.mainCanvas = drawArea.querySelector("#mainCanvas");
+	this.workCanvas = drawArea.querySelector("#workCanvas");
+	
+	/* モード切替 */
+	var modeButtons = drawArea.querySelectorAll(".mode button");
+	for (var i = 0; i < modeButtons.length; i++) {
+		on(modeButtons[i], "click", function(e) {
+			var index = this.name.indexOf("ModeButton");
+			var modeName = this.name.substring(0, index);
+			that.setMode(modeName);
+		});
+	}
+	
+	/* borderWidth */
+	var borderWidthElem = drawArea.querySelector("[name=borderWidth]");
+	on(drawArea.querySelector(".borderWidth [name=minus]"), "click", function() {
+		that.setBorderWidth(that.borderWidth - 1);
+	});
+	on(drawArea.querySelector(".borderWidth [name=plus]"), "click", function() {
+		that.setBorderWidth(that.borderWidth + 1);
+	});
+
+	/* borderColor */
+	var borderColorInput = drawArea.querySelector("[name=borderColor]");
+	on(borderColorInput, "keyup", function() {
+		that.setBorderColor(this.value);
+	});
+	var borderColors = drawArea.querySelectorAll(".borderColor .color");
+	for (var i = 0; i < borderColors.length; i++) {
+		on(borderColors[i], "click", function(){
+			var color = this.name.substr(2);
+			if (color == "clear") {
+				color = "rgba(0, 0, 0, 0)";
+			} else {
+				color = "#" + color;
+			}
+			that.setBorderColor(color);
+		});
+	}
+	
+	/* FillColor */
+	var fillColorInput = drawArea.querySelector("[name=fillColor]");
+	on(fillColorInput, "keyup", function() {
+		that.setFillColor(this.value);
+	});
+	var fillColors = drawArea.querySelectorAll(".fillColor .color");
+	for (var i = 0; i < fillColors.length; i++) {
+		on(fillColors[i], "click", function(){
+			var color = this.name.substr(2);
+			if (color == "clear") {
+				color = "rgba(0, 0, 0, 0)";
+			} else {
+				color = "#" + color;
+			}
+			that.setFillColor(color)
+		});
+	}
+	
+	/* font */
+	var fontInput = drawArea.querySelector("[name=font]");
+	on(fontInput, "keyup", function() {
+		that.font = this.value;
+	});
+	
+	/* scale */
+	var slaceElem = drawArea.querySelector("[name=scale]");
+	on(drawArea.querySelector(".scale [name=minus]"), "click", function() {
+		that.setScale(that.scale - 0.1);
+		that.repaint();
+	});
+	on(drawArea.querySelector(".scale [name=plus]"), "click", function() {
+		that.setScale(that.scale + 0.1);
+		that.repaint();
+	});
+	
+	/* undo,redo */
+	on(drawArea.querySelector("[name=undoButton]"), "click", function() {
+		if (that.commands.length != 0) {
+			var top = that.commands.pop();
+			that.redoCommands.push(top);
+			that.repaint();
+		}
+	});
+	on(drawArea.querySelector("[name=redoButton]"), "click", function() {
+		if (that.redoCommands.length != 0) {
+			var command = that.redoCommands.pop();
+			that.commands.push(command);
+			that.repaint();
+		}
+	});
+	
+	/* Reset */
+	var resetButton = drawArea.querySelector("[name=resetButton]");
+	on(resetButton, "click", function() {
+		var confirm = window.confirm(
+				"全ての描画をリセットしますか？この操作は元に戻せません。");
+		if (confirm == true) {
+			that.reset();
+			that.repaint();
+		}
+	});
+
+	/* Save */
+	var saveButton = drawArea.querySelector("[name=saveButton]")
+	on(saveButton, "click", function() {
+		var layerData = "";
+		var isEmpty = true;
+		var mainCtx = that.mainCanvas.getContext("2d");
+		var mainData = mainCtx.getImageData(0, 0, that.baseImg.width, that.baseImg.height);
+		for (var i = 0; i < mainData.data.length; i++) {
+			if (mainData.data[i] != 0) {
+				isEmpty = false;
+				break;
+			}
+		}
+		
+		var trimInfoString;
+		if (isEmpty) {
+			if (that.trimInfo.x == 0
+					&& that.trimInfo.y == 0
+					&& that.trimInfo.w == that.baseImg.width
+					&& that.trimInfo.h == that.baseImg.height) {
+				trimInfoString = "";
+			} else {
+				trimInfoString = JSON.stringify(that.trimInfo);
+			}
+		} else {
+			var tempCanvas = document.createElement("canvas");
+			tempCanvas.width = that.baseImg.width;
+			tempCanvas.height = that.baseImg.height;
+			tempCtx = tempCanvas.getContext("2d");
+			tempCtx.putImageData(mainData, that.trimInfo.x, that.trimInfo.y);
+			layerData = tempCanvas.toDataURL();
+			trimInfoString = JSON.stringify(that.trimInfo);
+		}
+		
+		that.saveCallback(layerData, trimInfoString);
+		that.reset();
+		that.hide();
+	});
+
+	/* cancel */
+	var cancelButton = drawArea.querySelector("[name=cancelButton]");
+	on(cancelButton, "click", function() {
+		var confirm = window.confirm("キャンセルしてもいいですか？編集内容は失われます。");
+		if (confirm == true) {
+			that.reset();
+			that.hide();
+			that.cancelCallback();
+		}
+	});
+
+	/* モード制御 */
+	on(this.workCanvas, "mousedown", function(e) {
+		var originalLength = that.commands.length;
+		var x = ((e.pageX + that.canvasWrapper.scrollLeft) / that.scale) + that.trimInfo.x;
+		var y = ((e.pageY + that.canvasWrapper.scrollTop) / that.scale) + that.trimInfo.y;
+		that.modeStrategy.onMouseDown(e, x, y, that.commands, that.workCommands);
+		if (originalLength != that.commands.length) {
+			that.redoCommands = [];
+		}
+	});
+	on(this.workCanvas, "mousemove", function(e) {
+		var originalLength = that.commands.length;
+		var x = ((e.pageX + that.canvasWrapper.scrollLeft) / that.scale) + that.trimInfo.x;
+		var y = ((e.pageY + that.canvasWrapper.scrollTop) / that.scale) + that.trimInfo.y;
+		that.modeStrategy.onMouseMove(e, x, y, that.commands, that.workCommands);
+		if (originalLength != that.commands.length) {
+			that.redoCommands = [];
+		}
+	});
+	on(this.workCanvas, "mouseup", function(e) {
+		var originalLength = that.commands.length;
+		var x = ((e.pageX + that.canvasWrapper.scrollLeft) / that.scale) + that.trimInfo.x;
+		var y = ((e.pageY + that.canvasWrapper.scrollTop) / that.scale) + that.trimInfo.y;
+		that.modeStrategy.onMouseUp(e, x, y, that.commands, that.workCommands);
+		if (originalLength != that.commands.length) {
+			that.redoCommands = [];
+		}
+	});
+	
+};
+KantanDrawer.prototype = {
+	show: function(content, layerContent, trimInfoStr, saveCallback, cancelCallback) {
+		this.saveCallback = saveCallback;
+		this.cancelCallback = cancelCallback;
+	
+		var that = this;
+		this.baseImg = new Image();
+		this.baseImg.onload = function() {
+			if (trimInfoStr.trim() != "") {
+				that.trimInfo = JSON.parse(trimInfoStr); 
+			} else {
+				that.trimInfo = {x:0, y:0, w:this.width, h:this.height}
+			}
+			
+			if (layerContent.trim() != "") {
+				that.layerImg = new Image();
+				that.layerImg.onload = function() {
+					showBlock(that.drawArea);
+					that.repaint();
+				};
+				that.layerImg.src = layerContent;
+			} else {
+				showBlock(that.drawArea);
+				that.repaint();
+			}
+		};
+		this.baseImg.src = content;
+		this.reset();
+	},
+	hide: function() {
+		this.baseImg = null;
+		this.layerImg = null;
+		hide(this.drawArea);
+	},
+	reset:function() {
+		this.commands = [];
+		this.redoCommands = [];
+		this.workCommands = [];
+		this.layerImg = null;
+		this.trimInfo = {
+				x: 0,
+				y: 0,
+				w: this.baseImg.width,
+				h: this.baseImg.height,};
+		this.setMode("rectangle");
+		this.setBorderWidth(1.0);
+		this.setBorderColor("#ff0000");
+		this.setFillColor("rgba(0, 0, 0, 0)");
+		this.setFont("18px sans-serif");
+		this.setScale(1.0);
+	},
+	setMode: function(modeName) {
+		if (modeName == "rectangle") {
+			this.modeStrategy = new RectangleModeStrategy(this);
+			this.modeStrategy.onBeforeModeStart(this.commands, this.workCommands);
+		} else if (modeName == "letter") {
+			this.modeStrategy = new LetterModeStrategy(this);
+			this.modeStrategy.onBeforeModeStart(this.commands, this.workCommands);
+		} else if (modeName == "eraser") {
+			this.modeStrategy = new EraserModeStrategy(this);
+			this.modeStrategy.onBeforeModeStart(this.commands, this.workCommands);
+		} else if (modeName == "trim") {
+			if (this.trimInfo.x == 0
+					&& this.trimInfo.y == 0
+					&& this.trimInfo.w == this.baseImg.width
+					&& this.trimInfo.h == this.baseImg.height) {
+				this.modeStrategy = new TrimModeStrategy(this);
+				this.modeStrategy.onBeforeModeStart(this.commands, this.workCommands);
+			} else {
+				this.trimInfo = {
+					x: 0,
+					y: 0,
+					w: this.baseImg.width,
+					h: this.baseImg.height,
+				}
+				this.repaint();
+			}
+		} else {
+			throw "未知のモード" + modeName;
+		}
+		
+		var modeButtons = drawArea.querySelectorAll(".mode button");
+		for (var i = 0; i < modeButtons.length; i++) {
+			modeButtons[i].classList.remove("selected");
+		}
+		var modeButton = drawArea.querySelector(".mode button[name=" + this.modeStrategy.modeName + "ModeButton]")
+				.classList.add("selected");
+	},
+	setBorderWidth: function (borderWidth) {
+		var borderWidthElem = drawArea.querySelector("[name=borderWidth]");
+		if (1 <= borderWidth) {
+			this.borderWidth = borderWidth;
+		}
+		borderWidthElem.textContent = this.borderWidth;
+		borderWidthElem.style.borderBottom = this.borderWidth + "px solid black";
+	},
+	setBorderColor: function(borderColor) {
+		var borderColorInput = drawArea.querySelector("[name=borderColor]");
+		this.borderColor = borderColor;
+		borderColorInput.value = borderColor;
+		borderColorInput.style.backgroundColor = borderColor;
+	},
+	setFillColor: function(fillColor) {
+		var fillColorInput = drawArea.querySelector("[name=fillColor]");
+		this.fillColor = fillColor;
+		fillColorInput.value = fillColor;
+		fillColorInput.style.backgroundColor = fillColor;
+	},
+	setFont: function(font) {
+		var fontInput = drawArea.querySelector("[name=font]");
+		this.font = font;
+		fontInput.value = font;
+	},
+	setScale: function(scale) {
+		var slaceElem = drawArea.querySelector("[name=scale]");
+		if (0.1 <= scale) {
+			this.scale = scale;
+		}
+		slaceElem.textContent = this.scale;
+	},
+	repaint: function() {
+		this.baseCanvas.width = 
+				this.mainCanvas.width = 
+				this.workCanvas.width = this.trimInfo.w * this.scale;
+				
+		this.baseCanvas.height = 
+				this.mainCanvas.height =
+				this.workCanvas.height = this.trimInfo.h * this.scale;
+		
+		var trimModeButton = this.drawArea.querySelector("[name=trimModeButton]");
+		if (this.trimInfo.x == 0
+				&& this.trimInfo.y == 0
+				&& this.trimInfo.w == this.baseImg.width
+				&& this.trimInfo.h == this.baseImg.height) {
+			trimModeButton.textContent = "Trim";
+		} else {
+			trimModeButton.textContent = "Reset Trim";
+		}
+		
+		var baseCtx = this.baseCanvas.getContext("2d");
+		baseCtx.clearRect(0, 0, this.baseImg.width, this.baseImg.height);
+		baseCtx.save();
+		baseCtx.scale(this.scale, this.scale);
+		baseCtx.translate(-this.trimInfo.x, -this.trimInfo.y);
+		baseCtx.drawImage(this.baseImg, 0, 0);
+		baseCtx.restore();
+		
+		var mainCtx = this.mainCanvas.getContext("2d");
+		mainCtx.clearRect(0, 0, this.baseImg.width, this.baseImg.height);
+		mainCtx.save();
+		mainCtx.scale(this.scale, this.scale);
+		mainCtx.translate(-this.trimInfo.x, -this.trimInfo.y);
+		if (this.layerImg) {
+			mainCtx.drawImage(this.layerImg, 0, 0);
+		}
+		for (var i = 0; i < this.commands.length; i++) {
+			var command = this.commands[i];
+			mainCtx.strokeStyle = command.strokeStyle;
+			mainCtx.lineWidth   = command.lineWidth;
+			mainCtx.fillStyle   = command.fillStyle;
+			command.paint(mainCtx);
+		} 
+		mainCtx.restore();
+		
+		var workCtx = this.workCanvas.getContext("2d");
+		workCtx.clearRect(0, 0, this.baseImg.width, this.baseImg.height);
+		workCtx.save();
+		workCtx.scale(this.scale, this.scale);
+		workCtx.translate(-this.trimInfo.x, -this.trimInfo.y);
+		for (var i = 0; i < this.workCommands.length; i++) {
+			var command = this.workCommands[i];
+			workCtx.strokeStyle = command.strokeStyle;
+			workCtx.lineWidth   = command.lineWidth;
+			workCtx.fillStyle   = command.fillStyle;
+			command.paint(workCtx);
+		}
+		workCtx.restore();
+	}
+}
+
+function DrawCommand(drawer, paintFunction) {
+	this.drawer      = drawer;
+	this.strokeStyle = drawer.borderColor;
+	this.lineWidth   = drawer.borderWidth;
+	this.fillStyle   = drawer.fillColor;
+	this.width       = drawer.baseImg.width;
+	this.height      = drawer.baseImg.height;
+	this.font        = drawer.font;
+	this.paint       = paintFunction;
+}
+
+function TrimModeStrategy(drawer){
+	this.modeName = "trim";
+	this.drawer = drawer;
+	this.originalScale = drawer.scale;
+	this.originalMode  = drawer.modeStrategy.modeName;
+	this.mouseStart = null;
+};
+TrimModeStrategy.prototype = {
+	onBeforeModeStart:function(commands, workCommands) {
+		this.drawer.scale = 1.0;
+		this.drawer.trimInfo = {
+			x: 0,
+			y: 0,
+			w: this.drawer.baseImg.width,
+			h: this.drawer.baseImg.height,
+		};
+		
+		workCommands.length = 0;
+		workCommands.push(new DrawCommand(this.drawer, function(ctx) {
+			ctx.save();
+			ctx.borderStyle = "rgba(0, 0, 0, 0.6)";
+			ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+			ctx.clearRect(0, 0, this.width, this.height);
+			ctx.fillRect(0, 0, this.width, this.height);
+			ctx.restore();
+		}));
+		this.drawer.repaint();
+	},
+	onMouseDown:function(e, x, y, commands, workCommands) {
+		this.mouseStart = {x: x, y : y};
+	},
+	onMouseMove:function(e, x, y, commands, workCommands) {
+		if (this.mouseStart != null) {
+			var that = this;
+			workCommands.length = 0;
+			workCommands.push(new DrawCommand(this.drawer, function(ctx) {
+				ctx.save();
+				ctx.borderStyle = "rgba(0, 0, 0, 0.6)";
+				ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+				
+				ctx.fillRect(0, 0, this.width, this.height);
+				ctx.clearRect(
+					that.mouseStart.x,
+					that.mouseStart.y,
+					x - that.mouseStart.x,
+					y - that.mouseStart.y
+				);
+				
+				ctx.restore();
+			}));
+			this.drawer.repaint();
+		}
+	},
+	onMouseUp: function(e,x, y, commands, workCommands) {
+		if (e.button == 0) {
+			var startX = Math.min(this.mouseStart.x, x);
+			var startY = Math.min(this.mouseStart.y, y);
+			var w = Math.max(this.mouseStart.x, x) - startX;
+			var h = Math.max(this.mouseStart.y, y) - startY;
+			this.drawer.trimInfo.x = startX;
+			this.drawer.trimInfo.y = startY;
+			this.drawer.trimInfo.w = w;
+			this.drawer.trimInfo.h = h;
+			
+			this.mouseStart = null;
+			workCommands.length = 0;
+			this.drawer.scale = this.originalScale;
+			this.drawer.setMode(this.originalMode);
+			this.drawer.repaint();
+		}
+	},
+};
+
+function RectangleModeStrategy(drawer){
+	this.modeName = "rectangle";
+	this.drawer = drawer;
+	this.mouseStart = null;
+	this.mouseEnd = null;
+};
+RectangleModeStrategy.prototype = {
+	onBeforeModeStart:function(commands, workCommands) {
+		this.mouseStart = null;
+		this.mouseEnd = null;
+		workCommands.length = 0;
+		this.drawer.repaint();
+	},
+	onMouseDown:function(e, x, y, commands, workCommands) {
+		if (e.button == 0) {
+			this.mouseStart = {x: x, y : y};
+			this.mouseEnd = {x: x, y : y};
+			
+			var mouseStart = this.mouseStart;
+			var mouseEnd = this.mouseEnd;
+			workCommands.length = 0;
+			workCommands.push(new DrawCommand(this.drawer, function(ctx) {
+				ctx.fillRect(
+					mouseStart.x,
+					mouseStart.y,
+					mouseEnd.x - mouseStart.x,
+					mouseEnd.y - mouseStart.y);
+				ctx.strokeRect(
+					mouseStart.x,
+					mouseStart.y,
+					mouseEnd.x - mouseStart.x,
+					mouseEnd.y - mouseStart.y);
+			}));
+			this.drawer.repaint();
+		}
+	},
+	onMouseMove:function(e, x, y, commands, workCommands) {
+		if (this.mouseStart != null) {
+			this.mouseEnd.x = x;
+			this.mouseEnd.y = y;
+			this.drawer.repaint();
+		}
+	},
+	onMouseUp: function(e, x, y, commands, workCommands) {
+		if ((this.mouseStart != null) && (e.button == 0)) {
+			this.mouseStart = null;
+			this.mouseEnd = null;
+			commands.push(workCommands[0]);
+			workCommands.length = 0;
+			this.drawer.repaint();
+		}
+	},
+};
+
+function EraserModeStrategy(drawer){
+	this.modeName = "eraser";
+	this.drawer = drawer;
+	this.mouseStart = null;
+	this.mouseEnd = null;
+};
+EraserModeStrategy.prototype = {
+	onBeforeModeStart:function(commands, workCommands) {
+		this.mouseStart = null;
+		this.mouseEnd = null;
+		workCommands.length = 0;
+		this.drawer.repaint();
+	},
+	onMouseDown:function(e, x, y, commands, workCommands) {
+		if (e.button == 0) {
+			this.mouseStart = {x: x, y : y};
+			this.mouseEnd = {x: x, y : y};
+			
+			var mouseStart = this.mouseStart;
+			var mouseEnd = this.mouseEnd;
+			workCommands.length = 0;
+			workCommands.push(new DrawCommand(this.drawer, function(ctx) {
+				ctx.strokeStyle = "#808080";
+				ctx.strokeRect(
+					mouseStart.x,
+					mouseStart.y,
+					mouseEnd.x - mouseStart.x,
+					mouseEnd.y - mouseStart.y);
+			}));
+			this.drawer.repaint();
+		}
+	},
+	onMouseMove:function(e, x, y, commands, workCommands) {
+		if (this.mouseStart != null) {
+			this.mouseEnd.x = x;
+			this.mouseEnd.y = y;
+			this.drawer.repaint();
+		}
+	},
+	onMouseUp: function(e, x, y, commands, workCommands) {
+		if ((this.mouseStart != null) && (e.button == 0)) {
+			var mouseStart = this.mouseStart;
+			var mouseEnd = this.mouseEnd;
+			workCommands.length = 0;
+			commands.push(new DrawCommand(this.drawer, function(ctx) {
+				ctx.clearRect(
+					mouseStart.x,
+					mouseStart.y,
+					mouseEnd.x - mouseStart.x,
+					mouseEnd.y - mouseStart.y);
+			}));
+			this.mouseStart = null;
+			this.mouseEnd = null;
+			this.drawer.repaint();
+		}
+	},
+};
+
+function LetterModeStrategy(drawer){
+	this.modeName = "letter";
+	this.drawer = drawer;
+	this.mouseStart = null;
+	this.mouseEnd = null;
+};
+LetterModeStrategy.prototype = {
+	onBeforeModeStart:function(commands, workCommands) {
+		this.mouseStart = null;
+		this.mouseEnd = null;
+		workCommands.length = 0;
+		this.drawer.repaint();
+	},
+	onMouseDown:function(e, x, y, commands, workCommands) {
+	},
+	onMouseMove:function(e, x, y, commands, workCommands) {
+	},
+	onMouseUp: function(e, x, y, commands, workCommands) {
+		if (e.button == 0) {
+			var string = window.prompt("文字を入力してください");
+			if (string != null) {
+				commands.push(new DrawCommand(this.drawer, function(ctx) {
+					ctx.save();
+					ctx.font = this.font;
+					ctx.fillStyle = this.strokeStyle;
+					ctx.fillText(string, x, y);
+					ctx.restore();
+				}));
+				this.drawer.repaint();
+			}
+		}
+	},
+};
+
+
+</script>
 <script id="kantanMarkdownJs">
 	// FirefoxでinnerTextが使えない対策
     (function(){
@@ -1356,14 +2145,9 @@ function toKantanEditor(editor) {
 		
 		return false;
 	})
-
+	
 	/* エディタに機能追加 */
 	toKantanEditor(document.getElementById("editor"));
-	
-	document.querySelector("#cssEditor").value = 
-			document.querySelector("#previewerStyle").innerHTML.trim();
-	document.querySelector("#cssEditor").selectionStart = 0;
-	document.querySelector("#cssEditor").selectionEnd = 0;
 	toKantanEditor(document.getElementById("cssEditor"));
 
 	/* シンタックスハイライト設定 */
@@ -1375,9 +2159,41 @@ function toKantanEditor(editor) {
 		});
 	}
 	
+	/* 画像キャッシュ */
+	var imageUrlMap = {};
+	function getCachedImageUrl(name) {
+		return imageUrlMap[name];
+	}
+	
+	function cacheImageUrl(name, base64) {
+		var imageUrl;
+		if (window.URL) {
+			var blob = base64ToBlob(base64);
+			imageUrl = {
+					blobOrBase64:window.URL.createObjectURL(blob),
+					base64:base64}
+		} else {
+			imageUrl = {
+					blobOrBase64:base64,
+					base64:base64}
+		}
+		
+		imageUrlMap[name] = imageUrl;
+		return imageUrl;
+	}
+	
+	function uncacheImageUrl(name) {
+		var imageUrl = imageUrlMap[name];
+		if (window.URL && imageUrl) {
+			window.URL.revokeObjectURL(imageUrl);
+		} 
+		delete imageUrlMap[name];
+	}
+	
 	/* 起動時にコンテンツ読み込み */
 	document.querySelector("body").classList.add("previewMode");
 	document.querySelector("body").classList.remove("editMode");
+	document.querySelector("body").classList.remove("initialState");
 	if (isEnable(document.getElementById("toggleButton")) 
 			&& (document.getElementById("editor").innerHTML == "")) {
 		// 編集モードでなく、内容が空であれば初期状態を編集モードにする
@@ -1559,28 +2375,9 @@ function toKantanEditor(editor) {
 		
 		// 画像埋め込み
 		var images = document.querySelectorAll("#previewer img");
-		for (i in images) {
+		for (var i = 0; i < images.length; i++) {
 			var elem = images[i];
-			var base64 = null;
-			if (elem.name) {
-				var script = document.getElementById("attach-" + elem.name);
-				if (script) {
-					base64 = script.innerHTML;
-				}
-			}
-			if (!base64 && elem.src) {
-				var matchs = elem.src.trim().match(/^attach:(.+)/);
-				if (matchs) {
-					var script = document.getElementById("attach-" + 
-							decodeURIComponent(matchs[1]));
-					if (script) {
-						base64 = script.innerHTML;
-					}
-				}
-			}
-			if (base64 != null) {
-				elem.src = base64;
-			}
+			loadImage(elem);
 		}
 		
 		// リンク
@@ -1592,11 +2389,12 @@ function toKantanEditor(editor) {
 				var matchs = href.trim().match(/^attach:(.+)/);
 				if (matchs) {
 					var name = decodeURIComponent(matchs[1]);
-					var blob = getBlob(name);
-					var url = window.URL || window.webkitURL;
-					var blobUrl = url.createObjectURL(blob);
-					anchor.href = blobUrl;
-					anchor.download = name;
+					getFileBlog(name, function(blob){
+						var url = window.URL || window.webkitURL;
+						var blobUrl = url.createObjectURL(blob);
+						anchor.href = blobUrl;
+						anchor.download = name;
+					});
 				}
 			}
 		}
@@ -1624,11 +2422,6 @@ function toKantanEditor(editor) {
 			}
 		}
 		
-		// IEだとinnerHTML後にborderが消えてしまい
-		// スクロールバーの位置がおかしくなる。
-		// なのでここで特別にこの行を書いてやらないといけない
-		previewer.style.border = "1px solid gray";
-		
 		// スクロールバーが最下部にある場合、更新後も最下部にする。
 		if (scrollLockFlag == true) {
 			previewer.scrollTop = previewer.scrollHeight;
@@ -1638,6 +2431,86 @@ function toKantanEditor(editor) {
 		var event = document.createEvent("Event");
 		event.initEvent("previewed", true, true);
 		previewer.dispatchEvent(event);
+	}
+	
+	function loadImage(elem) {
+		var name = null;
+		if (elem.name) {
+			name = elem.name;
+		} else if (elem.src) {
+			var matchs = elem.src.trim().match(/^attach:(.+)/);
+			if (matchs) {
+				name = decodeURIComponent(matchs[1]);
+			}
+		}
+		
+		if (name == null) {
+			return;
+		}
+		
+		loadImageByName(
+				name,
+				function(width, height) {
+				 	// 大きさが決まったら仮のイメージで領域だけ確保しておく
+					var canvas = document.createElement("canvas");
+					canvas.width = width;
+					canvas.height = height;
+					elem.src = canvas.toDataURL();
+				},
+				function(imageUrl) {
+					elem.src = imageUrl.blobOrBase64;
+				});
+	}
+	
+	function loadImageByName(name, onLoadSize, onLoadImage) {
+		var base64Script = document.getElementById("attach-" + name);
+		if (base64Script != null) {
+			var rootElem = base64Script.parentNode;
+			var base64 = base64Script.innerHTML;
+			var layer64 = rootElem.querySelector("script.layerContent").innerHTML;
+			var trimInfo = rootElem.querySelector("script.trimInfo").innerHTML;
+			trimInfo = (trimInfo != "") ? JSON.parse(trimInfo) : null;
+			
+			var cached = getCachedImageUrl(name);
+			if (cached) {
+				onLoadImage(cached);
+				return;
+			}
+			
+			if (trimInfo == null) {
+				var url = cacheImageUrl(name, base64);
+				onLoadImage(url);
+				return;
+			}
+			
+			onLoadSize(trimInfo.w, trimInfo.h);
+			
+			var baseImage = new Image();
+			baseImage.onload = function() {
+				var canvas = document.createElement("canvas");
+				canvas.width = trimInfo.w;
+				canvas.height = trimInfo.h;
+				var ctx = canvas.getContext('2d');
+				ctx.translate(-trimInfo.x, -trimInfo.y);
+				ctx.drawImage(baseImage,0, 0);
+				if (layer64 != "") {
+					var layerImage = new Image();
+					layerImage.onload = function() {
+						ctx.drawImage(layerImage,0, 0);
+						
+						var content = canvas.toDataURL();
+						var url = cacheImageUrl(name, content);
+						onLoadImage(url);
+					};
+					layerImage.src = layer64;
+				} else {
+					var content = canvas.toDataURL();
+					var url = cacheImageUrl(name, content);
+					onLoadImage(url);
+				}
+			};
+			baseImage.src= base64;
+		}
 	}
 	
 	function isMaxScroll (id) {
@@ -1699,12 +2572,16 @@ function toKantanEditor(editor) {
 		}
 	}
 	
-	function attachFile(file) {
+	function attachFile(file, fileName) {
 		var fr = new FileReader();
-	    fr.fileName = file.name;
+		if (fileName) {
+			fr.fileName = fileName;
+		} else {
+			fr.fileName = file.name;
+		}
 	    fr.onload = function(e) {
 			var target = e.target;
-			addAttachFileElements(target.fileName, target.result);
+			addAttachFileElements(target.fileName, target.result, "", "");
 		};
 		fr.readAsDataURL(file);
 	}
@@ -1745,14 +2622,19 @@ function toKantanEditor(editor) {
 	
 	function importKantanMarkdown(result, dummyHtml, file) {
 		if (result.attach == true) {
-			var fileListElement = dummyHtml.querySelector("ul#fileList");
-			var fileList = document.getElementById("fileList");
-			var importScripts = fileListElement.querySelectorAll("script");
-			for (var i = 0; i < importScripts.length; i++) {
-				var scriptElement = importScripts[i];
+			var fileListElement = dummyHtml.querySelectorAll("ul#fileList li");
+			for (var i = 0; i < fileListElement.length; i++) {
+				var scriptElement = fileListElement[i].querySelector("script");
 				var fileName = scriptElement.title;
 				var content = scriptElement.innerHTML;
-				addAttachFileElements(fileName, content);
+				
+				var layerElement = fileListElement[i].querySelector("script.layerContent");
+				var layerContent = (layerElement) ? layerElement.innerHTML : "";
+				
+				var trimInfoElement = fileListElement[i].querySelector("script.trimInfo");
+				var trimInfo = (trimInfoElement) ? trimInfoElement.innerHTML : "";
+				
+				addAttachFileElements(fileName, content, layerContent, trimInfo);
 			}
 			saved = false;
 		}
@@ -1768,8 +2650,14 @@ function toKantanEditor(editor) {
 			var styleElement = dummyHtml.querySelector("#previewerStyle");
 			if (styleElement) {
 				var cssEditor = document.getElementById("cssEditor");
-				cssEditor.value = cssEditor.textContent + styleElement.innerHTML;
-				saved = false;
+				var dummyCssEditor = dummyHtml.querySelector("#cssEditor");
+				if (styleElement.innerHTML.trim() != "") {
+					cssEditor.value = cssEditor.textContent + styleElement.innerHTML;
+					saved = false;
+				} else if (dummyCssEditor) {
+					cssEditor.value = cssEditor.textContent + dummyCssEditor.value;
+					saved = false;
+				}
 			}
 		}
 		
@@ -1828,15 +2716,16 @@ function toKantanEditor(editor) {
 		dialogElement.style.left = ((body.offsetWidth / 2.0) - (dialogElement.offsetWidth / 2.0)) + "px";
 	}
 	
-	function addAttachFileElements(fileName, content) {
+	function addAttachFileElements(fileName, content, layerContent, trimInfo) {
 		var name = fileName;
 		var script = document.querySelector("#fileList script[title='" + name + "']");
-		var i = 1;
+		var i = 2;
 		while (script) {
 			var pos = fileName.lastIndexOf(".");
+			pos = (pos != -1) ? pos : fileName.length;
 			var name = fileName.substring(0, pos);
 			var ext = fileName.substr(pos);
-			name = name + "(" + i + ")" + ext;
+			name = name + "_" + i + ext;
 			script = document.querySelector("#fileList script[title='" + name + "']");
 			i++;
 		}
@@ -1849,7 +2738,19 @@ function toKantanEditor(editor) {
 		script.title = name;
 		script.innerHTML = content;
 		li.appendChild(script);
-
+		
+		var layerScript = document.createElement("script");
+		layerScript.type  = "text/template";
+		layerScript.classList.add("layerContent");
+		layerScript.innerHTML = layerContent;
+		li.appendChild(layerScript);
+		
+		var trimScript = document.createElement("script");
+		trimScript.type  = "text/template";
+		trimScript.classList.add("trimInfo");
+		trimScript.innerHTML = trimInfo;
+		li.appendChild(trimScript);
+		
 		var input  = document.createElement("input");
 		input.type = "text";
 		input.classList.add('fileName');
@@ -1863,6 +2764,14 @@ function toKantanEditor(editor) {
 		on(insertButton, "click", onInsertButtonClicked);
 		li.appendChild(insertButton);
 		
+		var isImage = content.match("data:image/.+?;base64,");
+		var editoButton = document.createElement("button");
+		editoButton.classList.add('editButton');
+		editoButton.innerHTML = "Edit";
+		editoButton.disabled = !isImage;
+		on(editoButton, "click", onEditButtonClicked);
+		li.appendChild(editoButton);
+		
 		var downloadButton = document.createElement("button");
 		downloadButton.classList.add('downloadButton');
 		downloadButton.innerHTML = "Download";
@@ -1874,7 +2783,7 @@ function toKantanEditor(editor) {
 		detachButton.innerHTML = "×";
 		on(detachButton, "click", onDetachButtonClicked);
 		li.appendChild(detachButton);
-
+		
 		document.getElementById("fileList").appendChild(li);
 		
 		// ファイル添付領域を開く
@@ -1892,14 +2801,29 @@ function toKantanEditor(editor) {
 		queuePreview();
 	}
 
-	function getBlob(name) {
+	function getFileBlog(name, onLoaded) {
 		var script = document.getElementById("attach-" + name);
 		if (!script) {
-			return null;
+			onLoaded(null);
+		}
+		
+		var callBack = function(imageUrl) {
+			
 		}
 		
 		var base64 = script.innerHTML;
-		var mimeType = base64.match(/^\s*data:(.+);base64/)[1];
+		var mimeType = base64.match(/^\s*data:(.*);base64/)[1];
+		if (mimeType.match("^image")) {
+			loadImageByName(name, function(){}, function(imageUrl) {
+				onLoaded(base64ToBlob(imageUrl.base64));
+			});
+		} else {
+			onLoaded(base64ToBlob(base64));
+		}
+	}
+
+	function base64ToBlob(base64) {
+		var mimeType = base64.match(/^\s*data:(.*);base64/)[1];
 		var bin = atob(base64.replace(/^.*,/, ''));
 		var buffer = new Uint8Array(bin.length);
 		for (var i = 0; i < bin.length; i++) {
@@ -1908,7 +2832,6 @@ function toKantanEditor(editor) {
 		var blob = new Blob([buffer.buffer], {
 			type: mimeType
 		});
-		
 		return blob;
 	}
 
@@ -1919,6 +2842,7 @@ function toKantanEditor(editor) {
 		if(window.confirm('削除していいですか?')){
 			var parent = e.target.parentNode;
 			var name = parent.querySelector("script").name;
+			uncacheImageUrl(name);
 			parent.parentNode.removeChild(parent);
 			saved = false;
 		}
@@ -1955,7 +2879,8 @@ function toKantanEditor(editor) {
 			target.selectionEnd = name.length;
 			return false;
 		} 
-		var scriptTag = target.previousElementSibling;
+		var scriptTag = target.parentNode.querySelector("script");
+		uncacheImageUrl(scriptTag.title);
 		scriptTag.id =  "attach-" + name;
 		scriptTag.title = name;
 		saved = false;
@@ -1994,25 +2919,68 @@ function toKantanEditor(editor) {
 		var target = e.target;
 		var script = target.parentNode.querySelector("script");
 		var fileName = script.title;
-		var blob = getBlob(fileName);
-		if (window.navigator.msSaveBlob) {
-			window.navigator.msSaveBlob(blob, fileName);
-		} else {
-			var url = window.URL || window.webkitURL;
-			var blobURL = url.createObjectURL(blob);
-			var a = document.createElement('a');
-			a.download = fileName;
-			a.href = blobURL;
-			
-			// firefoxでa.click()が効かないため無理やりclickイベントをディスパッチする
-			var ev = document.createEvent("MouseEvents");
-		    ev.initMouseEvent("click", true, false, self, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-			a.dispatchEvent(ev);
-			delete a;
-		}
-		
+		getFileBlog(fileName, function(blob) {
+			if (window.navigator.msSaveBlob) {
+				window.navigator.msSaveBlob(blob, fileName);
+			} else {
+				var url = window.URL || window.webkitURL;
+				var blobURL = url.createObjectURL(blob);
+				var a = document.createElement('a');
+				a.download = fileName;
+				a.href = blobURL;
+				
+				// firefoxでa.click()が効かないため無理やりclickイベントをディスパッチする
+				var ev = document.createEvent("MouseEvents");
+			    ev.initMouseEvent("click", true, false, self, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+				a.dispatchEvent(ev);
+				delete a;
+			}
+		});
 	}
-
+	
+	/* お絵かき周り */
+	var drawer = new KantanDrawer(document.querySelector("#drawArea"));
+	on(".editButton", "click", onEditButtonClicked);
+	function onEditButtonClicked(e) {
+		var rootElement = e.target.parentNode;
+		var contentElement = rootElement.querySelector("script");
+		var layerElement = rootElement.querySelector("script.layerContent");
+		var trimElement = rootElement.querySelector("script.trimInfo");
+		
+		document.querySelector("body").classList.add("drawMode");
+		
+		var nav = document.querySelector("nav");
+		var attach = document.querySelector("#attach");
+		var wrapper = document.querySelector("#wrapper");
+		
+		nav.classList.add("hide");
+		attach.classList.add("hide");
+		wrapper.classList.add("hide");
+		
+		drawer.show(contentElement.innerHTML,
+				layerElement.innerHTML,
+				trimElement.innerHTML,
+				function(layerContent, trimInfo) {
+					layerElement.innerHTML = layerContent;
+					trimElement.innerHTML = trimInfo;
+					
+					nav.classList.remove("hide");
+					attach.classList.remove("hide");
+					wrapper.classList.remove("hide");
+					document.querySelector("body").classList.remove("drawMode");
+					
+					uncacheImageUrl(contentElement.title);
+					doPreview();
+				},
+				function() {
+					nav.classList.remove("hide");
+					attach.classList.remove("hide");
+					wrapper.classList.remove("hide");
+					document.querySelector("body").classList.remove("drawMode");
+				}
+		);
+	}
+	
 	/* 添付ファイル領域開け閉め */
 	on("#attachToggleButton", "click", function() {
 		if (isVisible(document.getElementById("filer"))){
@@ -2085,16 +3053,19 @@ function toKantanEditor(editor) {
 		var editor = document.getElementById("editor");
 		editor.innerHTML = editor.value.replace(/</g, "&lt;");
 		
+		var cssEditor = document.getElementById("cssEditor");
+		cssEditor.innerHTML = cssEditor.value;
+		
 		var toggleFlag = isEditMode();
 		if (toggleFlag == true) {
 			toggleMode();
 		}
+		document.querySelector("body").classList.add("initialState");
 		
 		/* ファイルの肥大化を防ぐため中身を消去 */
 		document.getElementById("previewer").innerHTML = "";
 		document.getElementById("messageArea").innerHTML = "";
-		// cssエディタはテキストエリアなので保存されない
-		// document.getElementById("cssEditor").value = "";
+		document.getElementById("previewerStyle").innerHTML="";
 		
 		var html = "<!doctype html>\n<html>\n";
 		html += document.getElementsByTagName("html")[0].innerHTML;
@@ -2123,6 +3094,8 @@ function toKantanEditor(editor) {
 		contentAtSave = editor.value;
 		saved = true;
 		doPreview();
+		
+		document.querySelector("body").classList.remove("initialState");
 		if (toggleFlag == true) {
 			toggleMode();
 		}
@@ -2453,9 +3426,70 @@ function toKantanEditor(editor) {
 		cssEditor.focus();
 	}
 	
+	function addAttachEditLayer(fileName, content) {
+		var script = document.createElement("script");
+		script.type  = "text/template";
+		script.className = "editLayer";
+		script.innerHTML = content;
+		
+		var attach = document.getElementById("attach-" + fileName);
+		var parent = attach.parentNode;
+		parent.insertBefore(script, attach.nextSibling);
+	}
+	
+	/* 画面キャプチャ貼り付け */
+	// Chrome向け
+	on("#pasteArea", "paste",function(e){
+		if (!e.clipboardData || !e.clipboardData.types) {
+			return true;
+		}
+		
+		var fileFlag = false;
+		for (var i=0; i < e.clipboardData.types.length; i++) {
+			if (e.clipboardData.types[i] == "Files") {
+				fileFlag = true;
+				break;
+			}
+		}
+		if (fileFlag == false) {
+			return true;
+		}
+		
+		e.preventDefault();
+		for (var i = 0; i < e.clipboardData.items.length; i++) {
+			attachFile(e.clipboardData.items[i].getAsFile(), "clipboard");
+		}
+		return false;
+	});
+	
+	// FF, IE向け
+	on("#pasteArea", "keyup",function(e){
+		e.preventDefault();
+		
+		var dummyElement = document.createElement("div");
+		dummyElement.innerHTML = this.innerHTML;
+		var imgElement = dummyElement.querySelector("img");
+		if (imgElement) {
+			var base64 = imgElement.src;
+			addAttachFileElements("clipboard", base64, "", "");
+		}
+		
+		this.innerHTML = "ここをクリックしてCtrl+V(Cmd+V)するとクリップボードの画像を添付できます。";
+		return false;
+	});
+	
 	/* ショートカットキー */
 	on("body", "keydown", function(event) {
 		var code = (event.keyCode ? event.keyCode : event.which);
+		
+		if (isDrawMode()) {
+			if (code == 83 && (event.ctrlKey || event.metaKey)){
+				event.preventDefault();
+				return false;
+			} else {
+				return true;
+			}
+		}
 		
 		if (code == 27) {
 			// ESCキー
@@ -2554,6 +3588,10 @@ function toKantanEditor(editor) {
 		return document.querySelector("body").classList.contains("editMode");
 	}
 	
+	function isDrawMode() {
+		return document.querySelector("body").classList.contains("drawMode");
+	}
+	
 	function isEnable(elem) {
 		return elem &&
 				((typeof elem.disabled === "undefined")
@@ -2582,6 +3620,7 @@ function toKantanEditor(editor) {
 		elem.classList.remove("showBlock")
 		elem.classList.add("hide");
 	}
+		
 
 </script>
 </body>

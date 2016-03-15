@@ -615,10 +615,10 @@
 				var cssEditor = document.getElementById("cssEditor");
 				var dummyCssEditor = dummyHtml.querySelector("#cssEditor");
 				if (styleElement.innerHTML.trim() != "") {
-					cssEditor.value = cssEditor.textContent + styleElement.innerHTML;
+					cssEditor.value = styleElement.innerHTML;
 					saved = false;
 				} else if (dummyCssEditor) {
-					cssEditor.value = cssEditor.textContent + dummyCssEditor.value;
+					cssEditor.value = dummyCssEditor.value;
 					saved = false;
 				}
 			}
