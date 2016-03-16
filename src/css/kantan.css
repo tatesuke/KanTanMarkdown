@@ -58,6 +58,13 @@ nav:after {
 	width: 300px;
 }
 
+#attach #pasteArea {
+	box-sizing:border-box;
+	width:100%;
+	border: 1px solid gray;
+	text-align:center;
+}
+
 #attach #attachToggleButton,
 #attach #previewToggleButton{
 	width: 50%;

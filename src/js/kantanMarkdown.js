@@ -108,14 +108,9 @@
 		
 		return false;
 	})
-
+	
 	/* エディタに機能追加 */
 	toKantanEditor(document.getElementById("editor"));
-	
-	document.querySelector("#cssEditor").value = 
-			document.querySelector("#previewerStyle").innerHTML.trim();
-	document.querySelector("#cssEditor").selectionStart = 0;
-	document.querySelector("#cssEditor").selectionEnd = 0;
 	toKantanEditor(document.getElementById("cssEditor"));
 
 	/* シンタックスハイライト設定 */
@@ -125,6 +120,37 @@
 				return hljs.highlightAuto(code, [lang]).value;
 			}
 		});
+	}
+	
+	/* 画像キャッシュ */
+	var imageUrlMap = {};
+	function getCachedImageUrl(name) {
+		return imageUrlMap[name];
+	}
+	
+	function cacheImageUrl(name, base64) {
+		var imageUrl;
+		if (window.URL) {
+			var blob = base64ToBlob(base64);
+			imageUrl = {
+					blobOrBase64:window.URL.createObjectURL(blob),
+					base64:base64}
+		} else {
+			imageUrl = {
+					blobOrBase64:base64,
+					base64:base64}
+		}
+		
+		imageUrlMap[name] = imageUrl;
+		return imageUrl;
+	}
+	
+	function uncacheImageUrl(name) {
+		var imageUrl = imageUrlMap[name];
+		if (window.URL && imageUrl) {
+			window.URL.revokeObjectURL(imageUrl);
+		} 
+		delete imageUrlMap[name];
 	}
 	
 	/* 起動時にコンテンツ読み込み */
@@ -312,28 +338,9 @@
 		
 		// 画像埋め込み
 		var images = document.querySelectorAll("#previewer img");
-		for (i in images) {
+		for (var i = 0; i < images.length; i++) {
 			var elem = images[i];
-			var base64 = null;
-			if (elem.name) {
-				var script = document.getElementById("attach-" + elem.name);
-				if (script) {
-					base64 = script.innerHTML;
-				}
-			}
-			if (!base64 && elem.src) {
-				var matchs = elem.src.trim().match(/^attach:(.+)/);
-				if (matchs) {
-					var script = document.getElementById("attach-" + 
-							decodeURIComponent(matchs[1]));
-					if (script) {
-						base64 = script.innerHTML;
-					}
-				}
-			}
-			if (base64 != null) {
-				elem.src = base64;
-			}
+			loadImage(elem);
 		}
 		
 		// リンク
@@ -345,11 +352,12 @@
 				var matchs = href.trim().match(/^attach:(.+)/);
 				if (matchs) {
 					var name = decodeURIComponent(matchs[1]);
-					var blob = getBlob(name);
-					var url = window.URL || window.webkitURL;
-					var blobUrl = url.createObjectURL(blob);
-					anchor.href = blobUrl;
-					anchor.download = name;
+					getFileBlog(name, function(blob){
+						var url = window.URL || window.webkitURL;
+						var blobUrl = url.createObjectURL(blob);
+						anchor.href = blobUrl;
+						anchor.download = name;
+					});
 				}
 			}
 		}
@@ -377,11 +385,6 @@
 			}
 		}
 		
-		// IEだとinnerHTML後にborderが消えてしまい
-		// スクロールバーの位置がおかしくなる。
-		// なのでここで特別にこの行を書いてやらないといけない
-		previewer.style.border = "1px solid gray";
-		
 		// スクロールバーが最下部にある場合、更新後も最下部にする。
 		if (scrollLockFlag == true) {
 			previewer.scrollTop = previewer.scrollHeight;
@@ -391,6 +394,86 @@
 		var event = document.createEvent("Event");
 		event.initEvent("previewed", true, true);
 		previewer.dispatchEvent(event);
+	}
+	
+	function loadImage(elem) {
+		var name = null;
+		if (elem.name) {
+			name = elem.name;
+		} else if (elem.src) {
+			var matchs = elem.src.trim().match(/^attach:(.+)/);
+			if (matchs) {
+				name = decodeURIComponent(matchs[1]);
+			}
+		}
+		
+		if (name == null) {
+			return;
+		}
+		
+		loadImageByName(
+				name,
+				function(width, height) {
+				 	// 大きさが決まったら仮のイメージで領域だけ確保しておく
+					var canvas = document.createElement("canvas");
+					canvas.width = width;
+					canvas.height = height;
+					elem.src = canvas.toDataURL();
+				},
+				function(imageUrl) {
+					elem.src = imageUrl.blobOrBase64;
+				});
+	}
+	
+	function loadImageByName(name, onLoadSize, onLoadImage) {
+		var base64Script = document.getElementById("attach-" + name);
+		if (base64Script != null) {
+			var rootElem = base64Script.parentNode;
+			var base64 = base64Script.innerHTML;
+			var layer64 = rootElem.querySelector("script.layerContent").innerHTML;
+			var trimInfo = rootElem.querySelector("script.trimInfo").innerHTML;
+			trimInfo = (trimInfo != "") ? JSON.parse(trimInfo) : null;
+			
+			var cached = getCachedImageUrl(name);
+			if (cached) {
+				onLoadImage(cached);
+				return;
+			}
+			
+			if (trimInfo == null) {
+				var url = cacheImageUrl(name, base64);
+				onLoadImage(url);
+				return;
+			}
+			
+			onLoadSize(trimInfo.w, trimInfo.h);
+			
+			var baseImage = new Image();
+			baseImage.onload = function() {
+				var canvas = document.createElement("canvas");
+				canvas.width = trimInfo.w;
+				canvas.height = trimInfo.h;
+				var ctx = canvas.getContext('2d');
+				ctx.translate(-trimInfo.x, -trimInfo.y);
+				ctx.drawImage(baseImage,0, 0);
+				if (layer64 != "") {
+					var layerImage = new Image();
+					layerImage.onload = function() {
+						ctx.drawImage(layerImage,0, 0);
+						
+						var content = canvas.toDataURL();
+						var url = cacheImageUrl(name, content);
+						onLoadImage(url);
+					};
+					layerImage.src = layer64;
+				} else {
+					var content = canvas.toDataURL();
+					var url = cacheImageUrl(name, content);
+					onLoadImage(url);
+				}
+			};
+			baseImage.src= base64;
+		}
 	}
 	
 	function isMaxScroll (id) {
@@ -452,12 +535,16 @@
 		}
 	}
 	
-	function attachFile(file) {
+	function attachFile(file, fileName) {
 		var fr = new FileReader();
-	    fr.fileName = file.name;
+		if (fileName) {
+			fr.fileName = fileName;
+		} else {
+			fr.fileName = file.name;
+		}
 	    fr.onload = function(e) {
 			var target = e.target;
-			addAttachFileElements(target.fileName, target.result);
+			addAttachFileElements(target.fileName, target.result, "", "");
 		};
 		fr.readAsDataURL(file);
 	}
@@ -498,14 +585,19 @@
 	
 	function importKantanMarkdown(result, dummyHtml, file) {
 		if (result.attach == true) {
-			var fileListElement = dummyHtml.querySelector("ul#fileList");
-			var fileList = document.getElementById("fileList");
-			var importScripts = fileListElement.querySelectorAll("script");
-			for (var i = 0; i < importScripts.length; i++) {
-				var scriptElement = importScripts[i];
+			var fileListElement = dummyHtml.querySelectorAll("ul#fileList li");
+			for (var i = 0; i < fileListElement.length; i++) {
+				var scriptElement = fileListElement[i].querySelector("script");
 				var fileName = scriptElement.title;
 				var content = scriptElement.innerHTML;
-				addAttachFileElements(fileName, content);
+				
+				var layerElement = fileListElement[i].querySelector("script.layerContent");
+				var layerContent = (layerElement) ? layerElement.innerHTML : "";
+				
+				var trimInfoElement = fileListElement[i].querySelector("script.trimInfo");
+				var trimInfo = (trimInfoElement) ? trimInfoElement.innerHTML : "";
+				
+				addAttachFileElements(fileName, content, layerContent, trimInfo);
 			}
 			saved = false;
 		}
@@ -521,8 +613,14 @@
 			var styleElement = dummyHtml.querySelector("#previewerStyle");
 			if (styleElement) {
 				var cssEditor = document.getElementById("cssEditor");
-				cssEditor.value = cssEditor.textContent + styleElement.innerHTML;
-				saved = false;
+				var dummyCssEditor = dummyHtml.querySelector("#cssEditor");
+				if (styleElement.innerHTML.trim() != "") {
+					cssEditor.value = styleElement.innerHTML;
+					saved = false;
+				} else if (dummyCssEditor) {
+					cssEditor.value = dummyCssEditor.value;
+					saved = false;
+				}
 			}
 		}
 		
@@ -581,15 +679,16 @@
 		dialogElement.style.left = ((body.offsetWidth / 2.0) - (dialogElement.offsetWidth / 2.0)) + "px";
 	}
 	
-	function addAttachFileElements(fileName, content) {
+	function addAttachFileElements(fileName, content, layerContent, trimInfo) {
 		var name = fileName;
 		var script = document.querySelector("#fileList script[title='" + name + "']");
-		var i = 1;
+		var i = 2;
 		while (script) {
 			var pos = fileName.lastIndexOf(".");
+			pos = (pos != -1) ? pos : fileName.length;
 			var name = fileName.substring(0, pos);
 			var ext = fileName.substr(pos);
-			name = name + "(" + i + ")" + ext;
+			name = name + "_" + i + ext;
 			script = document.querySelector("#fileList script[title='" + name + "']");
 			i++;
 		}
@@ -602,7 +701,19 @@
 		script.title = name;
 		script.innerHTML = content;
 		li.appendChild(script);
-
+		
+		var layerScript = document.createElement("script");
+		layerScript.type  = "text/template";
+		layerScript.classList.add("layerContent");
+		layerScript.innerHTML = layerContent;
+		li.appendChild(layerScript);
+		
+		var trimScript = document.createElement("script");
+		trimScript.type  = "text/template";
+		trimScript.classList.add("trimInfo");
+		trimScript.innerHTML = trimInfo;
+		li.appendChild(trimScript);
+		
 		var input  = document.createElement("input");
 		input.type = "text";
 		input.classList.add('fileName');
@@ -616,6 +727,14 @@
 		on(insertButton, "click", onInsertButtonClicked);
 		li.appendChild(insertButton);
 		
+		var isImage = content.match("data:image/.+?;base64,");
+		var editoButton = document.createElement("button");
+		editoButton.classList.add('editButton');
+		editoButton.innerHTML = "Edit";
+		editoButton.disabled = !isImage;
+		on(editoButton, "click", onEditButtonClicked);
+		li.appendChild(editoButton);
+		
 		var downloadButton = document.createElement("button");
 		downloadButton.classList.add('downloadButton');
 		downloadButton.innerHTML = "Download";
@@ -627,7 +746,7 @@
 		detachButton.innerHTML = "×";
 		on(detachButton, "click", onDetachButtonClicked);
 		li.appendChild(detachButton);
-
+		
 		document.getElementById("fileList").appendChild(li);
 		
 		// ファイル添付領域を開く
@@ -645,14 +764,29 @@
 		queuePreview();
 	}
 
-	function getBlob(name) {
+	function getFileBlog(name, onLoaded) {
 		var script = document.getElementById("attach-" + name);
 		if (!script) {
-			return null;
+			onLoaded(null);
+		}
+		
+		var callBack = function(imageUrl) {
+			
 		}
 		
 		var base64 = script.innerHTML;
-		var mimeType = base64.match(/^\s*data:(.+);base64/)[1];
+		var mimeType = base64.match(/^\s*data:(.*);base64/)[1];
+		if (mimeType.match("^image")) {
+			loadImageByName(name, function(){}, function(imageUrl) {
+				onLoaded(base64ToBlob(imageUrl.base64));
+			});
+		} else {
+			onLoaded(base64ToBlob(base64));
+		}
+	}
+
+	function base64ToBlob(base64) {
+		var mimeType = base64.match(/^\s*data:(.*);base64/)[1];
 		var bin = atob(base64.replace(/^.*,/, ''));
 		var buffer = new Uint8Array(bin.length);
 		for (var i = 0; i < bin.length; i++) {
@@ -661,7 +795,6 @@
 		var blob = new Blob([buffer.buffer], {
 			type: mimeType
 		});
-		
 		return blob;
 	}
 
@@ -672,6 +805,7 @@
 		if(window.confirm('削除していいですか?')){
 			var parent = e.target.parentNode;
 			var name = parent.querySelector("script").name;
+			uncacheImageUrl(name);
 			parent.parentNode.removeChild(parent);
 			saved = false;
 		}
@@ -708,7 +842,8 @@
 			target.selectionEnd = name.length;
 			return false;
 		} 
-		var scriptTag = target.previousElementSibling;
+		var scriptTag = target.parentNode.querySelector("script");
+		uncacheImageUrl(scriptTag.title);
 		scriptTag.id =  "attach-" + name;
 		scriptTag.title = name;
 		saved = false;
@@ -747,25 +882,68 @@
 		var target = e.target;
 		var script = target.parentNode.querySelector("script");
 		var fileName = script.title;
-		var blob = getBlob(fileName);
-		if (window.navigator.msSaveBlob) {
-			window.navigator.msSaveBlob(blob, fileName);
-		} else {
-			var url = window.URL || window.webkitURL;
-			var blobURL = url.createObjectURL(blob);
-			var a = document.createElement('a');
-			a.download = fileName;
-			a.href = blobURL;
-			
-			// firefoxでa.click()が効かないため無理やりclickイベントをディスパッチする
-			var ev = document.createEvent("MouseEvents");
-		    ev.initMouseEvent("click", true, false, self, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-			a.dispatchEvent(ev);
-			delete a;
-		}
-		
+		getFileBlog(fileName, function(blob) {
+			if (window.navigator.msSaveBlob) {
+				window.navigator.msSaveBlob(blob, fileName);
+			} else {
+				var url = window.URL || window.webkitURL;
+				var blobURL = url.createObjectURL(blob);
+				var a = document.createElement('a');
+				a.download = fileName;
+				a.href = blobURL;
+				
+				// firefoxでa.click()が効かないため無理やりclickイベントをディスパッチする
+				var ev = document.createEvent("MouseEvents");
+			    ev.initMouseEvent("click", true, false, self, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+				a.dispatchEvent(ev);
+				delete a;
+			}
+		});
 	}
-
+	
+	/* お絵かき周り */
+	var drawer = new KantanDrawer(document.querySelector("#drawArea"));
+	on(".editButton", "click", onEditButtonClicked);
+	function onEditButtonClicked(e) {
+		var rootElement = e.target.parentNode;
+		var contentElement = rootElement.querySelector("script");
+		var layerElement = rootElement.querySelector("script.layerContent");
+		var trimElement = rootElement.querySelector("script.trimInfo");
+		
+		document.querySelector("body").classList.add("drawMode");
+		
+		var nav = document.querySelector("nav");
+		var attach = document.querySelector("#attach");
+		var wrapper = document.querySelector("#wrapper");
+		
+		nav.classList.add("hide");
+		attach.classList.add("hide");
+		wrapper.classList.add("hide");
+		
+		drawer.show(contentElement.innerHTML,
+				layerElement.innerHTML,
+				trimElement.innerHTML,
+				function(layerContent, trimInfo) {
+					layerElement.innerHTML = layerContent;
+					trimElement.innerHTML = trimInfo;
+					
+					nav.classList.remove("hide");
+					attach.classList.remove("hide");
+					wrapper.classList.remove("hide");
+					document.querySelector("body").classList.remove("drawMode");
+					
+					uncacheImageUrl(contentElement.title);
+					doPreview();
+				},
+				function() {
+					nav.classList.remove("hide");
+					attach.classList.remove("hide");
+					wrapper.classList.remove("hide");
+					document.querySelector("body").classList.remove("drawMode");
+				}
+		);
+	}
+	
 	/* 添付ファイル領域開け閉め */
 	on("#attachToggleButton", "click", function() {
 		if (isVisible(document.getElementById("filer"))){
@@ -838,6 +1016,9 @@
 		var editor = document.getElementById("editor");
 		editor.innerHTML = editor.value.replace(/</g, "&lt;");
 		
+		var cssEditor = document.getElementById("cssEditor");
+		cssEditor.innerHTML = cssEditor.value;
+		
 		var toggleFlag = isEditMode();
 		if (toggleFlag == true) {
 			toggleMode();
@@ -847,8 +1028,7 @@
 		/* ファイルの肥大化を防ぐため中身を消去 */
 		document.getElementById("previewer").innerHTML = "";
 		document.getElementById("messageArea").innerHTML = "";
-		// cssエディタはテキストエリアなので保存されない
-		// document.getElementById("cssEditor").value = "";
+		document.getElementById("previewerStyle").innerHTML="";
 		
 		var html = "<!doctype html>\n<html>\n";
 		html += document.getElementsByTagName("html")[0].innerHTML;
@@ -1209,9 +1389,70 @@
 		cssEditor.focus();
 	}
 	
+	function addAttachEditLayer(fileName, content) {
+		var script = document.createElement("script");
+		script.type  = "text/template";
+		script.className = "editLayer";
+		script.innerHTML = content;
+		
+		var attach = document.getElementById("attach-" + fileName);
+		var parent = attach.parentNode;
+		parent.insertBefore(script, attach.nextSibling);
+	}
+	
+	/* 画面キャプチャ貼り付け */
+	// Chrome向け
+	on("#pasteArea", "paste",function(e){
+		if (!e.clipboardData || !e.clipboardData.types) {
+			return true;
+		}
+		
+		var fileFlag = false;
+		for (var i=0; i < e.clipboardData.types.length; i++) {
+			if (e.clipboardData.types[i] == "Files") {
+				fileFlag = true;
+				break;
+			}
+		}
+		if (fileFlag == false) {
+			return true;
+		}
+		
+		e.preventDefault();
+		for (var i = 0; i < e.clipboardData.items.length; i++) {
+			attachFile(e.clipboardData.items[i].getAsFile(), "clipboard");
+		}
+		return false;
+	});
+	
+	// FF, IE向け
+	on("#pasteArea", "keyup",function(e){
+		e.preventDefault();
+		
+		var dummyElement = document.createElement("div");
+		dummyElement.innerHTML = this.innerHTML;
+		var imgElement = dummyElement.querySelector("img");
+		if (imgElement) {
+			var base64 = imgElement.src;
+			addAttachFileElements("clipboard", base64, "", "");
+		}
+		
+		this.innerHTML = "ここをクリックしてCtrl+V(Cmd+V)するとクリップボードの画像を添付できます。";
+		return false;
+	});
+	
 	/* ショートカットキー */
 	on("body", "keydown", function(event) {
 		var code = (event.keyCode ? event.keyCode : event.which);
+		
+		if (isDrawMode()) {
+			if (code == 83 && (event.ctrlKey || event.metaKey)){
+				event.preventDefault();
+				return false;
+			} else {
+				return true;
+			}
+		}
 		
 		if (code == 27) {
 			// ESCキー
@@ -1310,6 +1551,10 @@
 		return document.querySelector("body").classList.contains("editMode");
 	}
 	
+	function isDrawMode() {
+		return document.querySelector("body").classList.contains("drawMode");
+	}
+	
 	function isEnable(elem) {
 		return elem &&
 				((typeof elem.disabled === "undefined")
@@ -1338,3 +1583,4 @@
 		elem.classList.remove("showBlock")
 		elem.classList.add("hide");
 	}
+		

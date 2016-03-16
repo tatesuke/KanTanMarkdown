@@ -1,0 +1,66 @@
+<div id="canvasWrapper">
+	<canvas id="baseCanvas"></canvas>
+	<canvas id="mainCanvas"></canvas>
+	<canvas id="workCanvas"></canvas>
+</div>
+<div id="drawControllWrapper">
+	<dl>
+		<dt>モード</dt>
+		<dd class="mode">
+			<button name="rectangleModeButton">Rectangle</button>
+			<button name="letterModeButton">Letter</button>
+			<button name="eraserModeButton">Eraser</button>
+			<button name="trimModeButton">Trim</button>
+		</dd>
+		
+		<dt>枠の太さ</dt>
+		<dd class="borderWidth clearfix">
+			<div class="float50" name="borderWidth"></div>
+			<button name="minus" class="float25">-</button><button name="plus"class="float25">+</button>
+		</dd>
+		
+		<dt>枠の色<dt>
+		<dd class="borderColor clearfix">
+			<button class="color color9" name="c_ff0000">　</button>
+			<button class="color color9" name="c_34A853">　</button>
+			<button class="color color9" name="c_000000">　</button>
+			<button class="color color9" name="c_ffffff">　</button>
+			<button class="color color3" name="c_clear">透明</button>
+			<input type="text" name="borderColor">
+		</dd>
+		
+		<dt>塗りつぶしの色</dt>
+		<dd class="fillColor clearfix">
+			<button class="color color9" name="c_ff0000">　</button>
+			<button class="color color9" name="c_34A853">　</button>
+			<button class="color color9" name="c_000000">　</button>
+			<button class="color color9" name="c_ffffff">　</button>
+			<button class="color color3" name="c_clear">透明</button>
+			<input type="text" name="fillColor">
+		</dd>
+		
+		<dt>フォント</dt>
+		<dd class="clearfix">
+			<input type="text" name="font">
+		</dd>
+		
+		<dt>拡大率</dt>
+		<dd class="scale clearfix">
+			<div class="float50" name="scale"></div>
+			<button name="minus" class="float25">-</button><button name="plus"class="float25">+</button>
+		</dd>
+		
+		<dt>編集</dt>
+		<dd>
+			<button name="undoButton" class="float50">←Undo</button>
+			<button name="redoButton" class="float50">Redo→</button>
+			<button name="resetButton">Reset</button>
+		</dd>
+		
+		<dt>ファイル</dt>
+		<dd>
+			<button name="saveButton">Save</button>
+			<button name="cancelButton">Cancel</button>
+		</dd>
+	</dl>
+</div>

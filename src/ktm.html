@@ -7,11 +7,8 @@
  * http://opensource.org/licenses/mit-license.php
  --><head>
 <meta charset="utf-8">
-<style><inline src="css/kantan.css" /></style>
-<style id="previewerStyle">
-<inline src="css/previewer.css" />
-<inline src="css/hljs.css" />
-</style>
+<style><inline src="css/kantan.css" /><inline src="css/drawer.css" /></style>
+<style id="previewerStyle"></style>
 <title>無題</title>
 </head>
 <body class="initialState">
@@ -30,6 +27,7 @@
 	<div id="filer">
 		<ul id="fileList">
 		</ul>
+		<div id="pasteArea" contenteditable="true">ここをクリックしてCtrl+V(Cmd+V)するとクリップボードの画像を添付できます。</div>
 	</div>
 	<button id="attachToggleButton">添付ファイルを表示(Alt+↓)</button><button id="previewToggleButton">プレビューを隠す(Alt+→)</button>
 </div>
@@ -38,7 +36,8 @@
 		<noscript>このファイルはJavaScriptを有効にするとより正確に表示できます。</noscript>
 		<div id="editorTabContents">
 			<textarea id="editor"></textarea>
-			<textarea id="cssEditor"></textarea>
+			<textarea id="cssEditor"><inline src="css/previewer.css" />
+<inline src="css/hljs.css" /></textarea>
 		</div>
 		<ol id="editorTabs">
 			<li class="selected"><a href="#" id="markdownTab">Markdown</a></li>
@@ -69,6 +68,9 @@
 	</ul>
 	</form>
 </div>
+<div id="drawArea">
+	<inline src="kantanDrawer.html" />
+</div>
 <input type="hidden" id="kantanVersion" value="<inline src="kantanVersion.txt" />">
 <input type="hidden" id="kantanEdition" value="__KANTAN_EDITION__">
 <div id="updateScriptArea"></div>
@@ -92,6 +94,9 @@
 </script>
 <script id="kantanEditorJS">
 <inline src="js/kantanEditor.js" />
+</script>
+<script id="kantanDrawerJS">
+<inline src="js/kantanDrawer.js" />
 </script>
 <script id="kantanMarkdownJs">
 <inline src="js/kantanMarkdown.js" />
