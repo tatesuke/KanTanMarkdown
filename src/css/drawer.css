@@ -1,0 +1,96 @@
+#drawArea {
+	position:absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: gray;
+	display: none;
+}
+
+#drawArea #canvasWrapper {
+	box-sizing: border-box;
+	float:left;
+	width: calc(100% - 200px);
+	height: 100%;
+	overflow: auto;
+	position: relative;
+	padding: 5px 15px 15px 5px;
+}
+
+#drawArea #canvasWrapper #baseCanvas,
+#drawArea #canvasWrapper #mainCanvas,
+#drawArea #canvasWrapper #workCanvas {
+	position: absolute;
+}
+
+#drawArea #drawControllWrapper {
+	position: relative;
+	background-color: white;
+	float:left;
+	width:200px;
+	height:100%;
+}
+
+
+#drawArea div {
+	width:100%;
+}
+
+#drawArea button {
+	display:block;
+	width: 100%;
+	border: 1px solid black;
+	background-color: #ffffff;
+}
+
+#drawArea  button.selected {
+	background-color: #7a9cd3;
+}
+
+
+#drawArea .float50 {
+	box-sizing:border-box;
+	float:left;
+	width:50%;
+}
+
+#drawArea .float25 {
+	box-sizing:border-box;
+	float:left;
+	width:25%;
+}
+
+#drawArea .color9 {
+	box-sizing:border-box;
+	float:left;
+	width:11.1%;
+	border:1px solid black;
+	margin:0;
+	padding:0;
+}
+
+#drawArea .color3 {
+	box-sizing:border-box;
+	float:left;
+	width:33.3%;
+	border:1px solid black;
+	margin:0;
+	padding:0;
+}
+
+#drawArea .color[name=c_ff0000] { background-color:#ff0000; }
+#drawArea .color[name=c_34A853] { background-color:#34A853; }
+#drawArea .color[name=c_000000] { background-color:#000000; }
+#drawArea .color[name=c_ffffff] { background-color:#ffffff; }
+#drawArea .color[name=c_clear]  { background-color:#ffffff; }
+
+#drawArea .clearfix:after {
+	content: "."; 
+	display: block; 
+	height: 0; 
+	font-size:0;	
+	clear: both; 
+	visibility:hidden;
+}
+
