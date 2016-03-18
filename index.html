@@ -18,7 +18,7 @@
 	</div>
 	<div id="rightNav">
 		<span id="messageArea"></span>
-		<input type="checkbox" id="autoSyncButton" name="autoSyncButton"><label for="autoSyncButton">自動プレビュー</label>
+		<input type="checkbox" id="autoSyncButton" name="autoSyncButton" checked="checked"><label for="autoSyncButton">自動プレビュー</label>
 		<button id="syncButton">プレビュー(F5)</button><button id="headingSyncButton">見出し同期(F2)</button><button id="toggleButton">編集/閲覧(ESC)</button><button id="saveButton">保存(Ctrl+S)</button>
 	</div>
 </nav>
@@ -31,11 +31,14 @@
 	</div>
 	<button id="attachToggleButton">添付ファイルを表示(Alt+↓)</button><button id="previewToggleButton">プレビューを隠す(Alt+→)</button>
 </div>
-<div id="wrapper" style="height: 882px;">
+<div id="wrapper" style="height: 927px;">
 	<div id="editorTabWrapper" class="hide">
 		<noscript>このファイルはJavaScriptを有効にするとより正確に表示できます。</noscript>
 		<div id="editorTabContents">
 			<textarea id="editor"># かんたんMarkdown
+
+KanTanMarkdown is a markdown editor and previewer which runs on single html. English contents is [here](temp/english_sample.html).
+
 かんたんMarkdownはメモ帳感覚で使えるちょっと変わったMarkdownエディタ、プレビューアです。クロスプラットフォームで、リアルタイムプレビューにも対応しています。
 
 * ちょっとメモしたいけどMarkdownの環境がない
