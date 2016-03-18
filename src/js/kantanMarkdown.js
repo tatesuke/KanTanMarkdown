@@ -202,6 +202,8 @@
 			
 			hide(attach);
 			hide(editorTabWrapper);
+			document.querySelector("body").classList.add("previewMode");
+			document.querySelector("body").classList.remove("editMode");
 			doPreview();
 			
 			// スクロールバー位置記憶
@@ -217,8 +219,6 @@
 			}	
 			
 			// レイアウト修正
-			document.querySelector("body").classList.add("previewMode");
-			document.querySelector("body").classList.remove("editMode");
 			doLayout();
 			
 			previewer.focus();
@@ -230,6 +230,8 @@
 			// 編集モードへ
 			showBlock(attach);
 			showBlock(editorTabWrapper);
+			document.querySelector("body").classList.remove("previewMode");
+			document.querySelector("body").classList.add("editMode");
 			doPreview();
 			
 			// スクロールバー位置記憶
@@ -249,8 +251,6 @@
 			}
 			
 			// レイアウト修正
-			document.querySelector("body").classList.remove("previewMode");
-			document.querySelector("body").classList.add("editMode");
 			doLayout();
 			
 			if (minElem) {
