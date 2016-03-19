@@ -10,21 +10,33 @@ function toKantanEditor(editor) {
 		var end   = editor.selectionEnd;
 		if (start == end) {
 			/* いわゆる普通のtab */
+			var insertString = "";
+			var tabSize = 4;
 			
+			var posOfLine = 0;
+			var i = start;
 			var text = editor.value;
-			editor.value = text.substr(0, start) + '\t' + text.substr(start, text.length);
-			editor.setSelectionRange(start + 1, start + 1);
+			while ((0 < i) && (text.charAt(i - 1) != "\n")) {
+				if (text.charAt(i - 1).match(/[!-}｡-ﾝ]/)) {
+					posOfLine += 1;
+				} else {
+					posOfLine += 2;
+				}
+				i--;
+			}
+			var spaceNum = tabSize - (posOfLine % tabSize);
+			for (var j = 0; j < spaceNum; j++) {
+				insertString += " ";
+			}
+			
+			editor.value = text.substr(0, start) + insertString + text.substr(start, text.length);
+			editor.setSelectionRange(start + insertString.length, start + insertString.length);
 			updateScrollPos(e.target);
 			saveUndo(e.target);
 		} else {
 			if (e.shiftKey) {
 				/* 選択 + Shift + Tabで複数行アウトデント */
-				var style = editor.currentStyle 
-						|| document.defaultView.getComputedStyle(editor, '');
-				var tabSize = style.tabSize
-							|| style.MozTabSize
-							|| 8;
-				tabSize = Number(tabSize);
+				var tabSize = 4;
 				
 				// スタート・エンド位置特定
 				var orgText = editor.value;

@@ -183,21 +183,22 @@ nav:after {
 	visibility:hidden;
 }
 
-#onlineMenu {
+.popupMenu {
 	display:none;
 	border : 1px solid gray;
 	position:absolute;
 	margin:0;
 	padding:0;
+	background-color:#ffffff;
 }
 
-#onlineMenu > ul {
+.popupMenu > ul {
 	list-style-type: none;
 	margin:0;
 	padding:0;
 }
 
-#onlineMenu > ul > li {
+.popupMenu > ul > li {
 	margin:0;
 }
 
@@ -210,7 +211,6 @@ nav:after {
 	width:100%;
 	height:100%;
 	color : black;
-	background-color:#ffffff;
 }
 
 #onlineMenu > ul > li > a:hover {

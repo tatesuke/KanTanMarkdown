@@ -104,11 +104,12 @@ kantanUpdate({
 		if (dialogResult.attach == true) {
 			for (var i = 0; i < originalFileList.length; i++) {
 				var originalFile = originalFileList[i];
-				addAttachFileElements(
+				addAttachFileElement(
 						originalFile.fileName,
 						originalFile.base64,
 						originalFile.layerContent,
-						originalFile.trimInfo);
+						originalFile.trimInfo,
+						false);
 			}
 			saved = false;
 		}
