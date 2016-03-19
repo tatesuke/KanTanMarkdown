@@ -1006,6 +1006,28 @@
 	var contentAtSave = editor.value;
 	on("#saveButton", "click", save);
 	function save() {
+		var html = getHTMLForSave();
+		
+		var blob = new Blob([html]);
+		if (window.navigator.msSaveBlob) {
+			/* for IE */
+			window.navigator.msSaveBlob(blob, document.title + ".html");
+		} else {
+			var url = window.URL || window.webkitURL;		
+			var blobURL = url.createObjectURL(blob);
+			var a = document.createElement('a');
+			a.download = document.title.replace(/^\* /, "") + ".html";
+			a.href = blobURL;
+			
+			// firefoxでa.click()が効かないため無理やりclickイベントをディスパッチする
+			var ev = document.createEvent("MouseEvents");
+		    ev.initMouseEvent("click", true, false, self, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+			a.dispatchEvent(ev);
+			delete a;
+		}
+	}
+
+	function getHTMLForSave() {
 		var wrapperScrollTop = document.getElementById("wrapper").scrollTop;
 		var previewerScrollTop = document.getElementById("previewer").scrollTop;
 		
@@ -1030,29 +1052,12 @@
 		document.getElementById("messageArea").innerHTML = "";
 		document.getElementById("previewerStyle").innerHTML="";
 		
+		// HTML生成
 		var html = "<!doctype html>\n<html>\n";
 		html += document.getElementsByTagName("html")[0].innerHTML;
 		var i = html.lastIndexOf("/script>"); // bug fix #1 #39
 		html = html.substring(0, i);
 		html += "/script>\n</body>\n</html>";
-
-		var blob = new Blob([html]);
-		if (window.navigator.msSaveBlob) {
-			/* for IE */
-			window.navigator.msSaveBlob(blob, document.title + ".html");
-		} else {
-			var url = window.URL || window.webkitURL;		
-			var blobURL = url.createObjectURL(blob);
-			var a = document.createElement('a');
-			a.download = document.title.replace(/^\* /, "") + ".html";
-			a.href = blobURL;
-			
-			// firefoxでa.click()が効かないため無理やりclickイベントをディスパッチする
-			var ev = document.createEvent("MouseEvents");
-		    ev.initMouseEvent("click", true, false, self, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-			a.dispatchEvent(ev);
-			delete a;
-		}
 		
 		contentAtSave = editor.value;
 		saved = true;
@@ -1065,6 +1070,7 @@
 		
 		document.getElementById("previewer").scrollTop = previewerScrollTop;
 		document.getElementById("wrapper").scrollTop = wrapperScrollTop;
+		return html;
 	}
 
 	/* 更新時、終了時の警告 */
