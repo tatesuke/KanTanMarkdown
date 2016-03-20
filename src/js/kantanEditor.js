@@ -17,7 +17,9 @@ function toKantanEditor(editor) {
 			var i = start;
 			var text = editor.value;
 			while ((0 < i) && (text.charAt(i - 1) != "\n")) {
-				if (text.charAt(i - 1).match(/[!-}｡-ﾝ]/)) {
+				var c = text.charCodeAt(i);
+				// 半角判定はざっくりと256未満と半角カナのみ
+				if (c < 256 || (c >= 0xff61 && c <= 0xff9f)) {
 					posOfLine += 1;
 				} else {
 					posOfLine += 2;

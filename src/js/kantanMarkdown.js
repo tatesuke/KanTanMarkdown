@@ -505,7 +505,7 @@
 	on("#attachButton", "change", function(e) {
 		var elem = e.target;
 	    var files = elem.files;
-	    attachFiles(files); //★
+	    attachFiles(files);
 	});
 	on("body", "dragover", function(e) {
 		e.stopPropagation();
@@ -517,7 +517,7 @@
 		e.stopPropagation();
 		e.preventDefault();
 		attachFiles(e.dataTransfer.files);
-		this.classList.remove("onDragover");//★
+		this.classList.remove("onDragover");
 	});
 	on("body", "dragleave", function(e){
 		this.classList.remove("onDragover");
@@ -1469,7 +1469,7 @@
 		
 		e.preventDefault();
 		for (var i = 0; i < e.clipboardData.items.length; i++) {
-			attachFile(e.clipboardData.items[i].getAsFile(), "clipboard");//★
+			attachFile(e.clipboardData.items[i].getAsFile(), "clipboard");
 		}
 		return false;
 	});
@@ -1483,7 +1483,7 @@
 		var imgElement = dummyElement.querySelector("img");
 		if (imgElement) {
 			var base64 = imgElement.src;
-			addAttachFileElement("clipboard", base64, "", "", true);//★
+			addAttachFileElement("clipboard", base64, "", "", true);
 		}
 		
 		this.innerHTML = "ここをクリックしてCtrl+V(Cmd+V)するとクリップボードの画像を添付できます。";
