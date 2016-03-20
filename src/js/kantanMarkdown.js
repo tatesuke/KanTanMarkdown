@@ -202,6 +202,8 @@
 			
 			hide(attach);
 			hide(editorTabWrapper);
+			document.querySelector("body").classList.add("previewMode");
+			document.querySelector("body").classList.remove("editMode");
 			doPreview();
 			
 			// スクロールバー位置記憶
@@ -217,8 +219,6 @@
 			}	
 			
 			// レイアウト修正
-			document.querySelector("body").classList.add("previewMode");
-			document.querySelector("body").classList.remove("editMode");
 			doLayout();
 			
 			previewer.focus();
@@ -230,6 +230,8 @@
 			// 編集モードへ
 			showBlock(attach);
 			showBlock(editorTabWrapper);
+			document.querySelector("body").classList.remove("previewMode");
+			document.querySelector("body").classList.add("editMode");
 			doPreview();
 			
 			// スクロールバー位置記憶
@@ -249,8 +251,6 @@
 			}
 			
 			// レイアウト修正
-			document.querySelector("body").classList.remove("previewMode");
-			document.querySelector("body").classList.add("editMode");
 			doLayout();
 			
 			if (minElem) {
@@ -271,7 +271,7 @@
 
 	// 自動同期チェックボックスをクリックしたらchecked属性を更新する
 	// これを行わないと自動同期チェックボックスの状態が保存されない
-	on("#autoSyncButton", "change", function() {
+	on("input[type=checkbox]", "change", function() {
 		if (this.checked == true) {
 			this.setAttribute("checked", "checked");
 		} else {
@@ -291,8 +291,8 @@
 	var previewQueue = null; // キューをストック 
 	var queuePreviewWait = 300; // 0.3秒後に実行の場合 
 	function queuePreview() {
-		var autoSyncButton = document.getElementById("autoSyncButton");
-		if (!autoSyncButton.checked) {
+		var settingAutoSync = document.getElementById("settingAutoSync");
+		if (!settingAutoSync.checked) {
 			return;
 		}
 
@@ -544,7 +544,7 @@
 		}
 	    fr.onload = function(e) {
 			var target = e.target;
-			addAttachFileElements(target.fileName, target.result, "", "");
+			addAttachFileElement(target.fileName, target.result, "", "", true);
 		};
 		fr.readAsDataURL(file);
 	}
@@ -597,7 +597,7 @@
 				var trimInfoElement = fileListElement[i].querySelector("script.trimInfo");
 				var trimInfo = (trimInfoElement) ? trimInfoElement.innerHTML : "";
 				
-				addAttachFileElements(fileName, content, layerContent, trimInfo);
+				addAttachFileElement(fileName, content, layerContent, trimInfo, false);
 			}
 			saved = false;
 		}
@@ -679,7 +679,7 @@
 		dialogElement.style.left = ((body.offsetWidth / 2.0) - (dialogElement.offsetWidth / 2.0)) + "px";
 	}
 	
-	function addAttachFileElements(fileName, content, layerContent, trimInfo) {
+	function addAttachFileElement(fileName, content, layerContent, trimInfo, insertImgTag) {
 		var name = fileName;
 		var script = document.querySelector("#fileList script[title='" + name + "']");
 		var i = 2;
@@ -723,7 +723,7 @@
 		
 		var insertButton = document.createElement("button");
 		insertButton.classList.add('insertButton');
-		insertButton.innerHTML = "insert URI";
+		insertButton.innerHTML = "Insert Tag";
 		on(insertButton, "click", onInsertButtonClicked);
 		li.appendChild(insertButton);
 		
@@ -758,6 +758,13 @@
 		}
 		if (!isVisible(filer)) {
 			openFiler();
+		}
+		
+		// イメージタグを挿入
+		var setting = document.querySelector("#settingInsertImgTagAfterAttach");
+		if (isImage && insertImgTag && setting.checked) {
+			var tag = '<img src="attach:' + name  + '">';
+			insertToEditor(tag);
 		}
 		
 		saved = false;
@@ -856,24 +863,33 @@
 	function onInsertButtonClicked (e) {
 		var target = e.target;
 		var script = target.parentNode.querySelector("script");
+		var isImage = script.innerHTML.match("data:image/.+?;base64,");
 		var fileName = script.title;
-		var insertText = "attach:" + fileName;
 		
-		var editor = document.getElementById("editor");
-		if (isVisible(editor)) {
-			var text = editor.value;
-			var newPos = editor.selectionStart + insertText.length + 1;
-			var part1 = text.substring(0, editor.selectionStart);
-			var part2 = text.substr(editor.selectionEnd);
-			editor.value = part1 + insertText + part2;
-			editor.selectionStart = newPos;
-			editor.selectionEnd = newPos;
-			updateScrollPos(editor);
-			
-			var event= document.createEvent("Event");
-			event.initEvent("changeByJs",false,false);
-			editor.dispatchEvent(event);
+		var insertText;
+		if (isImage) {
+			insertText = '<img src="attach:' + fileName  + '">';
+		} else {
+			insertText= '<a href="attach:' + fileName +'">' + fileName + '</a>';
 		}
+		
+		insertToEditor(insertText);
+	}
+	
+	function insertToEditor(insertText) {
+		var editor = document.getElementById("editor");
+		
+		var text = editor.value;
+		var newPos = editor.selectionStart + insertText.length + 1;
+		var part1 = text.substring(0, editor.selectionStart);
+		var part2 = text.substr(editor.selectionEnd);
+		editor.value = part1 + insertText + part2;
+		editor.selectionStart = newPos;
+		editor.selectionEnd = newPos;
+		updateScrollPos(editor);
+		var event= document.createEvent("Event");
+		event.initEvent("changeByJs",false,false);
+		editor.dispatchEvent(event);
 	}
 	
 	/* 添付ファイルをダウンロード */
@@ -1006,6 +1022,28 @@
 	var contentAtSave = editor.value;
 	on("#saveButton", "click", save);
 	function save() {
+		var html = getHTMLForSave();
+		
+		var blob = new Blob([html]);
+		if (window.navigator.msSaveBlob) {
+			/* for IE */
+			window.navigator.msSaveBlob(blob, document.title + ".html");
+		} else {
+			var url = window.URL || window.webkitURL;		
+			var blobURL = url.createObjectURL(blob);
+			var a = document.createElement('a');
+			a.download = document.title.replace(/^\* /, "") + ".html";
+			a.href = blobURL;
+			
+			// firefoxでa.click()が効かないため無理やりclickイベントをディスパッチする
+			var ev = document.createEvent("MouseEvents");
+		    ev.initMouseEvent("click", true, false, self, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
+			a.dispatchEvent(ev);
+			delete a;
+		}
+	}
+
+	function getHTMLForSave() {
 		var wrapperScrollTop = document.getElementById("wrapper").scrollTop;
 		var previewerScrollTop = document.getElementById("previewer").scrollTop;
 		
@@ -1030,29 +1068,12 @@
 		document.getElementById("messageArea").innerHTML = "";
 		document.getElementById("previewerStyle").innerHTML="";
 		
+		// HTML生成
 		var html = "<!doctype html>\n<html>\n";
 		html += document.getElementsByTagName("html")[0].innerHTML;
 		var i = html.lastIndexOf("/script>"); // bug fix #1 #39
 		html = html.substring(0, i);
 		html += "/script>\n</body>\n</html>";
-
-		var blob = new Blob([html]);
-		if (window.navigator.msSaveBlob) {
-			/* for IE */
-			window.navigator.msSaveBlob(blob, document.title + ".html");
-		} else {
-			var url = window.URL || window.webkitURL;		
-			var blobURL = url.createObjectURL(blob);
-			var a = document.createElement('a');
-			a.download = document.title.replace(/^\* /, "") + ".html";
-			a.href = blobURL;
-			
-			// firefoxでa.click()が効かないため無理やりclickイベントをディスパッチする
-			var ev = document.createEvent("MouseEvents");
-		    ev.initMouseEvent("click", true, false, self, 0, 0, 0, 0, 0, false, false, false, false, 0, null);
-			a.dispatchEvent(ev);
-			delete a;
-		}
 		
 		contentAtSave = editor.value;
 		saved = true;
@@ -1065,6 +1086,7 @@
 		
 		document.getElementById("previewer").scrollTop = previewerScrollTop;
 		document.getElementById("wrapper").scrollTop = wrapperScrollTop;
+		return html;
 	}
 
 	/* 更新時、終了時の警告 */
@@ -1098,6 +1120,33 @@
 		if (e.target != onlineMenuButton) {
 			hide(document.getElementById("onlineMenu"));
 		}
+	});
+	
+	/* 設定メニュー */
+	on("#settingMenuButton", "click", function(){
+		var button = this;
+		var settingMenu = document.getElementById("settingMenu");
+		settingMenu.style.top = (this.offsetTop + this.scrollHeight) + "px";
+		settingMenu.style.left = this.offsetLeft + "px";
+		showBlock(settingMenu);
+	});
+
+	on("body", "click", function(e){
+		var current = e.target;
+		
+		var settingMenuButton = document.getElementById("settingMenuButton");
+		if (current ==  settingMenuButton) {
+			return true;
+		}
+		
+		var settingMenu = document.getElementById("settingMenu");
+		while (current != null) {
+			if (current == settingMenu) {
+				return true;
+			}
+			current = current.parentNode;
+		}
+		hide(settingMenu);
 	});
 
 	/* 見出し同期 */
@@ -1434,7 +1483,7 @@
 		var imgElement = dummyElement.querySelector("img");
 		if (imgElement) {
 			var base64 = imgElement.src;
-			addAttachFileElements("clipboard", base64, "", "");
+			addAttachFileElement("clipboard", base64, "", "", true);
 		}
 		
 		this.innerHTML = "ここをクリックしてCtrl+V(Cmd+V)するとクリップボードの画像を添付できます。";
@@ -1583,4 +1632,5 @@
 		elem.classList.remove("showBlock")
 		elem.classList.add("hide");
 	}
-		
+
+	document.querySelector("#kantanVersion").value = "hoge";

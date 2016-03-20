@@ -4,7 +4,7 @@
  * KanTanMarkdown
  * Copyright (c) 2016 tatesuke
  * Released under the MIT license
- * http://opensource.org/licenses/mit-license.php
+ * https://github.com/tatesuke/KanTanMarkdown/blob/master/LICENSE
  --><head>
 <meta charset="utf-8">
 <style><inline src="css/kantan.css" /><inline src="css/drawer.css" /></style>
@@ -14,11 +14,10 @@
 <body class="initialState">
 <nav>
 	<div id="leftNav">
-		<button id="onlineMenuButton">オンラインメニュー</button>
+		<button id="onlineMenuButton">オンラインメニュー</button><button id="settingMenuButton">設定</button>
 	</div>
 	<div id="rightNav">
 		<span id="messageArea"></span>
-		<input type="checkbox" id="autoSyncButton" name="autoSyncButton" checked="checked"><label for="autoSyncButton">自動プレビュー</label>
 		<button id="syncButton">プレビュー(F5)</button><button id="headingSyncButton">見出し同期(F2)</button><button id="toggleButton">編集/閲覧(ESC)</button><button id="saveButton">保存(Ctrl+S)</button>
 	</div>
 </nav>
@@ -46,12 +45,19 @@
 	</div>
 	<div id="previewer" tabIndex="-1"></div>
 </div>
-<div id="onlineMenu">
+<div id="onlineMenu" class="popupMenu">
 	<ul>
 		<li><a href="http://tatesuke.github.io/KanTanMarkdown/ktm.html" target="_blank">新規作成</a></li>
 		<li><a href="http://tatesuke.github.io/KanTanMarkdown/syntax.html" id="helpButton" target="_blank">Markdown記法ヘルプ(F1)</a></li>
 		<li><a href="#" id="updateButton">最新版にアップデート(機能実験中)</a></li>
 		<li><a href="http://tatesuke.github.io/KanTanMarkdown/" target="_blank">かんたんMarkdown <span class="version"></span></a></li>
+	</ul>
+</div>
+<div id="settingMenu" class="popupMenu">
+	<ul>
+		<li><input type="checkbox" id="settingAutoSync" checked="checked"><label for="settingAutoSync">自動プレビュー</label></li>
+		<li><input type="checkbox" id="settingExpandtab"><label for="settingExpandtab">タブキーでスペースを挿入</label></li>
+		<li><input type="checkbox" id="settingInsertImgTagAfterAttach"><label for="settingInsertImgTagAfterAttach">画像を添付したらタグを挿入</label></li>
 	</ul>
 </div>
 <div id="importDialog">
