@@ -1633,4 +1633,3 @@
 		elem.classList.add("hide");
 	}
 
-	document.querySelector("#kantanVersion").value = "hoge";
