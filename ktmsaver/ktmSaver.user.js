@@ -58,14 +58,18 @@
     });
 
     function showKtmSaverUI() {
+        var baseButton = document.querySelector("#settingMenuButton");
+        if (!baseButton) {
+            baseButton = document.querySelector("#onlineMenuButton");
+        }
+        
         /* 上書き設定ボタン */
         var ktmSaverMenuButton = document.createElement("button");
-        var settingButton = document.querySelector("#settingMenuButton");
         ktmSaverMenuButton.innerHTML = "上書き設定";
-        ktmSaverMenuButton.style.height = settingButton.offsetHeight;
+        ktmSaverMenuButton.style.height = baseButton.offsetHeight;
         ktmSaverMenuButton.style.position = "absolute"
-        ktmSaverMenuButton.style.top = settingButton.offsetTop + "px";
-        ktmSaverMenuButton.style.left = (settingButton.offsetLeft + settingButton.offsetWidth) + "px";
+        ktmSaverMenuButton.style.top = baseButton.offsetTop + "px";
+        ktmSaverMenuButton.style.left = (baseButton.offsetLeft + baseButton.offsetWidth) + "px";
         on(ktmSaverMenuButton, "click", function() {
             var button = this;
             var menu = document.getElementById("ktmSaverMenu");
@@ -96,7 +100,7 @@
         connectingMessage.innerHTML = "接続中..";
         connectingMessage.id = "ktmSaverConnectingMessage";
         connectingMessage.style.width = "150px";
-        connectingMessage.style.height = (settingButton.offsetHeight - 2) + "px";
+        connectingMessage.style.height = (baseButton.offsetHeight - 2) + "px";
         connectingMessage.style.position = "absolute";
         connectingMessage.style.top = 0;
         connectingMessage.style.left = ((document.body.offsetWidth / 2) - (150 / 2)) + "px"
@@ -112,7 +116,7 @@
         savingMessage.innerHTML = "保存中..";
         savingMessage.id = "ktmSaverSavinggMessage";
         savingMessage.style.width = "150px";
-        savingMessage.style.height = (settingButton.offsetHeight - 2) + "px";
+        savingMessage.style.height = (baseButton.offsetHeight - 2) + "px";
         savingMessage.style.position = "absolute";
         savingMessage.style.top = 0;
         savingMessage.style.left = ((document.body.offsetWidth / 2) - (150 / 2)) + "px"
@@ -128,7 +132,7 @@
         sucessMessage.innerHTML = "保存完了";
         sucessMessage.id = "ktmSaverSuccessMessage";
         sucessMessage.style.width = "150px";
-        sucessMessage.style.height = (settingButton.offsetHeight - 2) + "px";
+        sucessMessage.style.height = (baseButton.offsetHeight - 2) + "px";
         sucessMessage.style.position = "absolute";
         sucessMessage.style.top = 0;
         sucessMessage.style.left = ((document.body.offsetWidth / 2) - (150 / 2)) + "px"
@@ -144,7 +148,7 @@
         errorMessage.innerHTML = "！保存失敗！";
         errorMessage.id = "ktmSaverErrorMessage";
         errorMessage.style.width = "150px";
-        errorMessage.style.height = (settingButton.offsetHeight - 2) + "px";
+        errorMessage.style.height = (baseButton.offsetHeight - 2) + "px";
         errorMessage.style.position = "absolute";
         errorMessage.style.top = 0;
         errorMessage.style.left = ((document.body.offsetWidth / 2) - (150 / 2)) + "px"
