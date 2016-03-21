@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ktmSaverForBrowser
 // @namespace    https://github.com/tatesuke/ktmsaver
-// @version      0.1
+// @version      0.2
 // @description  
 // @author       tatesuke
 // @match        file:///*/*
