@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ktmSaverForBrowser
 // @namespace    https://github.com/tatesuke/ktmsaver
-// @version      0.6
+// @version      0.7
 // @description  かんたんMarkdownで上書きを可能にするためのユーザスクリプト
 // @author       tatesuke
 // @match        http://tatesuke.github.io/KanTanMarkdown/**
@@ -29,7 +29,7 @@
     // ファイルパス取得
     var url = location.href;
     var filePath;
-    setFilePath((url.match(/^file:\/\//)) ? decodeURIComponent(url.substr(8)) : "");
+    setFilePath((url.match(/^file:\/\//)) ? decodeURIComponent(url.substr(7)) : "");
     function setFilePath(path) {
         if (path) {
             filePath = path;
