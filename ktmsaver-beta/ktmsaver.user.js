@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ktmSaverForBrowser
 // @namespace    https://github.com/tatesuke/ktmsaver
-// @version      0.7
+// @version      0.8
 // @description  かんたんMarkdownで上書きを可能にするためのユーザスクリプト
 // @author       tatesuke
 // @match        http://tatesuke.github.io/KanTanMarkdown/**
@@ -162,7 +162,8 @@
         });
 
         on ("#ktmSaverBackupEnabled", "change", function() {
-            setItem(this.id, (this.cheked) ? "cheked" : "");
+            console.log("change")
+            setItem(this.id, (this.checked) ? "checked" : "");
         });
 
         on("#cliseKtmSaverMenuButton", "click", function(event) {
@@ -172,7 +173,7 @@
 
     function getItem(name, defaultValue) {
         var value = localStorage.getItem("com.tatesuke.ktmsaver." + name);
-        return (value) ? value : defaultValue;
+        return (value != null) ? value : defaultValue;
     }
 
     function setItem(name, value) {
