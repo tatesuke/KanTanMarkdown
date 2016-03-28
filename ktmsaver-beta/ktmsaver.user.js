@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ktmSaverForBrowser
 // @namespace    https://github.com/tatesuke/ktmsaver
-// @version      0.8
+// @version      0.9
 // @description  かんたんMarkdownで上書きを可能にするためのユーザスクリプト
 // @author       tatesuke
 // @match        http://tatesuke.github.io/KanTanMarkdown/**
@@ -67,7 +67,7 @@
     on(saveButton, "click", function(){
         var confirm = window.confirm(
             "保存ボタンで保存を実行した場合、新しいファイルパスを取得することができないため、ファイルを開きなおすまでCtrl+Sによる上書き保存はできなくなります。\n" +
-            "「Ctrl+,」で表示されるメニューから「名前を付けて保存」を選択すればこの問題は発生しません。\n\n" + 
+            "「Ctrl+Shift+,」で表示されるメニューから「名前を付けて保存」を選択すればこの問題は発生しません。\n\n" + 
             "それでもこのボタンから実行しますか？");
         if (confirm == true) {
             isSaveButtonUsed = true;
@@ -93,17 +93,8 @@
             return false;
         } 
 
-        if (code == 188 && event.ctrlKey){
-            // CTRL+,で設定画面
-            event.preventDefault();
-            showBlock(ktmSaverMenu);
-            ktmSaverMenu.style.top = ((document.body.offsetHeight / 2) - (ktmSaverMenu.offsetHeight / 2)) + "px";
-            ktmSaverMenu.style.left = ((document.body.offsetWidth / 2) - (ktmSaverMenu.offsetWidth / 2)) + "px";
-            return false;
-        }
-
-        if (code == 188 && event.ctrlKey){
-            // CTRL+,で設定画面
+        if (code == 188 && event.ctrlKey && event.shiftKey){
+            // CTRL+Shift,で設定画面を開く
             event.preventDefault();
             showBlock(ktmSaverMenu);
             ktmSaverMenu.style.top = ((document.body.offsetHeight / 2) - (ktmSaverMenu.offsetHeight / 2)) + "px";
@@ -112,10 +103,9 @@
         }
 
         if (code == 27 && isVisible(ktmSaverMenu)){
+        	// 設定画面を開いているときにESCで設定画面を閉じる
             event.preventDefault();
             hide(ktmSaverMenu);
-            ktmSaverMenu.style.top = ((document.body.offsetHeight / 2) - (ktmSaverMenu.offsetHeight / 2)) + "px";
-            ktmSaverMenu.style.left = ((document.body.offsetWidth / 2) - (ktmSaverMenu.offsetWidth / 2)) + "px";
             return false;
         }
 
@@ -245,11 +235,11 @@
     showKTMSaverMessage("WARN", "ローカルAPPに接続中...");
 
     ws.onopen = function() {
-        showKTMSaverMessage("INFO", "上書き保存を利用できます。設定は「Ctrl+,」", 3000);
+        showKTMSaverMessage("INFO", "上書き保存を利用できます。設定は「Ctrl+Shift+,」", 3000);
     };
 
     ws.onerror = function(e) {
-        showKTMSaverMessage("WARN", "!上書き保存は利用できません。設定は「Ctrl+,」!");
+        showKTMSaverMessage("WARN", "!上書き保存は利用できません。設定は「Ctrl+Shift+,」!");
     };
 
     window.onbeforeunload = function() {
