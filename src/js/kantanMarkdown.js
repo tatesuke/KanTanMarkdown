@@ -109,6 +109,33 @@
 		return false;
 	})
 	
+	/* 端末固有設定 */
+	// 現在のところチェックボックスのみなので
+	// チェックボックスに特化して実装している
+	var saveValueElements = document.querySelectorAll(
+			"#settingAutoSync," + 
+			"#settingExpandtab," + 
+			"#settingInsertImgTagAfterAttach");
+	for (var i = 0; i < saveValueElements.length; i++) {
+		var element = saveValueElements[i];
+		var savedValue = getItem(element.id, null);
+		if (savedValue != null) {
+			element.checked = (savedValue == "true");
+		}
+		on (element, "change", function() {
+			setItem(this.id, this.checked);
+		});
+	}
+	
+	function getItem(name, defaultValue) {
+		var value = localStorage.getItem("com.tatesuke.ktm." + name);
+		return (value != null) ? value : defaultValue;
+	}
+
+	function setItem(name, value) {
+		localStorage.setItem("com.tatesuke.ktm." + name, value);
+	}
+	
 	/* エディタに機能追加 */
 	toKantanEditor(document.getElementById("editor"));
 	toKantanEditor(document.getElementById("cssEditor"));
