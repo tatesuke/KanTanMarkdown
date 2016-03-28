@@ -152,7 +152,17 @@
 	/* 画像キャッシュ */
 	var imageUrlMap = {};
 	function getCachedImageUrl(name) {
-		return imageUrlMap[name];
+		var imageUrl = imageUrlMap[name];
+		if (imageUrl == null) {
+			var element = document.getElementById("attach-" + name);
+			if (element != null) {
+				return cacheImageUrl(name, element.innerHTML);
+			} else {
+				return null;
+			}
+		} else {
+			return imageUrl;
+		}	
 	}
 	
 	function cacheImageUrl(name, base64) {
@@ -349,8 +359,8 @@
 		// CSS修正
 		var previewerStyle = document.querySelector("#previewerStyle");
 		var cssEditor = document.querySelector("#cssEditor");
-		previewerStyle.innerHTML = cssEditor.value;
-		
+		var replacedCss = replaceAttachURL(cssEditor.value);
+		previewerStyle.innerHTML = replacedCss;
 		
 		// タイトル変更
 		var h1 = document.querySelector("h1");
@@ -421,6 +431,55 @@
 		var event = document.createEvent("Event");
 		event.initEvent("previewed", true, true);
 		previewer.dispatchEvent(event);
+	}
+	
+	function replaceAttachURL(str) {
+		var replaced = "";
+		var i = 0;
+		var prefix = 'url("attach:';
+		var surfix = '"';
+		var n = prefix.length;
+		while (i < str.length) {
+			// prefixから始まるなら置き換える
+			if ((i + prefix.length) < str.length) {
+				var temp = str.substr(i, prefix.length);
+				if (temp == prefix) {
+					i += prefix.length;
+					
+					// 名前取得
+					var name = "";
+					var c = str.charAt(i++);
+					while (c != surfix) {
+						name += c;
+						c = str.charAt(i++);
+					}
+					
+					// 画像があればURLに置き換えて出力
+					var url = getCachedImageUrl(name);
+					if (url == null) {
+						replaced += prefix + name + surfix;
+					} else {
+						replaced += 'url("' + url.blobOrBase64 + surfix;
+					}
+					continue;
+				}
+			}
+			
+			var c = str.charAt(i++);
+			replaced += c;
+			
+			/* ""で囲まれた文字列ならスキップ */
+			if (c == '"') {
+				c = str.charAt(i++);
+				while (c != '"') {
+					replaced += c;
+					c = str.charAt(i++);
+				};
+				replaced += c;
+				continue;
+			}
+		}
+		return replaced;
 	}
 	
 	function loadImage(elem) {
@@ -791,7 +850,7 @@
 		var setting = document.querySelector("#settingInsertImgTagAfterAttach");
 		if (isImage && insertImgTag && setting.checked) {
 			var tag = '<img src="attach:' + name  + '">';
-			insertToEditor(tag);
+			insertToEditor(document.getElementById("editor"), tag);
 		}
 		
 		saved = false;
@@ -893,21 +952,26 @@
 		var isImage = script.innerHTML.match("data:image/.+?;base64,");
 		var fileName = script.title;
 		
-		var insertText;
-		if (isImage) {
-			insertText = '<img src="attach:' + fileName  + '">';
-		} else {
-			insertText= '<a href="attach:' + fileName +'">' + fileName + '</a>';
+		var editor = document.getElementById("editor");
+		if (isVisible(editor)) {
+			var insertText;
+			if (isImage) {
+				insertText = '<img src="attach:' + fileName  + '">';
+			} else {
+				insertText= '<a href="attach:' + fileName +'">' + fileName + '</a>';
+			}
+			insertToEditor(editor, insertText);
 		}
-		
-		insertToEditor(insertText);
+		var cssEditor = document.getElementById("cssEditor");
+		if (isVisible(cssEditor) && isImage) {
+			var insertText = 'url("attach:' + fileName  + '")';
+			insertToEditor(cssEditor, insertText);
+		}
 	}
 	
-	function insertToEditor(insertText) {
-		var editor = document.getElementById("editor");
-		
+	function insertToEditor(editor, insertText) {
 		var text = editor.value;
-		var newPos = editor.selectionStart + insertText.length + 1;
+		var newPos = editor.selectionStart + insertText.length;
 		var part1 = text.substring(0, editor.selectionStart);
 		var part2 = text.substr(editor.selectionEnd);
 		editor.value = part1 + insertText + part2;
