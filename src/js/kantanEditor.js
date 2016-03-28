@@ -10,25 +10,36 @@ function toKantanEditor(editor) {
 		var end   = editor.selectionEnd;
 		if (start == end) {
 			/* いわゆる普通のtab */
-			var insertString = "";
-			var tabSize = 4;
-			
-			var posOfLine = 0;
-			var i = start;
 			var text = editor.value;
-			while ((0 < i) && (text.charAt(i - 1) != "\n")) {
-				var c = text.charCodeAt(i);
-				// 半角判定はざっくりと256未満と半角カナのみ
-				if (c < 256 || (c >= 0xff61 && c <= 0xff9f)) {
-					posOfLine += 1;
-				} else {
-					posOfLine += 2;
+			var insertString;
+			if (document.querySelector("#settingExpandtab").checked) {
+				insertString = "";
+				var tabSize = 4;
+				var posOfLine = 0;
+				var i = start;
+				// 行頭まで遡り
+				while ((0 < i) && (text.charAt(i - 1) != "\n")) {
+					i--;
 				}
-				i--;
-			}
-			var spaceNum = tabSize - (posOfLine % tabSize);
-			for (var j = 0; j < spaceNum; j++) {
-				insertString += " ";
+				// 行の何文字目か調べる
+				for (; i < start; i++) {
+					var c = text.charCodeAt(i);
+					// 半角判定はざっくりと256未満と半角カナのみ
+					if (c == 9) {
+						posOfLine += tabSize - (posOfLine % tabSize);
+					} else if (c < 256 || (c >= 0xff61 && c <= 0xff9f)) {
+						posOfLine += 1;
+					} else {
+						posOfLine += 2;
+					}
+				}
+				// 行の何文字目かに応じてスペースを挿入する
+				var spaceNum = tabSize - (posOfLine % tabSize);
+				for (var j = 0; j < spaceNum; j++) {
+					insertString += " ";
+				}
+			} else {
+				insertString = "\t"
 			}
 			
 			editor.value = text.substr(0, start) + insertString + text.substr(start, text.length);
