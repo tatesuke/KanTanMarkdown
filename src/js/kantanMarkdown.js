@@ -151,9 +151,9 @@
 	
 	/* 画像キャッシュ */
 	var imageUrlMap = {};
-	function getCachedImageUrl(name) {
+	function getCachedImageUrl(name, createOnNoCached) {
 		var imageUrl = imageUrlMap[name];
-		if (imageUrl == null) {
+		if ((imageUrl == null) && createOnNoCached) {
 			var element = document.getElementById("attach-" + name);
 			if (element != null) {
 				return cacheImageUrl(name, element.innerHTML);
@@ -455,7 +455,7 @@
 					}
 					
 					// 画像があればURLに置き換えて出力
-					var url = getCachedImageUrl(name);
+					var url = getCachedImageUrl(name, true);
 					if (url == null) {
 						replaced += prefix + name + surfix;
 					} else {
@@ -520,7 +520,7 @@
 			var trimInfo = rootElem.querySelector("script.trimInfo").innerHTML;
 			trimInfo = (trimInfo != "") ? JSON.parse(trimInfo) : null;
 			
-			var cached = getCachedImageUrl(name);
+			var cached = getCachedImageUrl(name, false);
 			if (cached) {
 				onLoadImage(cached);
 				return;
