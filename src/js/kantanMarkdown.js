@@ -128,12 +128,20 @@
 	}
 	
 	function getItem(name, defaultValue) {
-		var value = localStorage.getItem("com.tatesuke.ktm." + name);
-		return (value != null) ? value : defaultValue;
+		try {
+			var value = localStorage.getItem("com.tatesuke.ktm." + name);
+			return (value != null) ? value : defaultValue;
+		} catch(e) {
+			return defaultValue;
+		}
 	}
 
 	function setItem(name, value) {
-		localStorage.setItem("com.tatesuke.ktm." + name, value);
+		try {
+			localStorage.setItem("com.tatesuke.ktm." + name, value);
+		} catch(e) {
+			// 握りつぶし
+		}
 	}
 	
 	/* エディタに機能追加 */
