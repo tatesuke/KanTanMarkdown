@@ -249,14 +249,6 @@ nav:after {
 	padding-right:  20px;
 }
 
-.showBlock {
-	display:block !important;
-}
-
-.hide {
-	display: none  !important;
-}
-
 /* JavaScriptOff時の配慮 */
 .initialState #editorTabWrapper {
 	display:block !important;

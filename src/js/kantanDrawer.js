@@ -218,6 +218,27 @@ KantanDrawer.prototype = {
 	hide: function() {
 		this.baseImg = null;
 		this.layerImg = null;
+		
+		var canvases = this.drawArea.querySelectorAll("canvas");
+		for (var i = 0; i < canvases.length; i++) {
+			canvases[i].removeAttribute("width");
+			canvases[i].removeAttribute("height");
+		}
+		var classee = this.drawArea.querySelectorAll("*[class]");
+		for (var i = 0; i < canvases.length; i++) {
+			if (classee[i].className == "") {
+				classee[i].removeAttribute("class");
+			}
+		}
+		var selecteds = this.drawArea.querySelectorAll(".mode .selected");
+		for (var i = 0; i < selecteds.length; i++) {
+			removeClass(selecteds[i], "selected");
+		}
+		
+		
+		this.drawArea.querySelector("div[name=borderWidth]").innerHTML = "";
+		this.drawArea.querySelector("div[name=scale]").innerHTML = "";
+		
 		hide(this.drawArea);
 	},
 	reset:function() {
