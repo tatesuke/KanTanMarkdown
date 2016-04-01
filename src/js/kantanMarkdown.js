@@ -128,12 +128,20 @@
 	}
 	
 	function getItem(name, defaultValue) {
-		var value = localStorage.getItem("com.tatesuke.ktm." + name);
-		return (value != null) ? value : defaultValue;
+		try {
+			var value = localStorage.getItem("com.tatesuke.ktm." + name);
+			return (value != null) ? value : defaultValue;
+		} catch(e) {
+			return defaultValue;
+		}
 	}
 
 	function setItem(name, value) {
-		localStorage.setItem("com.tatesuke.ktm." + name, value);
+		try {
+			localStorage.setItem("com.tatesuke.ktm." + name, value);
+		} catch(e) {
+			// 握りつぶし
+		}
 	}
 	
 	/* エディタに機能追加 */
@@ -191,9 +199,9 @@
 	}
 	
 	/* 起動時にコンテンツ読み込み */
-	document.querySelector("body").classList.add("previewMode");
-	document.querySelector("body").classList.remove("editMode");
-	document.querySelector("body").classList.remove("initialState");
+	addClass(document.querySelector("body"), "previewMode");
+	removeClass(document.querySelector("body"), "editMode");
+	removeClass(document.querySelector("body"), "initialState");
 	if (isEnable(document.getElementById("toggleButton")) 
 			&& (document.getElementById("editor").innerHTML == "")) {
 		// 編集モードでなく、内容が空であれば初期状態を編集モードにする
@@ -254,8 +262,8 @@
 			}	
 			
 			// レイアウト修正
-			document.querySelector("body").classList.add("previewMode");
-			document.querySelector("body").classList.remove("editMode");
+			addClass(document.querySelector("body"), "previewMode");
+			removeClass(document.querySelector("body"), "editMode");
 			doLayout();
 			
 			previewer.focus();
@@ -286,8 +294,8 @@
 			}
 			
 			// レイアウト修正
-			document.querySelector("body").classList.remove("previewMode");
-			document.querySelector("body").classList.add("editMode");
+			removeClass(document.querySelector("body"), "previewMode");
+			addClass(document.querySelector("body"), "editMode");
 			doLayout();
 			
 			if (minElem) {
@@ -308,7 +316,7 @@
 
 	// 自動同期チェックボックスをクリックしたらchecked属性を更新する
 	// これを行わないと自動同期チェックボックスの状態が保存されない
-	on("input[type=checkbox]", "change", function() {
+	on("#settingAutoSync", "change", function() {
 		if (this.checked == true) {
 			this.setAttribute("checked", "checked");
 		} else {
@@ -597,16 +605,16 @@
 		e.stopPropagation();
 		e.preventDefault();
 		e.dataTransfer.dropEffect = 'copy';
-		this.classList.add('onDragover');
+		addClass(this, 'onDragover');
 	});
 	on("body", "drop", function(e) {
 		e.stopPropagation();
 		e.preventDefault();
 		attachFiles(e.dataTransfer.files);
-		this.classList.remove("onDragover");
+		removeClass(this, "onDragover");
 	});
 	on("body", "dragleave", function(e){
-		this.classList.remove("onDragover");
+		removeClass(this, "onDragover");
 	});
 
 	function attachFiles(files){
@@ -722,6 +730,7 @@
 		document.getElementById("importDialogOkButton").onclick = function(e){
 			e.preventDefault();
 			hide(dialogElement);
+			document.getElementById("importDialogMessage").innerText = "";
 			
 			var result = {
 				result: true,
@@ -748,6 +757,7 @@
 		document.getElementById("importDialogCancelButton").onclick = function(e) {
 			e.preventDefault();
 			hide(dialogElement);
+			document.getElementById("importDialogMessage").innerText = "";
 			
 			callback({result:false});
 			
@@ -790,45 +800,45 @@
 		
 		var layerScript = document.createElement("script");
 		layerScript.type  = "text/template";
-		layerScript.classList.add("layerContent");
+		addClass(layerScript, "layerContent");
 		layerScript.innerHTML = layerContent;
 		li.appendChild(layerScript);
 		
 		var trimScript = document.createElement("script");
 		trimScript.type  = "text/template";
-		trimScript.classList.add("trimInfo");
+		addClass(trimScript, "trimInfo");
 		trimScript.innerHTML = trimInfo;
 		li.appendChild(trimScript);
 		
 		var input  = document.createElement("input");
 		input.type = "text";
-		input.classList.add('fileName');
+		addClass(input, 'fileName');
 		input.value = name;
 		on(input, "blur", onFileNameChanged);
 		li.appendChild(input);
 		
 		var insertButton = document.createElement("button");
-		insertButton.classList.add('insertButton');
+		addClass(insertButton, 'insertButton');
 		insertButton.innerHTML = "Insert Tag";
 		on(insertButton, "click", onInsertButtonClicked);
 		li.appendChild(insertButton);
 		
 		var isImage = content.match("data:image/.+?;base64,");
 		var editoButton = document.createElement("button");
-		editoButton.classList.add('editButton');
+		addClass(editoButton, 'editButton');
 		editoButton.innerHTML = "Edit";
 		editoButton.disabled = !isImage;
 		on(editoButton, "click", onEditButtonClicked);
 		li.appendChild(editoButton);
 		
 		var downloadButton = document.createElement("button");
-		downloadButton.classList.add('downloadButton');
+		addClass(downloadButton, 'downloadButton');
 		downloadButton.innerHTML = "Download";
 		on(downloadButton, "click", onDownloadButtonClicked);
 		li.appendChild(downloadButton);
 		
 		var detachButton = document.createElement("button");
-		detachButton.classList.add('detachButton');
+		addClass(detachButton, 'detachButton');
 		detachButton.innerHTML = "×";
 		on(detachButton, "click", onDetachButtonClicked);
 		li.appendChild(detachButton);
@@ -1017,15 +1027,15 @@
 		var layerElement = rootElement.querySelector("script.layerContent");
 		var trimElement = rootElement.querySelector("script.trimInfo");
 		
-		document.querySelector("body").classList.add("drawMode");
+		addClass(document.querySelector("body"), "drawMode");
 		
 		var nav = document.querySelector("nav");
 		var attach = document.querySelector("#attach");
 		var wrapper = document.querySelector("#wrapper");
 		
-		nav.classList.add("hide");
-		attach.classList.add("hide");
-		wrapper.classList.add("hide");
+		hide(nav);;
+		hide(attach);
+		hide(wrapper);
 		
 		drawer.show(contentElement.innerHTML,
 				layerElement.innerHTML,
@@ -1034,19 +1044,19 @@
 					layerElement.innerHTML = layerContent;
 					trimElement.innerHTML = trimInfo;
 					
-					nav.classList.remove("hide");
-					attach.classList.remove("hide");
-					wrapper.classList.remove("hide");
-					document.querySelector("body").classList.remove("drawMode");
+					showBlock(nav);
+					showBlock(attach);
+					showBlock(wrapper);
+					removeClass(document.querySelector("body"), "drawMode");
 					
 					uncacheImageUrl(contentElement.title);
 					doPreview();
 				},
 				function() {
-					nav.classList.remove("hide");
-					attach.classList.remove("hide");
-					wrapper.classList.remove("hide");
-					document.querySelector("body").classList.remove("drawMode");
+					showBlock(nav);
+					showBlock(attach);
+					showBlock(wrapper);
+					removeClass(document.querySelector("body"), "drawMode");
 				}
 		);
 	}
@@ -1090,7 +1100,7 @@
 		var previewer = document.getElementById("previewer");
 		if (isEditMode() && !isVisible(previewer)) {
 			document.getElementById("previewToggleButton").innerText = "プレビューを隠す(Alt+→)";
-			editorTabWrapper.classList.remove("fullWidth");
+			removeClass(editorTabWrapper, "fullWidth");
 			showBlock(previewer);
 			doLayout();
 		}
@@ -1103,7 +1113,7 @@
 		var previewer = document.getElementById("previewer");
 		if (isEditMode() && isVisible(previewer)) {
 			document.getElementById("previewToggleButton").innerText = "プレビューを表示(Alt+←)";
-			editorTabWrapper.classList.add("fullWidth");
+			addClass(editorTabWrapper, "fullWidth");
 			hide(previewer);
 			doLayout();
 		}
@@ -1152,12 +1162,25 @@
 		if (toggleFlag == true) {
 			toggleMode();
 		}
-		document.querySelector("body").classList.add("initialState");
+		addClass(document.querySelector("body"), "initialState");
 		
 		/* ファイルの肥大化を防ぐため中身を消去 */
 		document.getElementById("previewer").innerHTML = "";
 		document.getElementById("messageArea").innerHTML = "";
 		document.getElementById("previewerStyle").innerHTML="";
+		
+		// 不要なdiffの原因となるスタイルなどを削除
+		if (document.title.match(/^\* .*/)) {
+			document.title = document.title.substr("\* ".length);
+		}
+		
+		var stylees = document.querySelectorAll("*[style]");
+		for (var i = 0; i < stylees.length; i++) {
+			var stylee = stylees[i];
+			stylee.removeAttribute("style");
+		}
+		
+		document.querySelector("#previewer").removeAttribute("class");
 		
 		// HTML生成
 		var html = "<!doctype html>\n<html>\n";
@@ -1170,7 +1193,7 @@
 		saved = true;
 		doPreview();
 		
-		document.querySelector("body").classList.remove("initialState");
+		removeClass(document.querySelector("body"), "initialState");
 		if (toggleFlag == true) {
 			toggleMode();
 		}
@@ -1505,25 +1528,25 @@
 	
 	function showMarkdown() {
 		var markdownTab = document.querySelector("#markdownTab").parentNode;
-		markdownTab.classList.add("selected");
+		addClass(markdownTab, "selected");
 		var editor = document.querySelector("#editor");
 		showBlock(editor);
 		editor.focus();
 		
 		var cssTab = document.querySelector("#cssTab").parentNode;
-		cssTab.classList.remove("selected");
+		removeClass(cssTab, "selected");
 		var cssEditor = document.querySelector("#cssEditor");
 		hide(cssEditor);
 	}
 	
 	function showCss() {
 		var markdownTab = document.querySelector("#markdownTab").parentNode;
-		markdownTab.classList.remove("selected");
+		removeClass(markdownTab, "selected");
 		var editor = document.querySelector("#editor");
 		hide(document.querySelector("#editor"));
 		
 		var cssTab = document.querySelector("#cssTab").parentNode;
-		cssTab.classList.add("selected");
+		addClass(cssTab, "selected");
 		var cssEditor = document.querySelector("#cssEditor");
 		showBlock(cssEditor);
 		cssEditor.focus();
@@ -1715,12 +1738,28 @@
 	}
 
 	function showBlock(elem) {
-		elem.classList.add("showBlock");
-		elem.classList.remove("hide");
+		elem.style.display = "";
+		if (!isVisible(elem)) {
+			elem.style.display = "block";
+		}
 	}
 
 	function hide(elem) {
-		elem.classList.remove("showBlock")
-		elem.classList.add("hide");
+		elem.style.display = "";
+		if (isVisible(elem)) {
+			elem.style.display = "none";
+		}
 	}
+	
+	function addClass(elem, className) {
+		elem.classList.add(className);
+	}
+	
+	function removeClass(elem, className) {
+		elem.classList.remove(className);
+		if (elem.className == "") {
+			elem.removeAttribute("class");
+		}
+	}
+
 
