@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         ktmSaverForBrowser
 // @namespace    https://github.com/tatesuke/ktmsaver
-// @version      0.9
+// @version      0.10
 // @description  かんたんMarkdownで上書きを可能にするためのユーザスクリプト
 // @author       tatesuke
 // @match        http://tatesuke.github.io/KanTanMarkdown/**
@@ -275,7 +275,7 @@
         data.backupDir     = document.querySelector("#ktmSaverBackupDir").value;
         data.backupGeneration = document.querySelector("#ktmSaverBackupGeneration").value;
 
-        doSave(data);
+        doSave(data, html);
     }
 
     // 上書き保存
@@ -287,8 +287,6 @@
 
     function doOverwriteSave() {
         showKTMSaverMessage("WARN", "HTML生成中...");
-
-        var html = getHTMLForSave();
 
         if (filePath == "") {
             doSaveAs();
@@ -303,24 +301,37 @@
             data.backupDir     = document.querySelector("#ktmSaverBackupDir").value;
             data.backupGeneration = document.querySelector("#ktmSaverBackupGeneration").value;
 
-            doSave(data);
+            var html = getHTMLForSave();
+            
+            doSave(data, html);
         }
     }
 
-    function doSave(data) {
+    function doSave(data, html) {
         if (ws.readyState == WebSocket.OPEN) {
             // 送信
             showKTMSaverMessage("WARN", "保存中...");
+            
             ws.onmessage = onmessage;
             ws.send(JSON.stringify(data));
-            ws.send(str2buff(getHTMLForSave()));
+            
+            var size = 256 * 1024;
+            var bytes = str2buff(html);
+            for (var i = 0; i < bytes.length; i += size) {
+                var end = i + size;
+                end = (bytes.length < end) ? bytes.length : end; 
+                var sliced = bytes.slice(i, end);
+                ws.send(sliced);
+            }
+            
+            ws.send('{"action":"CLOSE"}');
         } else {
             // 切断されていたら再接続
             showKTMSaverMessage("WARN", "再接続中...");    
             port = document.querySelector("#ktmSaverPort").value;
             ws = new WebSocket('ws://localhost:' + port + '/ktmsaver/save');
             ws.onopen = function () {
-                doSave(data);
+                doSave(data, html);
             }
             return;
         }
