@@ -810,6 +810,18 @@
 		trimScript.innerHTML = trimInfo;
 		li.appendChild(trimScript);
 		
+		var upButton = document.createElement("button");
+		addClass(upButton, 'upButton');
+		upButton.innerHTML = "↑";
+		on(upButton, "click", onUpButtonClicked);
+		li.appendChild(upButton);
+		
+		var downButton = document.createElement("button");
+		addClass(downButton, 'downButton');
+		downButton.innerHTML = "↓";
+		on(downButton, "click", onDownButtonClicked);
+		li.appendChild(downButton);
+		
 		var input  = document.createElement("input");
 		input.type = "text";
 		addClass(input, 'fileName');
@@ -901,6 +913,27 @@
 		return blob;
 	}
 
+	/* 添付ファイル並び替え */
+	on(".upButton", "click", onUpButtonClicked);
+	function onUpButtonClicked(e) {
+		var currentLi = e.target.parentNode;
+		var previousLi = currentLi.previousElementSibling;
+		if (previousLi) {
+			var ul = currentLi.parentNode;
+			ul.insertBefore(currentLi, previousLi);
+		}
+	}
+	
+	on(".downButton", "click", onDownButtonClicked);
+	function onDownButtonClicked(e) {
+		var currentLi = e.target.parentNode;
+		var nextLi = currentLi.nextElementSibling;
+		if (nextLi) {
+			var ul = currentLi.parentNode;
+			ul.insertBefore(nextLi, currentLi);
+		}
+	}
+	
 	/* ファイル削除 */
 	on(".detachButton", "click", onDetachButtonClicked);
 	function onDetachButtonClicked(e) {
