@@ -182,6 +182,92 @@ function toKantanEditor(editor) {
 		}
 	});
 
+	/* /キーで閉じタグを入力 */
+	on(editor, 'keydown', function(e) {
+		// `/`キー以外なら終了
+		if (((e.which != 191) && (e.keyCode != 191)) 
+				|| (e.shiftKey || e.ctrlKey || e.metaKey || e.altKey)) {
+			return true;
+		}
+		
+		// 閉じタグ挿入がoffなら終了
+		if (!document.querySelector("#settingAutoCloseTab").checked) {
+			return true;
+		}
+		
+		// 一文字前が`<`以外だったら終了
+		var editor = e.target;
+		var pos = editor.selectionStart - 1;
+		if ((pos < 0) || (editor.value.charAt(pos) != "<")) {
+			return true;
+		}
+		pos--;
+		
+		// 一文字ずつ遡りながら直近の閉じてないタグを探す
+		var unclosedTagName = null;
+		var closeTagStack = [""];
+		while (0 <= pos) {
+			if (editor.value.charAt(pos) != "<") {
+				pos--;
+				continue;
+			}
+			
+			var isCloseTag;
+			var tagNamePos;
+			if (editor.value.charAt(pos + 1) == "/") {
+				isCloseTag = true;
+				tagNamePos = pos + 2;
+			} else {
+				isCloseTag = false;
+				tagNamePos = pos + 1;
+			}
+			
+			var currentTagName = getTagNameAt(editor, tagNamePos);
+			
+			if (isCloseTag) {
+				closeTagStack.push(currentTagName);
+			} else {
+				if (currentTagName == closeTagStack[closeTagStack.length - 1]) {
+					closeTagStack.pop();
+				} else {
+					unclosedTagName = currentTagName;
+					break;
+				}
+			}
+		
+			pos--;
+		}
+		
+		if (unclosedTagName == null) {
+			return true;
+		} else {
+			e.preventDefault();
+			var insertText = "/" + unclosedTagName + ">";
+			var newPos = editor.selectionStart + insertText.length;
+			var part1 = editor.value.substring(0, editor.selectionStart);
+			var part2 = editor.value.substr(editor.selectionEnd);
+			editor.value = part1 + insertText + part2;
+			
+			editor.selectionStart = newPos;
+			editor.selectionEnd = newPos;
+			updateScrollPos(e.target);
+			
+			saveUndo(e.target);
+			return false;
+		}
+	});
+	
+	function getTagNameAt(editor, pos) {
+		var tagName = "";
+		var c = editor.value.charAt(pos);
+		while ((c != ">") && (c != " ")) {
+			tagName = tagName + c;
+			pos++;
+			c = editor.value.charAt(pos);
+		}
+		return tagName;
+	}
+
 	/* Undo, Redo */
 	var isCtrlVDowning = false;
 	var keyCache = {};
