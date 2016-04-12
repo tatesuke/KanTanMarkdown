@@ -203,7 +203,7 @@ function toKantanEditor(editor) {
 		}
 		pos--;
 		
-		// 直近の閉じてないタグを探す
+		// 一文字ずつ遡りながら直近の閉じてないタグを探す
 		var unclosedTagName = null;
 		var closeTagStack = [""];
 		while (0 <= pos) {
@@ -222,13 +222,7 @@ function toKantanEditor(editor) {
 				tagNamePos = pos + 1;
 			}
 			
-			var currentTagName = "";
-			var c = editor.value.charAt(tagNamePos);
-			while ((c != ">") && (c != " ")) {
-				currentTagName = currentTagName + c;
-				tagNamePos++;
-				c = editor.value.charAt(tagNamePos);
-			}
+			var currentTagName = getTagNameAt(editor, tagNamePos);
 			
 			if (isCloseTag) {
 				closeTagStack.push(currentTagName);
@@ -262,6 +256,17 @@ function toKantanEditor(editor) {
 			return false;
 		}
 	});
+	
+	function getTagNameAt(editor, pos) {
+		var tagName = "";
+		var c = editor.value.charAt(pos);
+		while ((c != ">") && (c != " ")) {
+			tagName = tagName + c;
+			pos++;
+			c = editor.value.charAt(pos);
+		}
+		return tagName;
+	}
 
 	/* Undo, Redo */
 	var isCtrlVDowning = false;

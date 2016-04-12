@@ -113,9 +113,7 @@
 	// 現在のところチェックボックスのみなので
 	// チェックボックスに特化して実装している
 	var saveValueElements = document.querySelectorAll(
-			"#settingAutoSync," + 
-			"#settingExpandtab," + 
-			"#settingInsertImgTagAfterAttach");
+			"#settingMenu input[type=checkbox]");
 	for (var i = 0; i < saveValueElements.length; i++) {
 		var element = saveValueElements[i];
 		var savedValue = getItem(element.id, null);
