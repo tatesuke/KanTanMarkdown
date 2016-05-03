@@ -1,4 +1,7 @@
-/* 編集不可ブラウザ判定 */
+/*
+ * 編集不可ブラウザ判定 
+ * サポートしていないブラウザの場合、起動時に閲覧専用モードにする
+ */
 (function(prototype, ktm){
 
 	document.addEventListener('DOMContentLoaded', function() {
@@ -14,15 +17,15 @@
 		if ((ua.indexOf("chrome") == -1) && (ua.indexOf('safari') != -1)) {
 			setViewOnly();
 		}
-
-		function setViewOnly() {
-			document.getElementById("messageArea").innerText
-					 = "このブラウザでは編集できません。";
-			var navElems = document.querySelectorAll("nav > *");
-			for (var i = 0; i < navElems.length; i++) {
-				navElems[i].setAttribute("disabled", "disabled");
-			}
-		}
 	});
+	
+	function setViewOnly() {
+		document.getElementById("messageArea").innerText
+				 = "このブラウザでは編集できません。";
+		var navElems = document.querySelectorAll("nav > *");
+		for (var i = 0; i < navElems.length; i++) {
+			navElems[i].setAttribute("disabled", "disabled");
+		}
+	}
 	
 })(prototype, ktm);
