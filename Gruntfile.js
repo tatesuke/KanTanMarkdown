@@ -63,9 +63,22 @@ module.exports = function(grunt) {
 		uglify: {
 			js: {
 				files: {
-					"dist/temp/src/js/kantanEditor.js": ["dist/temp/src/js/kantanEditor.js"],
-					"dist/temp/src/js/kantanDrawer.js": ["dist/temp/src/js/kantanDrawer.js"],
-					"dist/temp/src/js/kantanMarkdown.js": ["dist/temp/src/js/kantanMarkdown.js"],
+					"dist/temp/src/js/kantanCoreBrowserChecker.js": ["dist/temp/src/js/kantanCoreBrowserChecker.js"],
+					"dist/temp/src/js/kantanCoreUpdate.js"        : ["dist/temp/src/js/kantanCoreUpdate.js"],
+					"dist/temp/src/js/kantanCoreDraw.js"          : ["dist/temp/src/js/kantanCoreDraw.js"],
+					"dist/temp/src/js/kantanCoreSave.js"          : ["dist/temp/src/js/kantanCoreSave.js"],
+					"dist/temp/src/js/kantanCoreLocalSetting.js"  : ["dist/temp/src/js/kantanCoreLocalSetting.js"],
+					"dist/temp/src/js/kantanCorePreview.js"       : ["dist/temp/src/js/kantanCorePreview.js"],
+					"dist/temp/src/js/kantanCoreEditor.js"        : ["dist/temp/src/js/kantanCoreEditor.js"],
+					"dist/temp/src/js/kantanCoreHeadingSync.js"   : ["dist/temp/src/js/kantanCoreHeadingSync.js"],
+					"dist/temp/src/js/kantanCoreCssEditor.js"     : ["dist/temp/src/js/kantanCoreCssEditor.js"],
+					"dist/temp/src/js/kantanCoreShortcutKey.js"   : ["dist/temp/src/js/kantanCoreShortcutKey.js"],
+					"dist/temp/src/js/kantanCoreAttach.js     "   : ["dist/temp/src/js/kantanCoreAttach.js"],
+					"dist/temp/src/js/kantanHighlight.js"         : ["dist/temp/src/js/kantanHighlight.js"],
+					"dist/temp/src/js/kantankantanCoreUi.js"      : ["dist/temp/src/js/kantanCoreUi.js"],
+					"dist/temp/src/js/kantanCommon.js"            : ["dist/temp/src/js/kantanCommon.js"],
+					"dist/temp/src/js/kantanEditor.js"            : ["dist/temp/src/js/kantanEditor.js"],
+					"dist/temp/src/js/kantanMarkdown.js"          : ["dist/temp/src/js/kantanMarkdown.js"],
 				}
 			}
 		},
