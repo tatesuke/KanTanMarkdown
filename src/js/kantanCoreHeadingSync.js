@@ -2,13 +2,20 @@
 (function(prototype, ktm){
 
 	document.addEventListener('DOMContentLoaded', function() {
-		
+		on("#headingSyncButton", "click", ktm.headingSyncToPreviewer);
+		on("#previewer", "previewed", addHeadingSyncEvent);
+		on("#previewer", "prepreview", removeHeadingSyncEvent);
 	});
 	
-	/* 見出し同期 */
-	on("#headingSyncButton", "click", headingSyncToPreviewer);
-
-	on("#previewer", "previewed", function(e) {
+	prototype.headingSyncToPreviewer = function() {
+		var editor = document.getElementById("editor");
+		var previewer = document.getElementById("previewer");
+		
+		var num = getCurrentNumberOfHeading(editor);
+		scrollPreviewerToHeading(previewer, num);
+	}
+	
+	 function addHeadingSyncEvent(e) {
 		if (ktm.isEditMode()) {
 			var headings = e.target.querySelectorAll("h1, h2, h3, h4, h5, h6");
 			for (var i = 0; i < headings.length; i++) {
@@ -20,23 +27,15 @@
 				headings[i].onclick = headingSyncToEditor;
 			}
 		}
-	});
+	}
 	
-	on("#previewer", "prepreview", function(e) {
+	 function removeHeadingSyncEvent(e) {
 		var headings = document.getElementById("previewer")
 				.querySelectorAll("h1, h2, h3, h4, h5, h6");
 		for (var i = 0; i < headings.length; i++) {
 			headings[i].onmouseover = null;
 			headings[i].onclick = null;
 		}
-	});
-
-	function headingSyncToPreviewer() {
-		var editor = document.getElementById("editor");
-		var previewer = document.getElementById("previewer");
-		
-		var num = getCurrentNumberOfHeading(editor);
-		scrollPreviewerToHeading(previewer, num);
 	}
 
 	function headingSyncToEditor(e) {

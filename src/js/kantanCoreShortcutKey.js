@@ -37,10 +37,8 @@
 			if (code == 83 && (event.ctrlKey || event.metaKey)){
 				// CTRL+Sで保存する
 				event.preventDefault();
-				
-				var saveButton = document.getElementById("saveButton");
-				if (isEnable(saveButton)) {
-					saveButton.click();
+				if (isEnable(document.getElementById("saveButton"))) {
+					ktm.save();
 				}
 				return false;
 			}
@@ -98,10 +96,7 @@
 			if (code == 113) {
 				// F2で見出し同期（エディタ→プレビューア）
 				event.preventDefault();
-				
-				var headingSyncButton = document.getElementById("headingSyncButton");
-				headingSyncButton.click();
-				
+				ktm.headingSyncToPreviewer();
 				return false;
 			}
 			
