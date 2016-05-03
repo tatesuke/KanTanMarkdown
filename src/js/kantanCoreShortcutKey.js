@@ -68,21 +68,21 @@
 			if ((code == 37) && event.altKey) {
 				// Alt+←
 				event.preventDefault();
-				openPreview();
+				ktm.openPreview();
 				return false;
 			}
 
 			if ((code == 38) && event.altKey) {
 				// Alt+↑
 				event.preventDefault();
-				closeFiler();
+				ktm.closeFiler();
 				return false;
 			}
 
 			if ((code == 39) && event.altKey) {
 				// Alt+→
 				event.preventDefault();
-				closePreview();
+				ktm.closePreview();
 				return false;
 			}
 			
