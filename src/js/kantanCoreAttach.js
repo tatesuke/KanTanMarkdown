@@ -1,29 +1,174 @@
-/* アップデート機能 */
+/* ファイル添付 */
 (function(prototype, ktm){
-
+	
+	const _imageCache = {};
+	const _drawer = new KantanDrawer(document.querySelector("#drawArea"));
+	
 	document.addEventListener('DOMContentLoaded', function() {
-		/* ファイル添付 */
-		on("#attachButton", "change", function(e) {
-			var elem = e.target;
-		    var files = elem.files;
-		    attachFiles(files);
-		});
-		on("body", "dragover", function(e) {
-			e.stopPropagation();
-			e.preventDefault();
-			e.dataTransfer.dropEffect = 'copy';
-			addClass(this, 'onDragover');
-		});
-		on("body", "drop", function(e) {
-			e.stopPropagation();
-			e.preventDefault();
-			attachFiles(e.dataTransfer.files);
-			removeClass(this, "onDragover");
-		});
-		on("body", "dragleave", function(e){
-			removeClass(this, "onDragover");
-		});
+		// ファイルボタンダイアログ
+		on("#attachButton"  , "change"   , onAttachButtonChange);
+		
+		// ドラッグアンドドロップ
+		on("body"           , "dragover" , onDragOver);
+		on("body"           , "drop"     , onDrop);
+		on("body"           , "dragleave", onDragLeave);
+		
+		// 添付ファイルのボタンなど
+		initFileName();
+		on(".upButton"      , "click"    , onUpButtonClicked);
+		on(".downButton"    , "click"    , onDownButtonClicked);
+		on(".detachButton"  , "click"    , onDetachButtonClicked);
+		on(".downloadButton", "click"    , onDownloadButtonClicked);
+		on(".insertButton"  , "click"    , onInsertButtonClicked);
+		on(".editButton"    , "click"    , ktm.showDrawer);
+		on("#fileList input", "blur"     , onFileNameChanged);
+		
+		// 画像ペースト
+		on("#pasteArea"     , "paste"    , onPasteForChrome);
+		on("#pasteArea"     , "keyup"    , onPaste);
 	});
+	
+	prototype.getFileBlog = function(name, onLoaded) {
+		var script = document.getElementById("attach-" + name);
+		if (!script) {
+			onLoaded(null);
+			return;
+		}
+		
+		var base64   = script.innerHTML;
+		var mimeType = base64.match(/^\s*data:(.*);base64/)[1];
+		if (mimeType.match("^image")) {
+			ktm.loadImageByName(name, function(){}, function(imageUrl) {
+				onLoaded(base64ToBlob(imageUrl.base64));
+			});
+		} else {
+			onLoaded(base64ToBlob(base64));
+		}
+	}
+	
+	prototype.loadImageByName = function (name, onLoadSize, onLoadImage) {
+		var base64Script = document.getElementById("attach-" + name);
+		if (base64Script == null) {
+			return;
+		}
+		var rootElem = base64Script.parentNode;
+		var base64 = base64Script.innerHTML;
+		var layer64 = rootElem.querySelector("script.layerContent").innerHTML;
+		var trimInfo = rootElem.querySelector("script.trimInfo").innerHTML;
+		trimInfo = (trimInfo != "") ? JSON.parse(trimInfo) : null;
+		
+		var cached = ktm.getCachedImageUrl(name, false);
+		if (cached) {
+			onLoadImage(cached);
+			return;
+		}
+		
+		if (trimInfo == null) {
+			var url = ktm.cacheImageUrl(name, base64);
+			onLoadImage(url);
+			return;
+		}
+		
+		onLoadSize(trimInfo.w, trimInfo.h);
+		
+		var baseImage = new Image();
+		baseImage.onload = function() {
+			var canvas = document.createElement("canvas");
+			canvas.width = trimInfo.w;
+			canvas.height = trimInfo.h;
+			var ctx = canvas.getContext('2d');
+			ctx.translate(-trimInfo.x, -trimInfo.y);
+			ctx.drawImage(baseImage,0, 0);
+			if (layer64 != "") {
+				var layerImage = new Image();
+				layerImage.onload = function() {
+					ctx.drawImage(layerImage,0, 0);
+					
+					var content = canvas.toDataURL();
+					var url = ktm.cacheImageUrl(name, content);
+					onLoadImage(url);
+				};
+				layerImage.src = layer64;
+			} else {
+				var content = canvas.toDataURL();
+				var url = ktm.cacheImageUrl(name, content);
+				onLoadImage(url);
+			}
+		};
+		baseImage.src= base64;
+	}
+	
+	function initFileName() {
+		// テキストエリアの値は保存されないので、起動時に反映させる
+		var fileNameElems = document.getElementsByClassName("fileName");
+		for (var i = 0; i < fileNameElems.length; i++) {
+			var fileNameElem = fileNameElems[i];
+			var script = fileNameElem.parentNode.querySelector("script");
+			var fileName = script.title;
+			fileNameElem.value = fileName;
+		}
+	}
+
+	function onAttachButtonChange (e) {
+		var elem  = e.target;
+	    var files = elem.files;
+	    attachFiles(files);
+	}
+	
+	function onDragOver (e) {
+		e.stopPropagation();
+		e.preventDefault();
+		e.dataTransfer.dropEffect = 'copy';
+		addClass(this, 'onDragover');
+	}
+	function onDrop(e) {
+		e.stopPropagation();
+		e.preventDefault();
+		attachFiles(e.dataTransfer.files);
+		removeClass(this, "onDragover");
+	}
+	
+	function onDragLeave(e){
+		removeClass(this, "onDragover");
+	}
+	
+	function onPasteForChrome(e){
+		if (!e.clipboardData || !e.clipboardData.types) {
+			return true;
+		}
+		
+		var fileFlag = false;
+		for (var i=0; i < e.clipboardData.types.length; i++) {
+			if (e.clipboardData.types[i] == "Files") {
+				fileFlag = true;
+				break;
+			}
+		}
+		if (fileFlag == false) {
+			return true;
+		}
+		
+		e.preventDefault();
+		for (var i = 0; i < e.clipboardData.items.length; i++) {
+			attachFile(e.clipboardData.items[i].getAsFile(), "clipboard");
+		}
+		return false;
+	}
+	
+	function onPaste(e){
+		e.preventDefault();
+		
+		var dummyElement = document.createElement("div");
+		dummyElement.innerHTML = this.innerHTML;
+		var imgElement = dummyElement.querySelector("img");
+		if (imgElement) {
+			var base64 = imgElement.src;
+			ktm.addAttachFileElement("clipboard", base64, "", "", true);
+		}
+		
+		this.innerHTML = "ここをクリックしてCtrl+V(Cmd+V)するとクリップボードの画像を添付できます。";
+		return false;
+	}
 
 	function attachFiles(files){
 		for (var i = 0; i < files.length; i++) {
@@ -46,7 +191,7 @@
 		}
 	    fr.onload = function(e) {
 			var target = e.target;
-			addAttachFileElement(target.fileName, target.result, "", "", true);
+			ktm.addAttachFileElement(target.fileName, target.result, "", "", true);
 		};
 		fr.readAsDataURL(file);
 	}
@@ -99,16 +244,16 @@
 				var trimInfoElement = fileListElement[i].querySelector("script.trimInfo");
 				var trimInfo = (trimInfoElement) ? trimInfoElement.innerHTML : "";
 				
-				addAttachFileElement(fileName, content, layerContent, trimInfo, false);
+				ktm.addAttachFileElement(fileName, content, layerContent, trimInfo, false);
 			}
-			saved = false;
+			ktm.setSaved(false);
 		}
 		
 		if (result.markdown == true) {
 			var editorElement = dummyHtml.querySelector("textarea#editor")
 			var editor = document.getElementById("editor");
 			editor.value = editor.value + editorElement.value;
-			saved = false;
+			ktm.setSaved(false);
 		}
 		
 		if (result.css == true) {
@@ -118,10 +263,10 @@
 				var dummyCssEditor = dummyHtml.querySelector("#cssEditor");
 				if (styleElement.innerHTML.trim() != "") {
 					cssEditor.value = styleElement.innerHTML;
-					saved = false;
+					ktm.setSaved(false);
 				} else if (dummyCssEditor) {
 					cssEditor.value = dummyCssEditor.value;
-					saved = false;
+					ktm.setSaved(false);
 				}
 			}
 		}
@@ -129,7 +274,7 @@
 		ktm.doPreview();
 	} 
 	
-	function addAttachFileElement(fileName, content, layerContent, trimInfo, insertImgTag) {
+	prototype.addAttachFileElement = function (fileName, content, layerContent, trimInfo, insertImgTag) {
 		var name = fileName;
 		var script = document.querySelector("#fileList script[title='" + name + "']");
 		var i = 2;
@@ -229,33 +374,10 @@
 			insertToEditor(document.getElementById("editor"), tag);
 		}
 		
-		saved = false;
+		ktm.setSaved(false);
 		ktm.queuePreview();
 	}
-
-	function getFileBlog(name, onLoaded) {
-		var script = document.getElementById("attach-" + name);
-		if (!script) {
-			onLoaded(null);
-		}
-		
-		var callBack = function(imageUrl) {
-			
-		}
-		
-		var base64 = script.innerHTML;
-		var mimeType = base64.match(/^\s*data:(.*);base64/)[1];
-		if (mimeType.match("^image")) {
-			loadImageByName(name, function(){}, function(imageUrl) {
-				onLoaded(base64ToBlob(imageUrl.base64));
-			});
-		} else {
-			onLoaded(base64ToBlob(base64));
-		}
-	}
 	
-	/* 添付ファイル並び替え */
-	on(".upButton", "click", onUpButtonClicked);
 	function onUpButtonClicked(e) {
 		var currentLi = e.target.parentNode;
 		var previousLi = currentLi.previousElementSibling;
@@ -265,7 +387,6 @@
 		}
 	}
 	
-	on(".downButton", "click", onDownButtonClicked);
 	function onDownButtonClicked(e) {
 		var currentLi = e.target.parentNode;
 		var nextLi = currentLi.nextElementSibling;
@@ -275,8 +396,6 @@
 		}
 	}
 	
-	/* ファイル削除 */
-	on(".detachButton", "click", onDetachButtonClicked);
 	function onDetachButtonClicked(e) {
 		// 削除ボタンが押されたら親要素(li)ごと削除
 		if(window.confirm('削除していいですか?')){
@@ -284,20 +403,11 @@
 			var name = parent.querySelector("script").name;
 			uncacheImageUrl(name);
 			parent.parentNode.removeChild(parent);
-			saved = false;
+			ktm.setSaved(false);
 		}
 	}
 
 	/* ファイル名変更 */
-	var fileNameElems = document.getElementsByClassName("fileName");
-	for (var i = 0; i < fileNameElems.length; i++) {
-		// なぜかvale属性の変更が保存されないので起動時に引っ張ってきてやる
-		var fileNameElem = fileNameElems[i];
-		var script = fileNameElem.parentNode.querySelector("script");
-		var fileName = script.title;
-		fileNameElem.value = fileName;
-	}
-	on("#fileList input", "blur", onFileNameChanged);
 	function onFileNameChanged (e) {
 		var target = e.target;
 		var name = target.value.trim();
@@ -323,13 +433,12 @@
 		uncacheImageUrl(scriptTag.title);
 		scriptTag.id =  "attach-" + name;
 		scriptTag.title = name;
-		saved = false;
+		ktm.setSaved(false);
 		ktm.queuePreview();
 		return true;
 	}
 
 	/* 添付ファイルをエディタに挿入 */
-	on(".insertButton", "click", onInsertButtonClicked);
 	function onInsertButtonClicked (e) {
 		var target = e.target;
 		var script = target.parentNode.querySelector("script");
@@ -354,12 +463,11 @@
 	}
 	
 	/* 添付ファイルをダウンロード */
-	on(".downloadButton", "click", onDownloadButtonClicked);
 	function onDownloadButtonClicked (e) {
 		var target = e.target;
 		var script = target.parentNode.querySelector("script");
 		var fileName = script.title;
-		getFileBlog(fileName, function(blob) {
+		ktm.getFileBlog(fileName, function(blob) {
 			if (window.navigator.msSaveBlob) {
 				window.navigator.msSaveBlob(blob, fileName);
 			} else {
@@ -432,53 +540,9 @@
 		dialogElement.style.left = ((body.offsetWidth / 2.0) - (dialogElement.offsetWidth / 2.0)) + "px";
 	}
 	
-	/* お絵かき周り */
-	var drawer = new KantanDrawer(document.querySelector("#drawArea"));
-	on(".editButton", "click", ktm.showDrawer);
-	prototype.showDrawer = function(e) {
-		var rootElement = e.target.parentNode;
-		var contentElement = rootElement.querySelector("script");
-		var layerElement = rootElement.querySelector("script.layerContent");
-		var trimElement = rootElement.querySelector("script.trimInfo");
-		
-		addClass(document.querySelector("body"), "drawMode");
-		
-		var nav = document.querySelector("nav");
-		var attach = document.querySelector("#attach");
-		var wrapper = document.querySelector("#wrapper");
-		
-		hide(nav);;
-		hide(attach);
-		hide(wrapper);
-		
-		drawer.show(contentElement.innerHTML,
-				layerElement.innerHTML,
-				trimElement.innerHTML,
-				function(layerContent, trimInfo) {
-					layerElement.innerHTML = layerContent;
-					trimElement.innerHTML = trimInfo;
-					
-					showBlock(nav);
-					showBlock(attach);
-					showBlock(wrapper);
-					removeClass(document.querySelector("body"), "drawMode");
-					
-					uncacheImageUrl(contentElement.title);
-					ktm.doPreview();
-				},
-				function() {
-					showBlock(nav);
-					showBlock(attach);
-					showBlock(wrapper);
-					removeClass(document.querySelector("body"), "drawMode");
-				}
-		);
-	}
 	
-		/* 画像キャッシュ */
-	var imageUrlMap = {};
 	prototype.getCachedImageUrl = function(name, createOnNoCached) {
-		var imageUrl = imageUrlMap[name];
+		var imageUrl = _imageCache[name];
 		if ((imageUrl == null) && createOnNoCached) {
 			var element = document.getElementById("attach-" + name);
 			if (element != null) {
@@ -504,16 +568,16 @@
 					base64:base64}
 		}
 		
-		imageUrlMap[name] = imageUrl;
+		_imageCache[name] = imageUrl;
 		return imageUrl;
 	}
 
 	function uncacheImageUrl(name) {
-		var imageUrl = imageUrlMap[name];
+		var imageUrl = _imageCache[name];
 		if (window.URL && imageUrl) {
 			window.URL.revokeObjectURL(imageUrl);
 		} 
-		delete imageUrlMap[name];
+		delete _imageCache[name];
 	}
 	
 	function addAttachEditLayer(fileName, content) {
@@ -526,46 +590,46 @@
 		var parent = attach.parentNode;
 		parent.insertBefore(script, attach.nextSibling);
 	}
+	/* お絵かき周り */
+	prototype.showDrawer = function(e) {
+		var rootElement = e.target.parentNode;
+		var contentElement = rootElement.querySelector("script");
+		var layerElement = rootElement.querySelector("script.layerContent");
+		var trimElement = rootElement.querySelector("script.trimInfo");
+		
+		addClass(document.querySelector("body"), "drawMode");
+		
+		var nav = document.querySelector("nav");
+		var attach = document.querySelector("#attach");
+		var wrapper = document.querySelector("#wrapper");
+		
+		hide(nav);;
+		hide(attach);
+		hide(wrapper);
+		
+		_drawer.show(contentElement.innerHTML,
+				layerElement.innerHTML,
+				trimElement.innerHTML,
+				function(layerContent, trimInfo) {
+					layerElement.innerHTML = layerContent;
+					trimElement.innerHTML = trimInfo;
+					
+					showBlock(nav);
+					showBlock(attach);
+					showBlock(wrapper);
+					removeClass(document.querySelector("body"), "drawMode");
+					
+					uncacheImageUrl(contentElement.title);
+					ktm.doPreview();
+				},
+				function() {
+					showBlock(nav);
+					showBlock(attach);
+					showBlock(wrapper);
+					removeClass(document.querySelector("body"), "drawMode");
+				}
+		);
+	}
 	
-	/* 画面キャプチャ貼り付け */
-	// Chrome向け
-	on("#pasteArea", "paste",function(e){
-		if (!e.clipboardData || !e.clipboardData.types) {
-			return true;
-		}
-		
-		var fileFlag = false;
-		for (var i=0; i < e.clipboardData.types.length; i++) {
-			if (e.clipboardData.types[i] == "Files") {
-				fileFlag = true;
-				break;
-			}
-		}
-		if (fileFlag == false) {
-			return true;
-		}
-		
-		e.preventDefault();
-		for (var i = 0; i < e.clipboardData.items.length; i++) {
-			attachFile(e.clipboardData.items[i].getAsFile(), "clipboard");
-		}
-		return false;
-	});
-	
-	// FF, IE向け
-	on("#pasteArea", "keyup",function(e){
-		e.preventDefault();
-		
-		var dummyElement = document.createElement("div");
-		dummyElement.innerHTML = this.innerHTML;
-		var imgElement = dummyElement.querySelector("img");
-		if (imgElement) {
-			var base64 = imgElement.src;
-			addAttachFileElement("clipboard", base64, "", "", true);
-		}
-		
-		this.innerHTML = "ここをクリックしてCtrl+V(Cmd+V)するとクリップボードの画像を添付できます。";
-		return false;
-	});
 
 })(prototype, ktm);

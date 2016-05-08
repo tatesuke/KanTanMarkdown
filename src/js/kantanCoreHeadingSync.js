@@ -1,37 +1,39 @@
-/* アップデート機能 */
+/* 見出し同期 */
 (function(prototype, ktm){
 
+	const _$headingSyncButton = document.getElementById("headingSyncButton");
+	const _$editor            = document.getElementById("editor");
+	const _$previewer         = document.getElementById("previewer");
+
 	document.addEventListener('DOMContentLoaded', function() {
-		on("#headingSyncButton", "click", ktm.headingSyncToPreviewer);
-		on("#previewer", "previewed", addHeadingSyncEvent);
-		on("#previewer", "prepreview", removeHeadingSyncEvent);
+		on(_$headingSyncButton, "click"     , ktm.headingSyncToPreviewer);
+		on(_$previewer        , "previewed" , addHeadingSyncEvent);
+		on(_$previewer        , "prepreview", removeHeadingSyncEvent);
 	});
 	
-	prototype.headingSyncToPreviewer = function() {
-		var editor = document.getElementById("editor");
-		var previewer = document.getElementById("previewer");
-		
-		var num = getCurrentNumberOfHeading(editor);
-		scrollPreviewerToHeading(previewer, num);
+	prototype.headingSyncToPreviewer = function() {		
+		var num = getCurrentNumberOfHeading();
+		scrollPreviewerToHeading(num);
 	}
 	
 	 function addHeadingSyncEvent(e) {
-		if (ktm.isEditMode()) {
-			var headings = e.target.querySelectorAll("h1, h2, h3, h4, h5, h6");
-			for (var i = 0; i < headings.length; i++) {
-				// 見出しにイベントを設定する。メモリリーク対策でプレビュー時に
-				// イベントを外しやすくするために、on**で実装する。 
-				headings[i].onmouseover = function(){
-					this.style.cursor = "pointer";
-				}
-				headings[i].onclick = headingSyncToEditor;
+		if (!ktm.isEditMode()) {
+			return;
+		}
+		
+		var headings = e.target.querySelectorAll("h1, h2, h3, h4, h5, h6");
+		for (var i = 0; i < headings.length; i++) {
+			// 見出しにイベントを設定する。メモリリーク対策でプレビュー時に
+			// イベントを外しやすくするために、on**で実装する。 
+			headings[i].onmouseover = function(){
+				this.style.cursor = "pointer";
 			}
+			headings[i].onclick = headingSyncToEditor;
 		}
 	}
 	
 	 function removeHeadingSyncEvent(e) {
-		var headings = document.getElementById("previewer")
-				.querySelectorAll("h1, h2, h3, h4, h5, h6");
+		var headings = _$previewer.querySelectorAll("h1, h2, h3, h4, h5, h6");
 		for (var i = 0; i < headings.length; i++) {
 			headings[i].onmouseover = null;
 			headings[i].onclick = null;
@@ -39,14 +41,12 @@
 	}
 
 	function headingSyncToEditor(e) {
-		var editor = document.getElementById("editor");
-		var previewer = document.getElementById("previewer");
-		var num = getNumberOfHeading(previewer, e.target);
-		scrollEditorToHeading(editor, num);
+		var num = getNumberOfHeading(e.target);
+		scrollEditorToHeading(num);
 	}
 
-	function getNumberOfHeading(previewer, elem) {
-		var headings = previewer.querySelectorAll("h1, h2, h3, h4, h5, h6");
+	function getNumberOfHeading(elem) {
+		var headings = _$previewer.querySelectorAll("h1, h2, h3, h4, h5, h6");
 		var i;
 		for (i = 0; i < headings.length; i++) {
 			if (headings[i] == elem) {
@@ -56,10 +56,9 @@
 		return i + 1;
 	}
 
-	function scrollEditorToHeading(editor, num) {
-		var value = editor.value;
+	function scrollEditorToHeading(num) {
+		var value = _$editor.value;
 		var processedLines = processForHeadingSync(value, value.length);
-
 		
 		var headingCount = 0;
 		var i;
@@ -89,25 +88,25 @@
 			}
 		}
 		
-		var end = editor.value.indexOf("\n", j);
-		end = (end == -1) ? editor.value.length : end;
+		var end = _$editor.value.indexOf("\n", j);
+		end = (end == -1) ? _$editor.value.length : end;
 		
-		editor.selectionStart = j;
-		editor.selectionEnd = end;
-		updateScrollPos(editor);
+		_$editor.selectionStart = j;
+		_$editor.selectionEnd = end;
+		updateScrollPos(_$editor);
 		// chromeだとupdateScrollPosのバグで強制的にsaved=trueになってしまう
 		// そのため、updateSavedFlagを呼び出して元に戻す。
 		// TODO いつか治したい
 		ktm.updateSavedFlag();
-		editor.focus();
+		_$editor.focus();
 	}
 
-	function getCurrentNumberOfHeading(editor) {
-		var value = editor.value;
+	function getCurrentNumberOfHeading() {
+		var value = _$editor.value;
 		
 		// ==や--によるheadingに対応するため
 		// キャレットの次の行まで読み込む
-		var length = editor.selectionStart;
+		var length = _$editor.selectionStart;
 		var lineBreakCount = 0;
 		while ((length < value.length) && (lineBreakCount < 2)) {
 			if (value.charAt(length) == "\n") {
@@ -126,13 +125,13 @@
 		return processed.join().split("# ").length - 1;
 	}
 
-	function scrollPreviewerToHeading(previewer, numberOfHeading) {
+	function scrollPreviewerToHeading(numberOfHeading) {
 		if (numberOfHeading == 0) {
-			previewer.scrollTop = 0;
+			_$previewer.scrollTop = 0;
 		} else {
-			var hElems = previewer.querySelectorAll("h1, h2, h3, h4, h5, h6");
+			var hElems = _$previewer.querySelectorAll("h1, h2, h3, h4, h5, h6");
 			var elem = hElems[numberOfHeading - 1];
-			previewer.scrollTop = elem.offsetTop - previewer.offsetTop;
+			_$previewer.scrollTop = elem.offsetTop - _$previewer.offsetTop;
 		}
 	}
 
@@ -141,8 +140,8 @@
 		var lines = text.split("\n");
 		var newLines = [];
 		
-		var style = editor.currentStyle 
-				|| document.defaultView.getComputedStyle(editor, '');
+		var style = _$editor.currentStyle 
+				|| document.defaultView.getComputedStyle(_$editor, '');
 		var tabSize = style.tabSize
 					|| style.MozTabSize
 					|| 8;

@@ -1,6 +1,10 @@
-/* アップデート機能 */
+/* プレビュー周り */
 (function(prototype, ktm){
 
+	const queuePreviewWait = 300;
+	
+	var previewQueue = null;
+	
 	document.addEventListener('DOMContentLoaded', function() {
 		//更新ボタンを押したら更新する 
 		on("#syncButton", "click", ktm.doPreview);
@@ -10,10 +14,9 @@
 		on("#editor", "keyup", ktm.queuePreview);
 	});
 	
+	
 	// 自動更新がONならプレビューする
 	// ただし、onkeyupなど呼ばれる頻度が高いので一定時間待って最後の呼び出しのみ実行する
-	var previewQueue = null; // キューをストック 
-	var queuePreviewWait = 300; // 0.3秒後に実行の場合 
 	prototype.queuePreview = function() {
 		var settingAutoSync = document.getElementById("settingAutoSync");
 		if (!settingAutoSync.checked) {
@@ -56,9 +59,6 @@
 		} else {
 			document.title = "無題";
 		}
-		if (ktm.isSaved() == false) {
-			document.title = "* " + document.title;
-		}
 		
 		// 画像埋め込み
 		var images = document.querySelectorAll("#previewer img");
@@ -72,18 +72,20 @@
 		for(i in anchors) {
 			var anchor = anchors[i];
 			var href = anchor.href;
-			if (href) {
-				var matchs = href.trim().match(/^attach:(.+)/);
-				if (matchs) {
-					var name = decodeURIComponent(matchs[1]);
-					getFileBlog(name, function(blob){
-						var url = window.URL || window.webkitURL;
-						var blobUrl = url.createObjectURL(blob);
-						anchor.href = blobUrl;
-						anchor.download = name;
-					});
-				}
+			if (!href) {
+				continue;
 			}
+			var matchs = href.trim().match(/^attach:(.+)/);
+			if (!matchs) {
+				continue;
+			}
+			var name = decodeURIComponent(matchs[1]);
+			ktm.getFileBlog(name, function(blob){
+				var url = window.URL || window.webkitURL;
+				var blobUrl = url.createObjectURL(blob);
+				anchor.href = blobUrl;
+				anchor.download = name;
+			});
 		}
 		
 		
@@ -184,9 +186,9 @@
 			return;
 		}
 		
-		loadImageByName(
+		ktm.loadImageByName(
 				name,
-				function(width, height) {
+				function (width, height) {
 				 	// 大きさが決まったら仮のイメージで領域だけ確保しておく
 					var canvas = document.createElement("canvas");
 					canvas.width = width;
@@ -196,57 +198,6 @@
 				function(imageUrl) {
 					elem.src = imageUrl.blobOrBase64;
 				});
-	}
-	
-	function loadImageByName(name, onLoadSize, onLoadImage) {
-		var base64Script = document.getElementById("attach-" + name);
-		if (base64Script != null) {
-			var rootElem = base64Script.parentNode;
-			var base64 = base64Script.innerHTML;
-			var layer64 = rootElem.querySelector("script.layerContent").innerHTML;
-			var trimInfo = rootElem.querySelector("script.trimInfo").innerHTML;
-			trimInfo = (trimInfo != "") ? JSON.parse(trimInfo) : null;
-			
-			var cached = ktm.getCachedImageUrl(name, false);
-			if (cached) {
-				onLoadImage(cached);
-				return;
-			}
-			
-			if (trimInfo == null) {
-				var url = ktm.cacheImageUrl(name, base64);
-				onLoadImage(url);
-				return;
-			}
-			
-			onLoadSize(trimInfo.w, trimInfo.h);
-			
-			var baseImage = new Image();
-			baseImage.onload = function() {
-				var canvas = document.createElement("canvas");
-				canvas.width = trimInfo.w;
-				canvas.height = trimInfo.h;
-				var ctx = canvas.getContext('2d');
-				ctx.translate(-trimInfo.x, -trimInfo.y);
-				ctx.drawImage(baseImage,0, 0);
-				if (layer64 != "") {
-					var layerImage = new Image();
-					layerImage.onload = function() {
-						ctx.drawImage(layerImage,0, 0);
-						
-						var content = canvas.toDataURL();
-						var url = ktm.cacheImageUrl(name, content);
-						onLoadImage(url);
-					};
-					layerImage.src = layer64;
-				} else {
-					var content = canvas.toDataURL();
-					var url = ktm.cacheImageUrl(name, content);
-					onLoadImage(url);
-				}
-			};
-			baseImage.src= base64;
-		}
 	}
 	
 	function isMaxScroll (id) {

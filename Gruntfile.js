@@ -65,13 +65,9 @@ module.exports = function(grunt) {
 				files: {
 					"dist/temp/src/js/kantanCoreBrowserChecker.js": ["dist/temp/src/js/kantanCoreBrowserChecker.js"],
 					"dist/temp/src/js/kantanCoreUpdate.js"        : ["dist/temp/src/js/kantanCoreUpdate.js"],
-					"dist/temp/src/js/kantanCoreDraw.js"          : ["dist/temp/src/js/kantanCoreDraw.js"],
 					"dist/temp/src/js/kantanCoreSave.js"          : ["dist/temp/src/js/kantanCoreSave.js"],
-					"dist/temp/src/js/kantanCoreLocalSetting.js"  : ["dist/temp/src/js/kantanCoreLocalSetting.js"],
 					"dist/temp/src/js/kantanCorePreview.js"       : ["dist/temp/src/js/kantanCorePreview.js"],
-					"dist/temp/src/js/kantanCoreEditor.js"        : ["dist/temp/src/js/kantanCoreEditor.js"],
 					"dist/temp/src/js/kantanCoreHeadingSync.js"   : ["dist/temp/src/js/kantanCoreHeadingSync.js"],
-					"dist/temp/src/js/kantanCoreCssEditor.js"     : ["dist/temp/src/js/kantanCoreCssEditor.js"],
 					"dist/temp/src/js/kantanCoreShortcutKey.js"   : ["dist/temp/src/js/kantanCoreShortcutKey.js"],
 					"dist/temp/src/js/kantanCoreAttach.js     "   : ["dist/temp/src/js/kantanCoreAttach.js"],
 					"dist/temp/src/js/kantanHighlight.js"         : ["dist/temp/src/js/kantanHighlight.js"],

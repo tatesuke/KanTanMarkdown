@@ -1,11 +1,19 @@
-/* アップデート機能 */
+/* 
+ * アップデート機能 
+ * JOSONPでアップデート
+ */
 (function(prototype, ktm){
+
+	const _UPDATE_URL = "http://tatesuke.github.io/KanTanMarkdown/kantanUpdate.js";
+	// const UPDATE_URL = "http://localhost:3000/kantanUpdate.js";
 
 	document.addEventListener('DOMContentLoaded', function() {
 		/* アップデート */
-	    updateKantanVersion(document.getElementById("kantanVersion").value);
-	    
-	    on("#updateButton", "click", function(event) {
+	    ktm.rewriteKantanVersion(document.getElementById("kantanVersion").value);
+	    on("#updateButton", "click", requestUpdate);
+	});
+	
+	function requestUpdate(event) {
 			event.preventDefault();
 			
 			if(!window.confirm(
@@ -18,8 +26,7 @@
 			}
 			
 			var script = document.createElement("script");
-			script.src = "http://tatesuke.github.io/KanTanMarkdown/kantanUpdate.js";
-			//script.src = "http://localhost:3000/kantanUpdate.js";
+			script.src = _UPDATE_URL;
 			script.class = "kantanUpdateScript";
 			script.onerror = function () {
 				alert("アップデートに失敗しました。\n" + 
@@ -29,24 +36,22 @@
 			document.querySelector("#updateScriptArea").appendChild(script);
 			
 			return false;
-		});
-	    
-	});
-	
-	function updateKantanVersion (version) {
-			document.getElementById("kantanVersion").value = version;
-			var edition = document.getElementById("kantanEdition").value;
-			var versionElements = document.getElementsByClassName("version");
-			for (var i = 0 ; i < versionElements.length; i++) {
-				versionElements[i].innerText = version + "_" + edition;
-			}
 		}
 	
-	function updateKantanEdition (edition) {
+	prototype.rewriteKantanVersion = function (version) {
+		document.getElementById("kantanVersion").value = version;
+		var edition = document.getElementById("kantanEdition").value;
+		var versionElements = document.getElementsByClassName("version");
+		for (var i = 0 ; i < versionElements.length; i++) {
+			versionElements[i].innerText = version + "_" + edition;
+		}
+	}
+	
+	prototype.updateKantanEdition = function (edition) {
 		document.getElementById("kantanEdition").value = edition;
 	}
 	
-	function kantanUpdate(json) {
+	prototype.kantanUpdate = function (json) {
 		json.doUpdate();
 	}
 	

@@ -1,24 +1,27 @@
 /* 基本的なUIの制御 */
 (function(prototype, ktm){
 	
-	const $body                = document.body;
-	const $onlineMenuButton    = document.getElementById("onlineMenuButton");
-	const $settingMenuButton   = document.getElementById("settingMenuButton");
-	const $toggleButton        = document.getElementById("toggleButton");
-	const $attachToggleButton  = document.getElementById("attachToggleButton");
-	const $previewToggleButton = document.getElementById("previewToggleButton");
-	const $markdownTab         = document.getElementById("markdownTab");
-	const $cssTab              = document.getElementById("cssTab");
-	const $editorTabWrapper    = document.getElementById("editorTabWrapper");
-	const $attach              = document.getElementById("attach");
-	const $editor              = document.getElementById("editor");
-	const $previewer           = document.getElementById("previewer");
-	const $wrapper             = document.getElementById("wrapper");
-	const $attachForm          = document.getElementById("attachForm");
-	const $filer               = document.getElementById("filer");
-	const $onlineMenu          = document.getElementById("onlineMenu");
-	const $settingMenu         = document.getElementById("settingMenu");
-	const $cssEditor           = document.getElementById("cssEditor");
+	const _$body                = document.body;
+	const _$onlineMenuButton    = document.getElementById("onlineMenuButton");
+	const _$settingMenuButton   = document.getElementById("settingMenuButton");
+	const _$settingAutoSync     = document.getElementById("settingAutoSync");
+	const _$toggleButton        = document.getElementById("toggleButton");
+	const _$attachToggleButton  = document.getElementById("attachToggleButton");
+	const _$previewToggleButton = document.getElementById("previewToggleButton");
+	const _$markdownTab         = document.getElementById("markdownTab");
+	const _$cssTab              = document.getElementById("cssTab");
+	const _$editorTabWrapper    = document.getElementById("editorTabWrapper");
+	const _$attach              = document.getElementById("attach");
+	const _$editor              = document.getElementById("editor");
+	const _$previewer           = document.getElementById("previewer");
+	const _$wrapper             = document.getElementById("wrapper");
+	const _$attachForm          = document.getElementById("attachForm");
+	const _$filer               = document.getElementById("filer");
+	const _$onlineMenu          = document.getElementById("onlineMenu");
+	const _$settingMenu         = document.getElementById("settingMenu");
+	const _$cssEditor           = document.getElementById("cssEditor");
+	
+	var _contentAtSave = _$editor.value;
 	
 	var _editorScrollBarPos = 0;
 	var _caretStartPos      = 0;
@@ -27,24 +30,46 @@
 
 	document.addEventListener('DOMContentLoaded', function() {
 		initLayout();
-		on(window              , "resize", ktm.doLayout);
-		on($onlineMenuButton   , "click" , showOnlineMenu);
-		on($body               , "click" , hideOnlineMenuIfNecessary);
-		on($settingMenuButton  , "click" , showSettingMenu);
-		on($body               , "click" , hideSettingMenuIfNecessary);
-		on($toggleButton       , "click" , ktm.toggleMode);
-		on($attachToggleButton , "click" , toggleAttach);
-		on($previewToggleButton, "click" , togglePreview);
-		on($markdownTab        , "click" , showMarkdown);
-		on($cssTab             , "click" , showCss); 
+		on(window               , "resize", ktm.doLayout);
+		on(_$onlineMenuButton   , "click" , showOnlineMenu);
+		on(_$body               , "click" , hideOnlineMenuIfNecessary);
+		on(_$toggleButton       , "click" , ktm.toggleMode);
+		on(_$attachToggleButton , "click" , toggleAttach);
+		on(_$previewToggleButton, "click" , togglePreview);
+		on(_$editor             , "input" , ktm.updateSavedFlag);
+		on(_$markdownTab        , "click" , showMarkdownEditor);
+		on(_$cssTab             , "click" , showCssEditor); 
+		
+		toKantanEditor(document.getElementById("cssEditor"));
+		toKantanEditor(document.getElementById("editor"));
+	
+		
+		on(_$body  , "ktm_before_save", beforeSave);
+		on(_$editor, "input", ktm.updateSavedFlag);
+		on("#cssEditor", "input", cssChanged);
+	
+		initLocalSetting();
 	});
+	
+	function cssChanged() {
+		ktm.setSaved(false);
+	}
+	
+	function beforeSave(){
+		_contentAtSave = _$editor.value;
+	}
+	
+	prototype.updateSavedFlag = function() {
+		var saved = (_contentAtSave === _$editor.value);
+		ktm.setSaved(saved);
+	}
 		
 	prototype.isEditMode = function () {
-		return isVisible($editorTabWrapper);
+		return isVisible(_$editorTabWrapper);
 	}
 	
 	prototype.isDrawMode = function () {
-		return $body.classList.contains("drawMode");
+		return _$body.classList.contains("drawMode");
 	}
 	
 	prototype.toggleMode = function() {
@@ -56,31 +81,31 @@
 	}
 	
 	prototype.doLayout = function() {
-		var wrapperHeight     = window.innerHeight - $wrapper.offsetTop - 10;
-		$wrapper.style.height = wrapperHeight + "px";
+		var wrapperHeight     = window.innerHeight - _$wrapper.offsetTop - 10;
+		_$wrapper.style.height = wrapperHeight + "px";
 	}
 
 	prototype.openFiler = function() {
-		$attachToggleButton.innerText = "添付ファイルを隠す(Alt+↑)";
-		showBlock($attachForm);
-		showBlock($filer);
+		_$attachToggleButton.innerText = "添付ファイルを隠す(Alt+↑)";
+		showBlock(_$attachForm);
+		showBlock(_$filer);
 		ktm.doLayout();
 	}
 	
 	prototype.closeFiler = function() {
-		attachToggleButton.innerText = "添付ファイルを表示(Alt+↓)";
-		hide($attachForm);
-		hide($filer);
+		_$attachToggleButton.innerText = "添付ファイルを表示(Alt+↓)";
+		hide(_$attachForm);
+		hide(_$filer);
 		ktm.doLayout();
 	}
 
 	prototype.openPreview = function() {
 		// エディタサイズに相対値を利用しているためプレビュー表示されていない場合のみ実行
 		// 閲覧モード時は実行しない
-		if (ktm.isEditMode() && !isVisible($previewer)) {
-			$previewToggleButton.innerText = "プレビューを隠す(Alt+→)";
-			removeClass($editorTabWrapper, "fullWidth");
-			showBlock($previewer);
+		if (ktm.isEditMode() && !isVisible(_$previewer)) {
+			_$previewToggleButton.innerText = "プレビューを隠す(Alt+→)";
+			removeClass(_$editorTabWrapper, "fullWidth");
+			showBlock(_$previewer);
 			ktm.doLayout();
 		}
 	}
@@ -88,20 +113,20 @@
 	prototype.closePreview = function() {
 		// エディタサイズに相対値を利用しているためプレビュー表示されている場合のみ実行
 		// 閲覧モード時は実行しない
-		if (ktm.isEditMode() && isVisible($previewer)) {
-			$previewToggleButton.innerText = "プレビューを表示(Alt+←)";
-			addClass($editorTabWrapper, "fullWidth");
-			hide($previewer);
+		if (ktm.isEditMode() && isVisible(_$previewer)) {
+			_$previewToggleButton.innerText = "プレビューを表示(Alt+←)";
+			addClass(_$editorTabWrapper, "fullWidth");
+			hide(_$previewer);
 			ktm.doLayout();
 		}
 	}
 	
 	function initLayout() {
-		addClass($body, "previewMode");
-		removeClass($body, "editMode");
-		removeClass($body, "initialState");
+		addClass(_$body, "previewMode");
+		removeClass(_$body, "editMode");
+		removeClass(_$body, "initialState");
 		
-		if (isEnable($toggleButton) && ($editor.innerHTML == "")) {
+		if (isEnable(_$toggleButton) && (_$editor.innerHTML == "")) {
 			// 編集モードでなく、内容が空であれば初期状態を編集モードにする
 			ktm.toggleMode();
 		} else {
@@ -110,40 +135,70 @@
 		
 		ktm.doLayout();
 	}
+	
+	function initLocalSetting() {
+		on(_$settingMenuButton  , "click" , showSettingMenu);
+		/* 端末固有設定 */
+		// 現在のところチェックボックスのみなので
+		// チェックボックスに特化して実装している
+		var saveValueElements = _$settingMenu.querySelectorAll("input[type=checkbox]");
+		for (var i = 0; i < saveValueElements.length; i++) {
+			var element    = saveValueElements[i];
+			var savedValue = getItem(element.id, null);
+			
+			element.checked = (savedValue != null) && (savedValue == "true");
+			
+			on (element, "change", function() {
+				setItem(this.id, this.checked);
+			});
+		}
+		
+		// 自動同期チェックボックスをクリックしたらchecked属性を更新する
+		// これを行わないと自動同期チェックボックスの状態が保存されない
+		on(_$settingAutoSync, "change", function() {
+			if (this.checked == true) {
+				this.setAttribute("checked", "checked");
+			} else {
+				this.removeAttribute("checked");
+			}
+		});
+		
+		on(_$body , "click" , hideSettingMenuIfNecessary);
+	}
 
 	function showOnlineMenu(){
-		var b = $onlineMenuButton;
-		$onlineMenu.style.top = (b.offsetTop + b.scrollHeight) + "px";
-		showBlock($onlineMenu);
+		var b = _$onlineMenuButton;
+		_$onlineMenu.style.top = (b.offsetTop + b.scrollHeight) + "px";
+		showBlock(_$onlineMenu);
 	}
 
 	function hideOnlineMenuIfNecessary (e) {
-		if (e.target != $onlineMenuButton) {
-			hide($onlineMenu);
+		if (e.target != _$onlineMenuButton) {
+			hide(_$onlineMenu);
 		}
 	}
 
 	function showSettingMenu(){
-		var b = $settingMenuButton;
-		$settingMenu.style.top  = (b.offsetTop + b.scrollHeight) + "px";
-		$settingMenu.style.left = b.offsetLeft + "px";
-		showBlock($settingMenu);
+		var b = _$settingMenuButton;
+		_$settingMenu.style.top  = (b.offsetTop + b.scrollHeight) + "px";
+		_$settingMenu.style.left = b.offsetLeft + "px";
+		showBlock(_$settingMenu);
 	}
 
 	function hideSettingMenuIfNecessary (e){
 		var current = e.target;
 		while (current != null) {
-			if ((current ==  $settingMenuButton) || (current == $settingMenu)) {
+			if ((current ==  _$settingMenuButton) || (current == _$settingMenu)) {
 				return true;
 			}
 			current = current.parentNode;
 		}
 		
-		hide($settingMenu);
+		hide(_$settingMenu);
 	}
 	
 	function toggleAttach () {
-		if (isVisible($filer)){
+		if (isVisible(_$filer)){
 			ktm.closeFiler();
 		} else {
 			ktm.openFiler();
@@ -151,7 +206,7 @@
 	}
 
 	function togglePreview() {
-		if (isVisible($previewer)){
+		if (isVisible(_$previewer)){
 			ktm.closePreview();
 		} else {
 			ktm.openPreview();
@@ -159,25 +214,25 @@
 	}
 	
 	function changeToPreviewMode() {
-		_editorScrollBarPos = $editor.scrollTop;
-		_caretStartPos      = $editor.selectionStart;
-		_caretEndPos        = $editor.selectionEnd;
-		_isPreviewerOpened  = isVisible($previewer);
+		_editorScrollBarPos = _$editor.scrollTop;
+		_caretStartPos      = _$editor.selectionStart;
+		_caretEndPos        = _$editor.selectionEnd;
+		_isPreviewerOpened  = isVisible(_$previewer);
 		
 		if (_isPreviewerOpened == false) {
 			openPreview();
 		}
 		
-		hide($attach);
-		hide($editorTabWrapper);
+		hide(_$attach);
+		hide(_$editorTabWrapper);
 		ktm.doPreview();
 		
 		// スクロールバー位置記憶
 		var minDiff = null;
 		var minElem = null;
-		var elems   = $previewer.querySelectorAll("*");
+		var elems   = _$previewer.querySelectorAll("*");
 		for (var i = 0; i < elems.length; i++) {
-			var diff = $previewer.scrollTop - (elems[i].offsetTop - $previewer.offsetTop);
+			var diff = _$previewer.scrollTop - (elems[i].offsetTop - _$previewer.offsetTop);
 			if ((minDiff == null) || (Math.abs(diff) < Math.abs(minDiff))) {
 				minDiff = diff;
 				minElem = elems[i];
@@ -185,28 +240,28 @@
 		}	
 		
 		// レイアウト修正
-		addClass($body, "previewMode");
-		removeClass($body, "editMode");
+		addClass(_$body, "previewMode");
+		removeClass(_$body, "editMode");
 		ktm.doLayout();
 		
-		$previewer.focus();
+		_$previewer.focus();
 		
 		if (minElem) {
-			wrapper.scrollTop = (minElem.offsetTop - $previewer.offsetTop) + minDiff;
+			wrapper.scrollTop = (minElem.offsetTop - _$previewer.offsetTop) + minDiff;
 		}
 	}
 	
 	function changeToEditMode() {
-		showBlock($attach);
-		showBlock($editorTabWrapper);
+		showBlock(_$attach);
+		showBlock(_$editorTabWrapper);
 		ktm.doPreview();
 
 		// スクロールバー位置記憶
 		var minDiff = null;
 		var minElem = null;
-		var elems   = $previewer.querySelectorAll("*");
+		var elems   = _$previewer.querySelectorAll("*");
 		for (var i = 0; i < elems.length; i++) {
-			var diff = wrapper.scrollTop - (elems[i].offsetTop - $previewer.offsetTop);
+			var diff = wrapper.scrollTop - (elems[i].offsetTop - _$previewer.offsetTop);
 			if ((minDiff == null) || (Math.abs(diff) < Math.abs(minDiff))) {
 				minDiff = diff;
 				minElem = elems[i];
@@ -218,42 +273,42 @@
 		}
 
 		// レイアウト修正
-		removeClass($body, "previewMode");
-		addClass($body, "editMode");
+		removeClass(_$body, "previewMode");
+		addClass(_$body, "editMode");
 		ktm.doLayout();
 
 		if (minElem) {
-			$previewer.scrollTop = (minElem.offsetTop - $previewer.offsetTop) + minDiff;
+			_$previewer.scrollTop = (minElem.offsetTop - _$previewer.offsetTop) + minDiff;
 		}
 
-		$editor.focus();
-		$editor.scrollTop      = _editorScrollBarPos;
-		$editor.selectionStart = _caretStartPos;
-		$editor.selectionEnd   = _caretEndPos;
+		_$editor.focus();
+		_$editor.scrollTop      = _editorScrollBarPos;
+		_$editor.selectionStart = _caretStartPos;
+		_$editor.selectionEnd   = _caretEndPos;
 	}
 
-	function showMarkdown(e) {
+	function showMarkdownEditor(e) {
 		e.preventDefault();
 		
-		addClass($markdownTab.parentNode, "selected");
-		showBlock($editor);
-		$editor.focus();
+		addClass(_$markdownTab.parentNode, "selected");
+		showBlock(_$editor);
+		_$editor.focus();
 		
 		removeClass(cssTab.parentNode, "selected");
-		hide($cssEditor);
+		hide(_$cssEditor);
 		
 		return false;
 	}
 	
-	function showCss(e) {
+	function showCssEditor(e) {
 		e.preventDefault();
 		
 		removeClass(markdownTab.parentNode, "selected");
-		hide($editor);
+		hide(_$editor);
 		
 		addClass(cssTab.parentNode, "selected");
-		showBlock($cssEditor);
-		$cssEditor.focus();
+		showBlock(_$cssEditor);
+		_$cssEditor.focus();
 		
 		return false;
 	}

@@ -173,3 +173,15 @@ function updateScrollPos(editor) {
 		editor.selectionEnd = selectionEnd;
 	}
 }
+
+function trigger(elem, eventName, data) {
+	var event;
+	if (window.CustomEvent) {
+		event = new CustomEvent('custom-event', {detail: data});
+	} else {
+		event = document.createEvent('CustomEvent');
+		event.initCustomEvent('custom-event', true, true, data);
+	}
+	
+	elem.dispatchEvent(event);
+}

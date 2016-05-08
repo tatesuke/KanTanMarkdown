@@ -1,13 +1,25 @@
 /* アップデート機能 */
 (function(prototype, ktm){
 
+	const KEY_CODE_LEFT  = 37;
+	const KEY_CODE_UP    = 38;
+	const KEY_CODE_RIGHT = 39;
+	const KEY_CODE_DOWN  = 40;
+	const KEY_CODE_R     = 82;
+	const KEY_CODE_S     = 83;
+	const KEY_CODE_ESC   = 27;
+	const KEY_CODE_F1    = 112;
+	const KEY_CODE_F2    = 113;
+	const KEY_CODE_F5    = 116;
+	
 	document.addEventListener('DOMContentLoaded', function() {
 		/* ショートカットキー */
 		on("body", "keydown", function(event) {
 			var code = (event.keyCode ? event.keyCode : event.which);
 			
 			if (ktm.isDrawMode()) {
-				if (code == 83 && (event.ctrlKey || event.metaKey)){
+				// DrawModeでのCtrl+Sを抑止する
+				if (code == KEY_CODE_S && (event.ctrlKey || event.metaKey)){
 					event.preventDefault();
 					return false;
 				} else {
@@ -15,7 +27,7 @@
 				}
 			}
 			
-			if (code == 27) {
+			if (code == KEY_CODE_ESC) {
 				// ESCキー
 				event.preventDefault();
 				
@@ -34,7 +46,7 @@
 			}
 			
 			
-			if (code == 83 && (event.ctrlKey || event.metaKey)){
+			if (code == KEY_CODE_S && (event.ctrlKey || event.metaKey)){
 				// CTRL+Sで保存する
 				event.preventDefault();
 				if (isEnable(document.getElementById("saveButton"))) {
@@ -43,8 +55,8 @@
 				return false;
 			}
 			
-			if (code == 116 ||
-					((code == 82) && (event.ctrlKey || event.metaKey))){
+			if (code == KEY_CODE_F5 ||
+					((code == KEY_CODE_R) && (event.ctrlKey || event.metaKey))){
 				// F5 or Ctrl + Rでエディタとプレビューアを同期
 				event.preventDefault();
 				
@@ -55,7 +67,7 @@
 				return false;
 			}
 			
-			if (code == 112){
+			if (code == KEY_CODE_F1){
 				// F1でヘルプ
 				event.preventDefault();
 				
@@ -65,35 +77,35 @@
 				return false;
 			}
 
-			if ((code == 37) && event.altKey) {
+			if ((code == KEY_CODE_LEFT) && event.altKey) {
 				// Alt+←
 				event.preventDefault();
 				ktm.openPreview();
 				return false;
 			}
 
-			if ((code == 38) && event.altKey) {
+			if ((code == KEY_CODE_UP) && event.altKey) {
 				// Alt+↑
 				event.preventDefault();
 				ktm.closeFiler();
 				return false;
 			}
 
-			if ((code == 39) && event.altKey) {
+			if ((code == KEY_CODE_RIGHT) && event.altKey) {
 				// Alt+→
 				event.preventDefault();
 				ktm.closePreview();
 				return false;
 			}
 			
-			if ((code == 40) && event.altKey) {
+			if ((code == KEY_CODE_DOWN) && event.altKey) {
 				// Alt+↓
 				event.preventDefault();
 				ktm.openFiler();
 				return false;
 			}
 			
-			if (code == 113) {
+			if (code == KEY_CODE_F2) {
 				// F2で見出し同期（エディタ→プレビューア）
 				event.preventDefault();
 				ktm.headingSyncToPreviewer();
